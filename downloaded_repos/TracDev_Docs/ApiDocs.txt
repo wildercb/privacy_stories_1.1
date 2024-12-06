@@ -1,0 +1,201 @@
+Trac API Documentation
+The code is the authoritative source of documentation, and most classes and methods have a corresponding Python "doc string". How the documentation that has been added to the code can be viewed and generated is explained on this page.
+View the documentation
+Besides the
+TracBrowser
+and looking directly at the code, you can also read the generated
+​
+API
+documentation, which shows the public API in a nicely organized and rendered way:
+Line of development
+Sphinx documentation
+(
+apidoc
+)
+Epydoc
+(
+apiref
+)
+HTML
+PDF
+Trac 1.5.
+x
+(trunk)
+​
+trunk
+—
+​
+trunk
+Trac 1.4
+​
+1.4-stable
+—
+​
+1.4-stable
+Trac 1.2
+​
+1.2-stable
+—
+​
+1.2-stable
+Trac 1.0
+​
+1.0
+|
+​
+1.0-stable
+​
+1.0
+​
+1.0
+|
+​
+1.0-stable
+Trac 0.12
+​
+0.12
+|
+​
+0.12.1
+|
+​
+0.12.2
+|
+​
+0.12.3
+|
+​
+0.12.4
+|
+​
+0.12-stable
+Trac 0.11
+​
+0.11.7
+In
+italic
+: corresponds to the latest revision on the branch.
+The Sphinx documentation will take precedence, because epydoc is no longer maintained. For now, the two sets of documentation are complementary.
+apidoc
+Semi-automatic API documentation, generated using
+​
+Sphinx
+.
+Sphinx offers fine-grained control over the generated documentation and the order in which it appears. We've also written additional explanations and examples not present in the code. Therefore, this documentation reads better than the purely auto-generated manual. The downside is that there is no full coverage of the API yet. Apidoc has been introduced in Trac 1.0.
+apiref
+Full API reference, generated using
+​
+epydoc
+.
+With epydoc, the entirety of the API is covered, but there is less control over the generated output, as it only shows what is present in the source code. The documentation has a more auto-generated feel.
+Generating the documentation
+Sphinx —
+make apidoc
+Once you have installed
+sphinx
+, go to your Trac 1.0-stable or trunk checkout and do:
+$ make apidoc-html
+This will generate the
+Sphinx
+documentation in
+./build/doc/html
+, start with the
+index.html
+page.
+You can also generate a PDF document using
+​
+rst2pdf
+:
+$ make apidoc-pdf
+This will generate the
+./build/doc/pdf/trac_dev.pdf
+file.
+FIXME
+Alternatively you can invoke
+make apidoc
+to get both.
+Sphinx is installed as
+easy_install sphinx
+, which will get you the appropriate dependencies, such as docutils and jinja2.
+Same goes for
+easy_install rst2pdf
+.
+Verifying the completeness of the documentation —
+checkapidoc.py
+Note that we also have a help script for checking whether a documented .rst module below
+source:trunk/doc/api
+contains all the symbols that need to be documented.
+For example:
+$
+PYTHONPATH
+=
+. python doc/utils/checkapidoc.py trac_wiki_api
+will check if all public and documented symbols from
+source:trunk/trac/wiki/api.py
+​
+are referenced in
+source:trunk/doc/api/trac_wiki_api.rst
+​
+.
+$
+PYTHONPATH
+=
+. python doc/utils/checkapidoc.py trac_wiki_api
+Warning: trac.wiki.api doesn
+'
+t define __all__, using exported symbols.
+ * ..   autofunction :: validate_page_name
+Explaining the output:
+Warning: trac.wiki.api doesn't define __all__, using exported symbols.
+means that in the absence of an explicit list of public symbols, we try to guess what needs to be documented by looking at the globals of that module which have a docstring.
+* ..   autofunction :: validate_page_name
+corresponds to a function in
+api.py
+​
+which has a docstring but is not yet present in
+trac_wiki_api.rst
+​
+.
+Note that when
+__all__
+is specified, we also consider that listed symbols which
+don't
+have a docstring yet should also be documented.
+A symbol can be explicitly declared to be unwanted in the Sphinx documentation by listing it in the global
+__no_apidoc__
+property of its defining module.
+There's also a verbose mode
+-v
+for showing all the symbols found:
+$
+PYTHONPATH
+=
+. python doc/utils/checkapidoc.py trac_wiki_api -v
+==
+Checking trac_wiki_api.rst ...
+Warning: trac.wiki.api doesn
+'
+t define __all__, using exported symbols.
+ - OK      autoclass :: IWikiChangeListener
+ - OK      autoclass :: IWikiMacroProvider
+ - OK      autoclass :: IWikiPageManipulator
+ - OK      autoclass :: IWikiSyntaxProvider
+ - OK      autoclass :: WikiSystem
+ - OK   autofunction :: parse_args
+ * ..   autofunction :: validate_page_name
+Epydoc —
+make apiref
+Once you have installed
+epydoc
+, go to your Trac trunk checkout and do:
+$ make apiref
+This will generate the
+epydoc
+documentation in
+./build/doc/epydoc
+, start with the
+index.html
+page.
+Note that while installing epydoc with
+easy_install
+might work on Linux (not tested), on Windows you should rather download and execute the Windows installer.

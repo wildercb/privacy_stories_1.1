@@ -1,0 +1,464 @@
+Contents
+Unicode Mini Tutorial
+Trac utilities for Unicode
+to_unicode
+The Mimeview component
+Trac boundaries for Unicode Data
+Database Layer
+The console
+Filesystem objects
+versioncontrol
+subsystem
+Generating content with ClearSilver templates
+The Web interface
+Interaction with plugins
+Questions / Suggestions
+Trac and Unicode: Development Guidelines
+Since Trac
+0.10
+, Trac uses
+unicode
+strings internally.
+This document clarifies what the implications of this change are.
+Unicode Mini Tutorial
+In Python, there are two kinds of string types, both subclasses of
+basestring
+:
+unicode
+is a string type in which each character is an Unicode code point.
+All common string operations (len, slicing, etc.) will operate on those code points.
+i.e. "real" character boundaries, in any language.
+str
+is a string type in which each character is a byte.
+The string operations will operate on those bytes, and byte boundaries 
+don't correspond to character boundaries in many common encodings.
+unicode
+provides a real representation of textual data: once you're in
+unicode
+, you know that your text data can contain any kind of multilingual characters, and that you can safely manipulate it the expected way.
+On the other hand, a
+str
+object can be used to contain anything, binary data, or some text using any conceivable encoding. But if it's supposed to contain text, it is crucial to know which encoding was used. That knowledge must be known or inferred from somewhere, which is not always trivial.
+In summary, it is not manipulating
+unicode
+object which is problematic (it is not), but how to go from the "wild" side (
+str
+) to the "safe" side (
+unicode
+). Going from
+unicode
+to
+str
+is usually less problematic, because you can always control what kind of encoding you want to use for serializing your Unicode data.
+How does all the above look like in practice? Let's take an example (from [1]):
+u"ndré Le"
+is an Unicode object containing the following sequence of
+Unicode code points:
+>>> ["U-%04x" % ord(x) for x in u"ndré Le"]
+['U-006e', 'U-0064', 'U-0072', 'U-00e9', 'U-0020', 'U-004c', 'U-0065']
+From there, you can easily transform that to a
+str
+object.
+As we said above, we can choose the encoding:
+UTF-8
+: it's a variable length encoding which is widely understood,
+and in which
+any
+code point can be represented:
+>>> u"ndré Le".encode('utf-8')
+'ndr\xc3\xa9 Le'
+iso-8859-15
+: it's a fixed length encoding, which is commonly used
+in European countries. It
+happens
+that the
+unicode
+sequence we
+are interested in can be mapped to a sequence of bytes in this encoding.
+>>> u"ndré Le".encode('iso-8859-15')
+'ndr\xe9 Le'
+ascii
+: it is a very "poor" encoding, as there are only 128 unicode
+code points (those in the U-0000 to U-007e range) that can be mapped to 
+ascii. Therefore, trying to encode our sample sequence will fail, 
+as it contains one code point outside of this range (U-00e9).
+>>> u"ndré Le".encode('ascii')
+Traceback (most recent call last):
+  File "<stdin>", line 1, in ?
+UnicodeEncodeError: 'ascii' codec can't encode character u'\xe9' in position 3: ordinal not in range(128)
+It should be noted that this is also the error one would get by doing a 
+coercion to
+str
+on that unicode object, because the system encoding
+is usually
+'ascii'
+:
+>>> str(u"ndré Le")
+Traceback (...): # same as above
+>>> sys.getdefaultencoding()
+'ascii'
+Lastly, there are ways to
+force
+a conversion to succeed, even
+if there's no way to encode some of the original unicode characters
+in the targeted charset. One possible way is to use replacement characters:
+>>> u"ndré Le".encode('ascii', 'replace')
+'ndr? Le'
+Now, you might wonder how to get a
+unicode
+object in the first place,
+starting from a string.
+For this it is critical
+to
+know
+what encoding was used in the
+str
+object, as either
+'ndr\xe9 Le'
+or
+'ndr\xc3\xa9 Le'
+could be decoded into the same
+unicode string
+u"ndré Le"
+(it is in fact as important
+as knowing whether that stream of bytes has been gzipped or ROT13-ed.)
+Assuming we know the encoding of the
+str
+object, getting an
+unicode
+object out of it is trivial:
+>>> unicode('ndr\xc3\xa9 Le', 'utf-8')
+u'ndr\xe9 Le'
+>>> unicode('ndr\xe9 Le', 'iso-8859-15')
+u'ndr\xe9 Le'
+The above can be rewritten using the
+str.decode()
+method:
+>>> 'ndr\xc3\xa9 Le'.decode('utf-8')
+u'ndr\xe9 Le'
+>>> 'ndr\xe9 Le'.decode('iso-8859-15')
+u'ndr\xe9 Le'
+But what happens if we do a bad guess?
+>>> unicode('ndr\xc3\xa9 Le', 'iso-8859-15')
+u'ndr\xc3\xa9 Le'
+No errors here, but the unicode string now contains garbage
+NB: as we have seen above, 'iso-8859-15' is a fixed-byte encoding
+with a mapping defined for all the 0..255 range, so decoding
+any
+input assuming such an encoding will
+always
+succeed.
+>>> unicode('ndr\xe9 Le', 'utf-8')
+Traceback (most recent call last):
+  File "<stdin>", line 1, in ?
+UnicodeDecodeError: 'utf8' codec can't decode bytes in position 3-5: invalid data
+Here, we clearly see that not all sequence of bytes can be interpreted as UTF-8.
+What happens if we don't provide an encoding at all?
+>>> unicode('ndr\xe9 Le')
+Traceback (most recent call last):
+  File "<stdin>", line 1, in ?
+UnicodeDecodeError: 'ascii' codec can't decode byte 0xe9 in position 3: ordinal not in range(128)
+>>> 'ndr\xe9 Le'.decode()
+Traceback (...) # same as above
+This is analogous to the encoding situation: the
+sys.getdefaultencoding()
+is used
+(usually 'ascii') when no encoding is explicitly given.
+Now, as with the encoding situation, there are ways to
+force
+the encoding
+process to succeed, even if we are wrong about the charset used by our
+str
+object.
+One possibility would be to use replacement characters:
+>>> unicode('ndr\xe9 Le', 'utf-8', 'replace')
+u'ndr\ufffde'
+The other one would be to choose an encoding guaranteed to succeed 
+(as
+iso-8859-1
+or
+iso-8859-15
+, see above).
+There are more in-depth tutorials on Unicode in general and Python / Unicode in particular available:
+[1]
+​
+http://www.egenix.com/files/python/LSM2005-Developing-Unicode-aware-applications-in-Python.pdf
+[2]
+​
+http://www.python.org/dev/peps/pep-0100
+Now we can move to the specifics of Trac programming.
+Trac utilities for Unicode
+In order to handle the unicode related issues in a cohesive way, there are a few utility functions that can be used, but this is mainly our swiss-army knife
+to_unicode
+function.
+to_unicode
+The
+to_unicode
+function was designed with flexibility and robustness in mind: Calling
+to_unicode()
+on anything should never fail.
+The use cases are as follows:
+given any arbitrary object
+x
+, one could use
+to_unicode(x)
+as one would use
+unicode(x)
+to convert it to an unicode string
+given a
+str
+object
+s
+, which
+might
+be a text but for which 
+we have no idea what was the encoding used, one can use
+to_unicode(s)
+to convert it to an
+unicode
+object in a safe way.
+Actually, a decoding using 'utf-8' will be attempted first,
+and if this fails, a decoding using the
+locale.getpreferredencoding()
+will be done, in replacement mode.
+given a
+str
+object
+s
+, for which we
+think
+we know what is
+the encoding
+enc
+used, we can do
+to_unicode(s, enc)
+to try
+to decode it using the
+enc
+encoding, in replacement mode.
+A practical advantage of using
+to_unicode(s, enc)
+over
+unicode(s, enc, 'replace')
+is that our first form will revert to
+the
+use case 2
+, should
+enc
+be
+None
+.
+So, if the above works in all situations, where should you still use
+unicode(x)
+or
+unicode(x,enc)
+?
+you could use
+unicode(x)
+when you know for sure that x is anything
+but
+a
+str
+containing bytes in the 128..255 range;
+It should be noted that
+to_unicode(x)
+simply does a
+unicode(x)
+call 
+for anything which is not a
+str
+object, so there's virtually no
+performance penalty in using
+to_unicode
+instead (in particular, 
+there's no exception handler set in this case).
+use
+unicode(buf, encoding)
+when you know for sure what the
+encoding is. You will have a performance gain here over
+to_unicode
+,
+as no exception handler will be set. Of course, the downside is that
+you will get an
+UnicodeDecodeError
+exception if your assumption
+was wrong. Therefore, use this if you
+want
+to catch errors 
+in this situation.
+There are a few other unicode related utilies besides
+to_unicode
+in the
+trac.util.text
+​
+module.
+The Mimeview component
+The Mimeview component is the place where we collect some intelligence about the MIME types and charsets auto-detection.
+Most of the time, when we manipulate
+file content
+, we only have partial information about the nature of the data actually contained in those files.
+This is true whether the file is located in the filesystem, in a version control repository or is streamed by the web browser (file upload).
+The Mimeview component tries to associate a MIME type to a file content, based on the filename or, if that's not enough on the file's content itself. During this process, the charset used by the file
+might
+be inferred as well.
+The API is quite simple:
+Mimeview.get_mimetype(self, filename, content)
+guess the MIME type from the
+filename
+or eventually from the
+content
+Mimeview.get_charset(self, content, mimetype=None)
+guess the charset from the
+content
+or from the
+mimetype
+(as the
+mimetype
+might
+convey charset information as well)
+Mimeview.to_unicode(self, content, mimetype=None, charset=None)
+uses the
+to_unicode
+utility and eventually guess the charset if needed
+Note
+: that the Mimeview API is currently being overhauled and will most probably change in the next releases (
+#3332
+).
+Trac boundaries for Unicode Data
+Most of the time, within Trac we assume that we are manipulating
+unicode
+objects.
+But there are places where we need to deal with raw
+str
+objects, and therefore we must know what to do, either when encoding to or when decoding from
+str
+objects.
+Database Layer
+Each database connector should configure its database driver so that the
+Cursor
+objects are able to accept and will return
+unicode
+objects. This sometimes involves writing a wrapper class for the original Cursor class. See for example
+SQLiteUnicodeCursor
+​
+, for pysqlite1.
+The console
+When reading from the console, we assume the text is encoded using
+sys.stdin.encoding
+.
+When writing to the console, we assume that the
+sys.stdout.encoding
+should be used.
+The logging API seems to handle
+unicode
+objects just fine.
+Filesystem objects
+Whenever a file is read or written, some care should be taken about the content.
+Usually, when writing text data, we will choose to encode it using
+'utf-8'
+.
+When reading, it is context dependent: there are situations were we know for sure the data in the file is encoded using
+'utf-8'
+.
+We therefore usually do a
+to_unicode(filecontent, 'utf-8')
+in these situations.
+There's an additional complexity here in that the filenames are also possibly using non-ascii characters. In Python, it should be safe to provide
+unicode
+objects for all the
+os
+filesystem related functions.
+Look also at
+r7360
+,
+r7361
+,
+r7362
+.
+More information about how Python deals with Python at system boundaries can be found here:
+​
+http://kofoto.rosdahl.net/wiki/UnicodeInPython
+.
+versioncontrol
+subsystem
+This is dependent on the backend.
+In Subversion, there are clear rules about the pathnames used by the SVN Bindings for Python: those should be UTF-8 encoded
+str
+objects.
+Therefore,
+unicode
+pathnames should be 'utf-8' encoded before being passed to the bindings, and pathnames returned by the bindings should be decoded using 'utf-8' before being returned to callers of the
+versioncontrol
+API.
+As noted above when talking about file contents, the node content can contain any kind of data, including binary data and therefore
+Node.get_content().read()
+returns a
+str
+object.
+Depending on the backend, some
+hints
+about the nature of the content (and eventually about the charset used if the content is text) can be given by the
+Node.get_content_type()
+method.
+The Mimeview component can be used in order to use those hints in a streamlined way.
+Generating content with ClearSilver templates
+The main "source" of generated text from Trac is the
+ClearSilver
+template engine.
+The ClearSilver engine doesn't accept
+unicode
+objects, so those are converted to UTF-8 encoded
+str
+objects just before being inserted in the "HDF" (the data structure used by the template engine to fill in the templates).
+This is done automatically by our
+HDFWrapper
+class, so anywhere else in the code one can safely associate unicode values to entries in
+req.hdf
+.
+The body of those templates (the
+.cs
+files) must also use the UTF-8 encoding.
+The Web interface
+The information in the
+Request
+object (
+req
+) is converted to
+unicode
+objects, from 'UTF-8' encoded strings.
+The data sent out is generally converted to 'UTF-8' as well (like the headers), except if some charset information has been explicitly set in the
+'Content-Type'
+header. If this is the case, that encoding is used.
+Interaction with plugins
+Whenever Trac gets data from plugins, it must try to cope with
+str
+objects. Those might be 0.9 pre-unicode plugins which have not been migrated fully to 0.10 and beyond.
+Questions / Suggestions
+Q
+: When dealing with plugins that weren't designed to be unicode friendly and used unicode in favour of to_unicode, what parts of the plugin should be updated, what should use to_unicode ? —
+JamesMills
+A
+: There shouldn't be any reason to replace a working call to
+unicode()
+by a call to
+to_unicode()
+, unless you specified the encoding, like in:
+ustring = unicode(data_from_trac, 'utf-8')
+The above doesn't work if
+data_from_trac
+is actually an unicode object. You would get
+TypeError: decoding Unicode is not supported
+.
+In this case, either don't use
+unicode
+at all (0.10 and above only plugins) or replace it by
+to_unicode
+(0.9 and 0.10 plugins).
+See also
+TracUnicode
+,
+unicode related tickets
+,
+UnicodeEncodeError
+,
+UnicodeDecodeError

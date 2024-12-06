@@ -1,0 +1,22 @@
+Trac HTTP Methods
+To protect against
+​
+CSRF attacks
+and to adhere to the HTTP RFC rules on
+​
+Safe and Idempotent Methods
+,
+Check that all requests that create, modify or delete resources use the HTTP POST method.
+Use real server-side confirmation for deletion of wiki pages and attachments, instead of the
+JavaScript
+confirmation dialog.
+This policy started with changeset
+[1701]
+, as explained in a
+​
+mail
+on the
+MailingList
+by
+ChristopherLenz
+.

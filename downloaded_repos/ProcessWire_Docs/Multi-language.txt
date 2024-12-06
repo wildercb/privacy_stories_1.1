@@ -1,0 +1,46 @@
+Multi-language page names (URLs) and multi-language text fields make developing a multilingual site as easy as developing a single language site.
+ProcessWire's multi-language support includes a full gettext-style
+translation system
+, but with the translation tools built into the CMS, and without actually using gettext. You can also install (or create) alternate language packs for the admin side of ProcessWire.
+Multi-language support is installed with core modules available in the admin: Modules > Language > Language Support. If you just want to install alternate language packs, then all you need is the base
+Language Support
+module. If you want to support multi-language fields in your own site, then you should also install the
+Language Support Fields
+module. We also recommend installing
+Language Support Page Names
+module for multi-language URLs
+.
+Code i18n
+This page provides detailed documentation on everything you need to know to make your template files or modules translatable using ProcessWire's translation tools.
+Multi-language fields
+Here we look in detail at multi-language fields and language-alternate fields, as well as how to use them. Also includes a video overview and examples of how to use language fields to create full multi-language websites.
+Multi-language URLs
+Multi-language URLs and page names enable you to maintain different/translated URLs for each page, based on the language. It also lets you produce your site easily, as the language is determined automatically by the URL.
+Language Packs
+Language packs for use with the ProcessWire admin.
+Multi-Language Support Forum
+A place to get support and chat about multi-language capabilities in ProcessWire.
+Hreflang tag generator
+Hreflang tag generator for multi-language websites. Select a language and optionally a country to generate the hreflang tag.
+Creating multi-language modules
+If you are a module developer, you might want to bundle multi-language translations with your module. This page covers all the details step-by-step.
+Multi-language
+Code i18n
+Multi-language fields
+Multi-language URLs
+Language Packs
+Multi-Language Support Forum
+Hreflang tag generator
+Creating multi-language modules
+Docs
+API reference
+Getting started
+Front-end
+Tutorials
+Selectors
+Modules & hooks
+Fields, types, input
+Access control
+Security
+Multi-language
+More topics

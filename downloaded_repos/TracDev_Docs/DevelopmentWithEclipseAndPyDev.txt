@@ -1,0 +1,223 @@
+Contents
+Installing and configuring Eclipse
+Automatic translation compilation
+pylint integration
+Ignoring warnings
+Format Code
+Remote Debugging
+Acknowledgements
+How to develop Trac with Eclipse PyDev
+Follow the instructions for
+Setting up the environment
+and
+Installing and configuring Trac
+on the
+Developer setup for Trac
+page, before configuring Eclipse and PyDev.
+Installing and configuring Eclipse
+Install
+​
+Eclipse
+(3.3 or newer will do).
+Install the
+​
+PyDev
+plugin for Eclipse.
+Alternatively, install
+​
+LiClipse
+, it comes with PyDev already integrated.
+(Optional) Install either
+​
+Subclipse
+or
+​
+Subversive
+for Eclipse-integrated Subversion tools.
+Create a new project in Eclipse that contains the sources for Trac.
+In Eclipse, make sure that the PYTHONPATH in the project properties dialog includes the sources for Trac and for Genshi.
+Create an initial run configuration by clicking right on
+trac/web/standalone.py file
+, and choosing
+Run As → Python Run
+. Trac will complain that no environment has been set.
+Select
+Run → Open Run Dialog…
+and set the correct command line arguments in the
+arguments
+tab, eg.
+—port 8000 /path/to/myproject
+.
+Note that the option —auto-reload will cause tracd to restart every time source code has been changed, but it seems to prevent debugging with PyDev. This seems to have something to do with the way Trac reloads new instance as a child thread using "thread" library, which doesn't seem to be compatible with PyDev debugging. Then, instead of using "thread"-module you should use "threading"-module (higherlevel).
+Note that if your debugging doesn't work with a plugin, then remove the package from the install destination, eg
+rm -Rf
+and soft link it from your source.
+You should now be able to run tracd, as well as to debug it using the same run configuration. To run the test cases, just click on a test folder and select
+Run → Python unit tests
+.
+Automatic translation compilation
+If you want to set up automatic translation compilation do the following:
+Right click on Trac project and select
+Properties
+. Select
+Builders
+. Click
+New
+. Select
+Program
+.
+Name builder, like 'Locale fi_FI builder'.
+Main
+tab:
+Location
+: click
+Browse File System…
+. Select Python executable.
+Working Directory
+: set it to
+${project_loc}
+.
+Arguments
+:
+setup.py compile_catalog -f -l fi_FI
+(change to your locale).
+Refresh
+tab:
+Check
+Refresh resources upon completion
+.
+Select
+Spesific resources
+and select
+trac/locale/fi_FI
+(select your locale).
+Build Options
+tab:
+Check
+During auto builds
+.
+Check
+Specify working set of relevant resources
+.
+Click
+Specify resources…
+. Select
+trac/locale/fi_FI
+(select your locale, same as in step 4).
+Name it like
+fi_FI locale
+.
+After modifying your message.po file you should get following output:
+running compile_catalog
+ compiling catalog 'trac/locale\\fi_FI\\LC_MESSAGES\\messages.po' to 'trac/locale\\fi_FI\\LC_MESSAGES\\messages.mo'
+If Trac is running, your changes will be effective immediately.
+pylint integration
+PyLint is a validator and quality checker for the Python programming language. It can be integrated with PyDev, see
+​
+pydev.org
+for details.
+For developing Trac plugins, you should reference to all dependent eggs, such as Trac, Genshi, Babel, etc. To do this open
+Project > Properties
+, go to node
+PyDev - PYTHONPATH
+and click on
+Add zip/jar/egg/
+in tab
+External Libraries
+. Search for your
+Trac-$VERSION-.egg
+and do the same for all required libraries (Genshi, Babel).
+If you import from
+pkg_resources
+you need to add
+#@UnresolvedImport
+after it, because otherwise you get the error:
+Unresolved import: resource_filename
+. See
+​
+stackoverflow-question
+for details:
+from
+pkg_resources
+import
+resource_filename
+#@UnresolvedImport
+Ignoring warnings
+As described in
+​
+stackoverflow
+you can use a "deactivation comment" at the end of the line, if you want to suppress a warning. Examples:
+from
+pkg_resources
+import
+resource_filename
+# @UnresolvedImport
+fpath
+,
+fname
+=
+os
+.
+path
+.
+split
+(
+name
+)
+# @UnusedVariable
+You can also configure PyDev to avoid getting a warning "unused variable", see
+​
+PyDev Code Analysis
+.
+Format Code
+To enable Code Formatting using PEP8 (command "Format Code", short cut
+Ctrl + Shift + F
+) you need to check Preferences →
+PyDev/Editor/CodeStyle/CodeFormatter
+and activate "Using autopep8.py for code formatting".
+Remote Debugging
+With Eclipse
+​
+PyDev
+it is possible to debug Trac remotely. This means you can evaluate all variables and "Step into" (
+F5
+), "Step over" (
+F6
+) and "Step out" (
+F7
+) of each line of code.
+How to setup the remote debugger is described in
+​
+PyDev Manual
+. Basically you need to follow these steps:
+Go to the debug perspective.
+Start the remote debugger server.
+Make sure
+pydevd.py
+is in your pythonpath: the python file usually resides under
+eclipse/plugins/org.python.pydev_x.x.x/pysrc/pydevd.py
+.
+Then you can insert the following code to start the debug mode (see
+Screenshot
+​
+):
+try
+:
+import
+pydevd
+;
+pydevd
+.
+settrace
+()
+#@UnresolvedImport
+except
+ImportError
+:
+None
+# avoids throwing an Exception when not in debug mode
+Acknowledgements
+Originally these instructions were
+​
+posted on trac-dev list
+by Joachim Hoessler.

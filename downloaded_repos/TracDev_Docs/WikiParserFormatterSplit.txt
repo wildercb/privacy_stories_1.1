@@ -1,0 +1,251 @@
+Requirements
+Implementation Notes
+The WikiSystem
+The Parser
+The Formatters
+Addressing Current Issues
+Parser Issues
+Formatter Issues
+Processing Structured Content
+"Technical" details
+Comments
+Wiki Engine Refactoring: Split Parser and Formatter Stages
+The current Trac Wiki Engine, while working quite well, suffers from a few fundamental drawbacks:
+the parsing and formatting steps are done in one step; this makes it hard to examine the inner structure of a Wiki text, as a new parser/formatter has to be rewritten by subclassing an existing one
+the code is quite complex, contains numerous (only?) special cases, and as a result, is not easy to maintain
+Because of that, a parser/formatter split was in order. This has to be done carefully however, as the Wiki engine is one of the "vital piece" of Trac.
+We first outline the major requirements, then briefly explain the envisioned implementation of the new engine. Finally we present and discuss all the major opened issues for the Wiki system, which provide concrete use cases that must be addressed by the new design.
+Requirements
+Compatibility
+The existing Trac wiki syntax should continue to work the way it always had (well, modulo the bug fixes).
+Pages that used to "look good" using the former engine should look the same.
+Flexibility
+The Trac wiki engine is a modular one, with the possibility to have plugins inject their own 
+Wiki syntax (IWikiSyntaxProvider). This flexibility should remain and even be augmented:
+Possibility to extend the parser, by adding new "tokens"
+Possibility to extend the existing formatters, in order to have the new tokens transformed by existing formatters
+Possibility to easily create new formatters, to address new needs
+Speed
+The use of wiki text is ubiquitous in Trac, so it should be very fast to parse a wiki text and 
+apply one or many formatting on it.
+Maintainability
+The wiki engine must be easy to understand. Ok, the regexps can still be scary to satisfy 3.
+Implementation Notes
+I've chosen a tree-based approach, in which the wiki text is first converted to a Wiki DOM tree,
+consisting of instances of subclasses of WikiDomNode.
+This tree can then in turn be transformed into some other output format, like Genshi Element nodes or events.
+This is the approach outlined in
+#4431
+.
+More specifically, the WikiDomNode class hierarchy is used to model the inheritance relations between the various types of nodes. This enables to setup
+embedding rules
+, specifying which node can be placed into which others. Therefore the structure of the document and its consistency can be ensured.
+not sure about this anymore (cboos)
+The inheritance relationships are also quite useful on the formatter level, as this way one can easily specify some specific handling for a group of node types.
+More importantly, if a new type of node is added (say by a
+IWikiSyntaxProvider
+), the existing formatters can also be augmented by custom rendering callbacks for those new nodes. If some formatters aren't updated (say because there are special formatters contributed by some unrelated plugins), they'll be able to handle those new nodes based on their parent type.
+Some early ideas are visible in
+version 6
+of this document.
+The parsing logic is described in
+VerticalHorizontalParsing
+.
+The WikiSystem
+It contains the extension point for the
+IWikiSyntaxProvider
+s.
+It also serves as a registry for the various formatter, according to their
+flavor
+.
+The Parser
+WikiParser Component
+The component is used to incorporate syntax additions and rules provided by 
+the
+IWikiSyntaxProvider
+s and to maintain the environment global state of the parser.
+WikiDocument
+A document correspond to the parsing of a given wiki text.
+It contains a Wiki DOM tree.
+WikiDomNode
+A node in a Wiki DOM tree. Each node can have children nodes, and other properties depending on their type.
+The Formatters
+WikiFormatter Component
+The component is used to register the specific formatting rules that the
+IWikiSyntaxProvider
+s may offer.
+(format)Formatter
+Individual formatters are transient objects used for traversing a Wiki DOM tree and generating some kind of output.
+Addressing Current Issues
+Here we list some of the most outstanding issues in the Trac ticket database concerning the Wiki component, 
+and we discuss for each of them how they would be handled in the proposed solution.
+Parser Issues
+#2048
+: Wiki macros for generating
+<div>
+s and
+<span>
+s with classes
+We need a way to "wrap" wiki text fragments, in a robust way.
+This need can be addressed if we have a low foot-print when
+recursively
+parsing wiki text.
+On a related topic,
+#4139
+was discussing the possibility for a macro to provide additional wiki text,
+instead of producing formatted output.
+While building the DOM tree, when macros are found, they can be asked to participate in the parsing stage
+as well.
+#1200
+: Provide syntax to link to file-differences from svn log messages
+Or more generally, have the possibility to have context-dependent special syntaxes.
+The parser should be able to use additional parsers for what it would otherwise consider to be text.
+#2064
+: Timeline
+WikiFormatting
+mis-parses WikiLinks with aliases.
+Currently, for rendering short excerpts of wiki text, we simply truncate the wiki text.
+That's of course far better than arbitrarily truncating the rendered HTML output, 
+but is also very problematic has it has a high likelihood of breaking the consistency of 
+the original wiki syntax.
+Therefore, it's better to parse the full text, and in the formatter, stop producing output 
+as soon as enough text was produced.
+#4140
+: Merge OutlineFormatter into Formatter
+Currently using the [[PageOutline]] macro for producing a table of content of the current page implies parsing the wiki text twice.
+Once we have a parse tree, we can reuse it as many time as we want, to produce different kinds of output
+(see also
+processing structured content
+below).
+In this situation however, we see that we must take care of passing the WikiDOM tree of the 
+wiki text to the macros when "rendering" them.
+#1424
+:
+MediaWiki
+-style table syntax support
+Improved table support is difficult to achieve in the current engine, as the table syntax is limited to one row per line of wiki text. 
+The handling of tables carries on that limitation throughout and basically only inline content can be placed in a cell.
+A nearly complete redesign of the internals of the current engine would be required only to be able to handle this particular enhancement request.
+In the new engine, the rules relative to the embedding of WikiDOM elements makes writing such an enhancement easily possible, eventually even by the way of a (extended)
+IWikiSyntaxProvider
+.
+#4235
+: Wiki formatting lost in ">" quoted blocks
+It should be possible to "embed" usual wiki notation within some context.
+Previously we discussed this for table cells, but having the wiki content rendered 
+normally even when prefixed share a similar problematic.
+A notable difference is the need for better abstraction of what should be considered
+the start of a line. This is an open issue that will hopefully be more easily solvable 
+using the new parser. Other than the lexing issues, the WikiDOM rules for embedding 
+elements one in another greatly facilitate the handling of this situation.
+Formatter Issues
+#4778
+: simplified wikification of svn log messages
+A TracLinksHtmlFormatter could be written (flavor
+'traclinks'
+), 
+which would handle only the
+TracLinks
+, no other formatting.
+This formatter can also be used for addressing
+#1520
+, wikification of comment in source code.
+#4270
+: Ticket CC emails contain wiki formatting
+A TextFormatter could be written (flavor
+'text'
+), which would produce a rendering 
+of the wiki text in a way suitable for being read in text e-mails.
+This rendering involves suppressing the markup that goes in the way,
+(like
+{{{ }}}
+blocks), provide a more explicit markup for headings
+(underlined titles), provide footnote style references to links, etc.
+#2296
+: Export wiki pages to latex
+This ticket is one example of a different output format which should be entirely doable by creating a plugin which would implement only the formatting side.
+#3477
+is another example for this (DocBook in this case).
+Processing Structured Content
+#2717
+: Create window title on wiki pages from = The title =
+Once a wiki text is parsed, it should be trivial to fetch the first toplevel heading node 
+from the corresponding Wiki DOM tree.
+#3895
+: Provide Trac API for returning all outbound links in a page
+The Wiki text contains
+structured information
+, primarily by the way of
+TracLinks
+.
+Properly retrieving
+TracLinks
+inside any wiki text can be useful in a lot of situations and due to the profusion of
+TracLinks
+forms and their extensible nature, some direct support for reusable parsing is necessary.
+A Wiki DOM tree can be quickly scanned in order to retrieve all the links contained in a robust way.
+Typical use cases are
+#108
+,
+#109
+,
+#611
+and more generally
+TracCrossReferences
+.
+#1024
+: Each section should have a edit button
+Being able to edit a particular section of the wiki text implies to be able to identify
+where
+the section starts and ends in the source wiki text. This can be done if the WikiDOM nodes keep track of their position in the original text.
+"Technical" details
+#3925
+: whitespace not preserved in
+{{{ }}}
+blocks
+Since the switch to Genshi, the whitespace in <pre> elements are collapsed, because the corresponding output is wrapped in a Markup instance.
+This can be solved by having the HtmlFormatter output Genshi events or Elements.
+#3232
+: Wiki syntax should be enforced (for ticket comments)
+In various situations, it happens that the formatted HTML is not
+valid
+, as it contains opened tags with no corresponding closing tags.
+If the formatter uses a regular way (e.g. recursive descent traversal of the parse tree) to produce structured content, this problem can be avoided completely.
+#3794
+: Invalid table(with indentation) layout in wiki.
+An example of the usual kind of "buglets" that affect the Wiki engine: the formatting that is produced for a given wiki text doesn't look "right". Fixing such issues is currently not very convenient, because all is done at once. Being able to focus on the logic of either the parser or the formatter would tremendously help with this kind of issue. Other similar tickets:
+#1936
+,
+#3335
+,
+#4790
+…
+Comments
+Not sure what your specific plans are, but one of the docutils developers at
+PyCon illustrated fairly convincingly why calling
+enter
+/
+leave
+methods
+for each node in the tree, when "parsing", is bad, and why a visitor pattern is
+good. Something to consider
+(
+AlecThomas
+)
+For the formatting phase, I use something that could be called a "typed" hierarchical visitor pattern. You start with the root of the parse tree, and the formatter simply
+render
+s the root node, by calling the most specific callback registered for the type of that node. That callback in turn can call the
+render
+method on children nodes, and the process repeats. So in effect you find there the
+hierarchical navigation
+notion (as the visitor has full access to the tree) and the
+conditional navigation
+notion (as the visitor decides if it's worth recursing or not) of the
+​
+c2Wiki:HierarchicalVisitorPattern
+. But this will become clearer with some code :-)
+— cboos
+See also:
+Wiki related tickets
+,
+VerticalHorizontalParsing

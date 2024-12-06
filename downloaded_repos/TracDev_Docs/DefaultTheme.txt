@@ -1,0 +1,14 @@
+Ideas and plans for improving Trac's default theme
+Tools
+While working on
+#10012
+, I noticed a lot of replication of CSS rules, and when I had to make more of them, I noted in a comment from which rule I copied from. I believe we could take this to the next level and use some more powerful format for specifying the CSS rules, like
+​
+LESS
+or
+​
+Stylus
+(see
+ticket:633#comment:15
+).
+—cboos

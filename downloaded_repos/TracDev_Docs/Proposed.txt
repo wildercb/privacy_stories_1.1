@@ -1,0 +1,16 @@
+Proposed changes
+Sometimes it can be useful to demonstrate an upcoming change on a live demo site on t.e.o (
+testing
+), so that the behavior or the layout can be discussed and fine-tuned before committing.
+We have some infrastructure in place to achieve this for the "+testing" git reference, which is usually a temporary merge of the git branches corresponding to the tickets being demonstrated.
+Tickets with the
++testing
+keyword:
+Ticket
+Summary
+Status
+Keywords
+Owner
+Type
+Priority
+No tickets found

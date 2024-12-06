@@ -1,0 +1,162 @@
+Trac Data Model Proposal
+Note:
+This was the original rough sketch. See
+GenericTrac
+for a later evolution of the proposal.
+The Context
+Trac stores the data for its resources in various tables, each tailored to a specific situation.
+This leads to a similar variety of APIs in our model modules, to heterogeneous functionality for no good reason etc. All of this has been exposed for a long time, in the
+TracObjectModelProposal
+.
+A way to provide more consistent change tracking and store the authorship of resource modifications can be found in
+TracDev/Proposals/Journaling
+.
+The Generic Model
+Resource Data
+The new model should have a good balance between
+generality
+, so that the API can be the same across resources) and
+specificity
+so that the database load is spread across multiple tables, and additional tables can be easily joined to the generic ones, depending on a module specific need (in particular, the vc layer).
+Each resource type could eventually have its own main table, for registering the identity of each object. There are pros/cons for that:
+(+) each dependent table won't have to repeat the full
+id
+of a resource for linking to it
+(+) facilitates resource renaming (
+id
+remains, only
+name
+changes)
+(-) makes the raw db content of each table less readable
+(-) joins are always needed
+That main table could eventually also store some mandatory fields, which are always of (1:1) cardinality.
+Then, each resource should have a
+<resource>_prop
+table, which can be seen as a generalization of the
+ticket_custom
+table we have now. I think it's enough to have
+(name,value)
+columns, however, as the type information could eventually be stored in some
+resource_schema
+table.
+Also, it might well be that we'll actually need to have datatype-specific property tables, like
+<tesource>_prop_int
+,
+<resource>_prop_text
+, even
+<resource>_prop_resource
+for linking to other resources in a flexible way (
+TracCrossReferences
+style).
+The property approach is essential for solving some of the main drawbacks of the current model:
+overcome the 1:1 limitation of ticket → milestone, ticket → component (also, components should become top level resources)
+deal with content in an uniform way; for example, it should be possible to access a wiki page content and a ticket description the same way (see
+#2945
+).
+The property tables above contain a
+snapshot
+of the current values for those objects. They are always updated after a change.
+Resource Change History
+Every "transaction" (change to any resource in the system) is tracked in a
+<resource>_journal
+table, containing an unique identifier for the change
+tid
+, the date of the change, the authorship information
+(author, ip number, authenticated flag)
+and the affected resource
+id
+. For dealing with "batch" changes (e.g.
+#525
+), there could eventually be a specific extension to this: if the
+id
+data stored in
+<resource>_journal
+is NULL, then we'd look in a
+<resource>_batch
+table, relating the
+tid
+to (1:N)
+id
+of resources.
+For each property table, there will be a corresponding
+<resource>_<prop>_history
+table, containing the
+(tid, name, value)
+triples corresponding to what has changed during this transaction. No more
+(old_value, new_value)
+pairs, as this can easily be reconstructed from the full history of changes.
+When looking at the history of a text property, we actually have access to the various
+versions
+of that content. This is how wiki page content, ticket and milestone descriptions could be versioned all the same way (see
+#1673
+), and therefore accessed the same way by the API. From that, it would be trivial to build similar web UI for these, in a "cheap" way (see
+#2945
+).
+The comments will likewise be a simple "comment" text property, with accompanying "cnum" and "replyto" int properties. Instead of accessing that field in the same way as a page content or ticket description, each
+version
+of the field will be picked and inserted in the right place when displaying the history of change for the resource (i.e. it will look exactly the same as our current ticket UI, but we could potentially have exactly the same for Wiki pages, Milestones and Changesets, see
+#2035
+).
+Lastly, there would be a
+<resource>_overlay
+table for storing old versions of versioned properties themselves, should they ever change. This would be a way to enable editing ticket comments (see
+#454
+), and possibly
+version 1
+of commit messages, should they change in the repository itself (
+#731
+).
+See also:
+TracDev/Proposals
+,
+#150
+,
+#221
+,
+#695
+,
+#787
+,
+#918
+,
+#1113
+,
+#1386
+,
+#1395
+,
+#1678
+,
+#1835
+,
+#2035
+,
+#2344
+,
+#2464
+,
+#2465
+,
+#2467
+,
+#2662
+,
+#2961
+,
+#3003
+,
+#3080
+,
+#3718
+,
+#3911
+,
+#4588
+,
+#5211
+,
+#7871
+,
+#8335
+,
+#9263

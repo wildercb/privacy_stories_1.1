@@ -1,0 +1,129 @@
+Email Validation
+This proposal is about adding an email validation facility to Trac.
+The Context
+User enters a new or changes an existing email address in the general preferences tab.
+Under all circumstances, a verification email for confirming the address must be sent to the user, containing a link that will validate the email address with the system. Only when confirmed, the change of the e-mail address must come into effect, otherwise, the change will be rendered invalid and the e-mail address entered will be discarded/ignored.
+However, the general preferences tab may not be the only place where user's might enter an email address. Similar input fields exist in the ticket system where
+one can add email addresses for ticket change notification. Other such possibilities for input of an email address might exist, given the wide range of available
+plugins making use of the notification subsystem.
+Additionally, in
+TracIni
+there exist some configuration entries which might contain email addresses. Should these be validated too by the system or should these be taken for already having been validated by the administrator who defined the configuration?
+Requirements
+Please use discussion below prior adding additional requirements. Thank you.
+Since this is heavily related to the notification subsystem it seems only natural to extend that subsystem with the ability to send email verification
+mails and in turn receiving notification from the user upon clicking on the verification link. In the general preferences tab a notification must be
+shown that the email address still needs validation and also a resend email verification mail button must be present.
+users need to register their email address with the system in order to receive notifications
+and also having them validate their email addresses via the notification subsystem
+email addresses must be entered in the general preferences tab and will be stored in the session
+only one default email address can be associated with a given user
+MAYBE FUTURE? other preference panel providers may opt the user for entering alternate email addresses for different
+purposes, and, if none was specified, they must fall back to default email address, if available
+alternate email address entry forms, for example in the ticket system, must register the specified
+email address with the session on behalf of the user, and, for as long as that email address was
+not validated, the user must not be able to opt in for notification
+i18n requirements
+The notification email clearly needs to be localized/translated.
+Consider Email Validation and Other Related Tickets
+#4286
+#8637
+Discussion
+Open for discussion
+While the proposal in
+#9900
+can only be used for a quick validation of the user's input, it must also be extended to accommodate situations where
+one has defined a default domain in trac.ini for sending the email messages to. In addition, the user must be send an email for verifying that it 
+is both a valid email address and also owned by the user entering it.
+Additional Requirements and Non Requirements
+addresses with unicode should be handled properly, cf.
+#9085
+moved to discussion
+internally, all strings are stored as unicode
+hashes made up from the e-mail address and a timestamp are being used for validation purposes and communicating the validation links to the user.
+for renewal of validation requests, email addresses will be url encoded.
+as for email addresses entered not matching the given production rules set forth in RFC822, these should definitely be rejected until successors of that RFC, namely those which support UTF-8 encoding of smtp headers, have become widely accepted, see
+#9085
+for more information
+feel free to move it back up to requirements once we have settled on this issue, thanks.
+Proposed Solution
+The notification API should be extended so that it will provide a new extension point, namely IEmailAddressValidator.
+It will provide a default implementation for that, namely DefaultEmailAddressValidator, which is also the default validator used if none was configured.
+There exists only one active implementation of that extension point interface in the system, which will be configured via
+TracIni
+[notification], e.g. email.validator = DefaultEmailAddressValidator
+The data model must be extended so that the validator can both register and track validation progress and state for given email addresses, it will do so by storing both the e-mail address and the associated validation hashes along with a state and a timestamp
+Clients of the TracNotificationAPI will then query the api for an instance of the validator, e.g. get_validator
+Clients of the validator will then be able to register new email addresses for validation. If an email address was validated before, the validator can query its data model for the hash of that email address and look up its state, they will also be able to unregister email addresses no longer in use by the system and they are also able to forcedly invalidate existing email addresses.
+The notification subsystem will also implement a request handler for handling requests to the validation response address, for example /notification/validate, and, subsequently instruct the validator to try to validate the email address
+The validator might implement a mechanism for timing out a given email validation process by associating a timestamp with each validation in progress
+*NEW* The data model knows of the following states of an e-mail validation request: PENDING (newly added), VALID (user clicked on validation link provided in the mail), TIMEDOUT (validation request timed out), INVALID (after a given number of tries or by direct smtp query the validation request was invalidated)
+*NEW* The request handler implemented by the notification subsystem handles the resource paths
+/notification/validate
+and
+/notification/renew
+Implications on Other Subsystems
+The preferences module must be extended so that it will make use of the validator, along with the general tab preferences template and the method that prepares the view model
+The ticket system should be extended so that it will only accept validated email addresses when adding them to the CC-list of a given ticket.
+Open Questions
+What happens with email addresses of users who enter their email address in the general preferences tab and who then destroy the session with the service by removing the cookies set by the system for identifying the session?
+While the email address can still be validated, the preferences, as they are bound to the session, cannot be retrieved, so the user must reenter their email address next time they visit the site.
+How will the system behave then? Will it accept the email address, since the validator considers it a valid email address, or should the preferences simply invalidate the existing email address and restart the validation process?
+What hashing algorithm do we use?
+input to the algorithm would be the e-mail address and a timestamp
+requirements for the algorithm are: fast, non-colliding, and very importantly: reproducible
+non requirements are: both e-mail addresses and the timestamp must not be assessable from a given hash
+Since notification e-mails are always plain text, the template engine for this is rather simple, however, how do we localize the multi line text?
+localization can be done using the provided localization mechanisms, e.g. _('localized message', *args)
+this, however will require the non localized message to be hard coded into the system
+again, this would enable translators to translate the message.
+does the system used for translation support multi-line messages?
+with the introduction of the plug-able IEmailAddressValidationTemplate component, notification emails must no longer be plain text
+Current Development Status
+initial prototype is now working (it compiles :D, sending of mails is untested though)
+integration into the preferences module is still missing
+the API along with also the new extension points still needs some work but is quite stable right now
+introduced a base class for the email address validator and extended its private interface so that implementers of new validators can reuse existing functionality
+db upgrades are working smoothly
+the data model might need a few extra attributes, right now there is
+address
+,
+hash
+,
+state
+and
+ts
+aka
+timestamp
+additional attributes have been added:
+redirect_url
+and
+lang
+made the template a pluggable component which can be configured in the
+TracIni
+[notification]
+the default template is hard coded and must be moved so that it can be translated
+Repository
+​
+https://github.com/axnsoftware/trac-bugs-n-features/tree/trac-issue-4286
+​
+git://github.com/axnsoftware/trac-bugs-n-features.git
+branch trac-issue-4286
+Using the Repository
+to clone the repository, simply type
+git clone
+​
+git://github.com/axnsoftware/trac-bugs-n-features.git
+this will create the trac-bugs-n-features folder in the current folder
+now cd into this directory
+cd trac-bugs-n-features
+in order to switch to the correct branch use
+git checkout trac-issue-4286
+See also:
+TracNotification
+,
+TracDev/Proposals
+,
+TracNotification API documentation
+,
+Developer reference page for AnnouncerPlugin

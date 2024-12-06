@@ -1,0 +1,11 @@
+Ideas for improving the roadmap module
+User interface
+Add
+Edit
+and
+Delete
+buttons for each milestone on the Roadmap, like the
+Edit
+and
+Delete
+buttons for each report on the Report Listing page.

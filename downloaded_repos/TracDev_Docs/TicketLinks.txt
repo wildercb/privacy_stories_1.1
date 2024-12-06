@@ -1,0 +1,56 @@
+Generalized Ticket Links
+This proposals corresponds to the implementation of
+#31
+and the related tickets, like
+#886
+/
+#9550
+.
+The work started on this topic by bootstrapped by the
+patch
+contributed by Joachim Hoessler on that ticket.
+The approach from this patch was preferred over the ones from existing plugins (
+​
+TH:MasterTicketsPlugin
+,
+​
+TH:SubticketsPlugin
+,
+​
+TH:ChildTicketsPlugin
+) as none was providing a really extensible starting point, in the spirit of
+#31
+. The first two use a specific table dedicated to the relation they're dealing with (respectively
+mastertickets(source, dest)
+,
+subtickets(parent,child)
+), and the latter is using a
+parent
+custom field. That is not to say there are no interesting ideas to lift from there ;-)
+The initial data model
+ticket_links(source, type, destination)
+is quite close in spirit to the one proposed in
+TracRelations
+, but is focusing on the tickets. This is a good thing, as previous attempts at creating tables for storing relations between any resources are difficult to push through. Second, storing the relations while being centered on a particular resources are also in line with my recent updates to the
+GenericTrac
+proposal (see
+GenericTrac#Relations
+), so this approach can be seen as a practical test ground for those ideas.
+Besides this, there are no big plans yet for this feature - it'll eventually go to the point of implementing fully
+#31
+and
+#886
+, but not up to the
+SubTickets
+proposal.
+The
+TicketLinks
+page describes the work in progress in the
+ticket-links
+Mercurial branch.
+Note that this approach has stalled, in part because I couldn't find a good way to integrate this with the
+TicketQuery
+module. Lack of global approach for dealing with multi-valued fields…
+#918
+. —
+cboos, 2014

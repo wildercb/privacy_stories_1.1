@@ -1,0 +1,401 @@
+←
+0.12
+|
+1.1
+→
+TracDev/ApiChanges/1.0
+1.0
+is the current stable version of Trac
+These notes reflect the final status.
+Summary
+Prerequisites
+Modified Dependencies
+jQuery and jQuery UI (bundled)
+Babel (optional)
+Clearsilver (dropped)
+Genshi (mandatory)
+Detailed List of Developer Visible Changes
+Database API Changes
+Environment.get_db_cnx
+is obsolete
+Environment.db_query()
+and
+Environment.db_transaction()
+(1.0)​
+New in the 1.0 API
+Prerequisites
+Python 2.4 support has been dropped.
+Python versions 2.5, 2.6 and 2.7 are supported.
+Modified Dependencies
+jQuery and jQuery UI (bundled)
+The bundled version of
+​
+jQuery
+is now 1.7.2 instead of 1.4.4 in Trac 0.12-stable.
+See jQuery release notes for the corresponding major updates
+​
+1.5
+,
+​
+1.6
+and
+​
+1.7
+.
+The full minified jQuery UI package is now bundled with Trac. The version is
+​
+1.8.21
+and includes a custom theme.
+Babel (optional)
+The internationalization support (i18) for Trac is depending on
+​
+Babel
+, preferably version 0.9.6. The trunk version (1.0dev) should work as well.
+Clearsilver (dropped)
+Support for
+ClearSilver
+templates has been dropped. In case your plugin was still using
+.cs
+templates,
+PortingFromClearSilverToGenshi
+is now mandatory.
+Genshi (mandatory)
+Genshi 0.7dev
+changed to accepting
+unicode
+instances by default, rather than UTF-8 encoded regular
+str
+instances. Trac has been updated to override the default back to UTF-8 but plugins that access Genshi directly might raise an error:
+UnicodeError: source returned bytes, but no encoding specified
+.
+Genshi 0.6.x
+is still supported and will likely be a safer alternative. See
+#10126
+for details.
+Detailed List of Developer Visible Changes
+Component: database backend
+(3 matches)
+Ticket
+Summary
+#6348
+Catch database exceptions in a backend neutral way
+API Changes
+Added the attribute
+db_exc
+to
+Environment
+to access DB-specific exception types.
+Added the method
+get_exceptions()
+to
+IDatabaseConnector
+.
+#8575
+IntegrityError: duplicate key violates unique constraint
+API Changes
+trac.db
+: Added a method
+update_sequence()
+to database connections to allow updating table sequences during schema updates.
+[10114]
+#9842
+[PATCH] Make database connectors reusable
+API Changes
+IDatabaseConnector.init_db()
+now accepts an optional schema string, if not provided it is read from the
+TracIni
+.
+Component: general
+(11 matches)
+Ticket
+Summary
+#8036
+allow IPermissionRequestor to extend existing meta-permissions
+API Changes
+perm: Made meta-permissions cumulative, so e.g.
+TICKET_ADMIN
+can be extended by plugins.
+[10417]
+#8695
+generate API documentation
+API Changes
+make apiref
+for Epydoc documentation;
+make apidoc
+for Sphinx documentation
+#9418
+Creating instances of Component class is unsafe in multi-thread
+API Changes
+Ensure that a
+Component
+'s
+__init__(self)
+method is always called before any other.
+#9536
+Remove Python 2.4 compatibility
+API Changes
+db API makeover by introducing context managers and a shortcut for query execution; see
+TracDev/DatabaseApi#Trac0.13API
+for details
+#9777
+New option for displaying absolute date/time in ticket
+API Changes
+Provide
+pretty_dateinfo
+function which displays relative/absolute datetime in the user preferences and
+default_dateinfo_format
+option.
+#9836
+Describe trac.ini sections in code
+API Changes
+config: Added the
+ConfigSection
+descriptor to define and document configuration sections.
+[10341]
+#9870
+Improve the cache subsystem
+API Changes
+It is now safe to inherit from classes having
+@cached
+properties.
+#10165
+Upgrade to jQuery 1.7.x
+API Changes
+Upgraded jQuery to 1.7.2.
+#10245
+jQuery UI integration
+API Changes
+trac.web.chrome:
+add_script_data()
+now also accepts keyword arguments.
+add_jquery_ui()
+adds the jQuery UI Javascript library.
+#10427
+trac.log: dead code - logger_factory()
+API Changes
+Removed obsolete
+trac.log.logger_factory
+function.
+#10644
+[PATCH] Allow microseconds in parse_date() input
+API Changes
+parse_date()
+now optionally accepts micro-seconds in the date string
+Component: i18n
+(2 matches)
+Ticket
+Summary
+#10038
+Descriptions of wiki macros should be translated
+API Changes
+trac.wiki.api:
+get_macro_description
+return a tuple of gettext domain and macro description. The gettext domain is used to translate the description.
+#10717
+js: make it unnecessary to call babel.format explicitly
+API Changes
+babel.js: it's no longer necessary to call
+babel.format
+, one can directly pass formatting parameters to
+gettext
+,
+_
+and
+ngettext
+(
+r11068
+)
+Component: rendering
+(2 matches)
+Ticket
+Summary
+#9915
+Extend RST to support additional directive types
+API Changes
+Registered reStructuredText roles and directives can gain access to the Trac environment and rendering context corresponding to the docutils content being processed.
+#10538
+restructuredtext renderer confused by utf-8 BOM
+API Changes
+trac.mimeview.api.content_to_unicode
+will remove the leading BOM character in the content if present (
+r10967
+)
+Component: roadmap
+(1 match)
+Ticket
+Summary
+#2182
+configurable date and time formats
+API Changes
+trac.util.datefmt
+:
+format_{date,time,datetime}
+,
+parse_date
+and
+get_{date,datetime}_format_hint
+takes optionals locale argument (default to None)
+[10571]
+Added
+user_time
+helper function for
+format_*
+and
+parse_date
+functions
+[10571]
+trac.web.main
+: Added
+lc_time
+property of
+Request
+class for selecting the date format
+[10571]
+Component: ticket system
+(2 matches)
+Ticket
+Summary
+#9935
+[PATCH] Make req parameter to Query.execute() optional
+API Changes
+The req parameter to Query.execute() is no longer required.
+#10667
+Better HTML tag metadata in page output
+API Changes
+trac-field-<fieldname>
+classes added to field changes in the ticket change history
+[11112]
+Component: version control
+(3 matches)
+Ticket
+Summary
+#9607
+Rework branch labeling in the timeline
+API Changes
+versioncontrol: added
+Changeset.get_tags()
+[10077]
+#10208
+AuthzSourcePolicy does not conform to mod_authz_svn rules
+API Changes
+versioncontrol: use the requested
+(path, rev)
+for the identity of a
+Node
+instead of
+(created_path, created_rev)
+(
+r10914
+)
+#10712
+move svn support to tracopt
+API Changes
+Subversion specific code is now located in the
+tracopt.versioncontrol.svn
+package.
+Component: web frontend
+(2 matches)
+Ticket
+Summary
+#7768
+add_script & add_stylesheet don't support external scripts
+API Changes
+trac.web.chrome:
+add_script()
+and
+add_stylesheet()
+now also accept absolute URLs
+[10027]
+#7774
+Allow to set script charset in add_script
+API Changes
+chrome:
+add_script
+takes optional charset argument (defaults to 'utf-8').
+[10196]
+Component: wiki system
+(1 match)
+Ticket
+Summary
+#8137
+TracQuery count as part of a heading
+API Changes
+Added
+IWikiMacroProvider.is_inline
+optional method. If it is present and returns True, then the macro is called even from an inline context (
+r10905
+)
+Database API Changes
+Environment.get_db_cnx
+is obsolete
+Following the
+deprecation
+made in 0.12, using
+Environment.get_db_cnx
+for obtaining a database connection is now considered
+obsolete
+and its use is heavily discouraged, as that method will be removed in Trac 1.1.
+One should now only use the
+context managers
+for retrieving a database Connection
+in read or write mode.
+a
+read-only
+Connection can be used to form queries:
+with
+env
+.
+db_query
+as
+db
+:
+...
+a
+db
+instance obtained the above way should only be used for executing
+SELECT
+queries
+a
+writable
+Connection can be used to modify the database content in a transaction:
+with
+env
+.
+db_transaction
+as
+db
+:
+...
+a
+db
+instance obtained the above way can be used to execute
+INSERT/UPDATE/DELETE
+queries; they will be committed when the last such automatic transaction 
+in the control flow completes successfully. See
+DatabaseApi
+for the full details.
+Environment.db_query()
+and
+Environment.db_transaction()
+(1.0)
+​
+The
+@with_transaction(env)
+/
+@env.with_transaction()
+decorators introduced in 0.12 remain available, but they're now deprecated as well, as the
+with
+syntax is the one to be used. Those decorators will likely be removed in Trac 1.1 as well.
+See
+#8751
+for details and related notes about
+get_db_cnx
+deprecation above.
+New in the 1.0 API
+Be sure to have a look at the new
+ApiDocs
+(
+​
+Sphinx generated documentation for Trac 1.0
+).
+This is a work in progress - coverage for 1.0 is not complete but will be extended in the 1.0-stable branch.

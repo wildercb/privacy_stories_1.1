@@ -1,0 +1,107 @@
+Wiki Storage (
+#1132
+)
+This proposal is about implementing new storage backends for wiki pages. This started mainly as an effort to implement the
+#1132
+ticket, but has some more far reaching consequences, notably that I chose this as the starting point for experimenting with
+GenericTrac
+.
+Also, when thinking about the proper way to make the storage backend configurable, I realized this had not to be an all or nothing choice, provided we coupled that with the
+WikiNamespaces
+idea developed in
+#3021
+. A given namespace has one storage backend, and multiple namespaces can happily coexist, for different purpose and breadth of use. See related proposal for details.
+For historical background, see
+TighterSubversionIntegration
+and
+WhySQLite
+. The arguments presented there tend to defend one approach versus the other, whereas here we show that with some flexibility we can propose a palette of solutions that can cover all the needs (including the
+status quo
+;-) ).
+Implementation plan
+extract the code related to specificities of the current database model in a TraditionalWikiStorage component
+associate a storage backend to the default wiki namespace
+wiki:
+via a configuration setting:
+[wiki]
+default_storage_backend = TraditionalWikiStorage
+introduce a
+RepositoryWikiStorage
+component that delegates the storage operations to a VCS in a dedicated repository (the repository has to be created first)
+[wiki]
+default_storage_backend = RepositoryWikiStorage
+default_wiki_repository = wiki
+this leaves open the question whether attachments should be stored there as well;
+maybe do that in a second step?
+what about indexing? Do we want to special case a wiki repository or do we want to take this opportunity to implement
+#3541
+? Start with
+no
+search capabilities.
+storage details: would be nice to have pages stored with
+.wiki
+extension (and map that to x-trac-wiki, btw), as this will make life easier for people editing pages with an editor from a checkout. In addition, this will solve the problem for subwiki pages:
+TracDev
+→
+/TracDev.wiki
+TracDev/Proposals/WikiStorage
+→
+/TracDev/Proposals/WikiStorage.wiki
+In a later step, we could even store the attachments in the same backend:
+TracDev
+→
+/TracDev.wiki
+attachment:image.png:wiki:TracDev
+→
+/TracDev.attachment/image.png
+If extra attributes have to be stored, they could be placed in a
+TracDev.<field>
+file.
+We should also add some extra limitations to the allowed page names, so that a checkout can work on Windows (i.e. no characters in
+"\\/:*?\"<>|"
+)
+introduce a
+GenericWikiStorage
+component that implements an improved in-db storage scheme (
+GenericTrac#Base
+). This would allow to implement advanced features, like
+#695
+and
+#1386
+.
+introduce
+WikiNamespaces
+(+ add that page to the
+TracGuide
+)
+objectify
+WikiNamespaces
+(
+GenericTrac#Base
+), have a
+namespace:
+resolver
+add a dispatching mechanism from a namespace to a backend, similar to the one used for repositories, possibly abstracting some code? Although this should be simpler as we could require naming the storage backend explicitly (as the
+backend
+property of the namespace. If it's
+RepositoryWikiStorage
+, then the extra
+repository
+property is also needed to indicate
+which
+repository contains the wiki).
+introduce a mixed db/repository storage,
+RepositoryDbWikiStorage
+, which combines the advantages of both the
+RepositoryWikiStorage
+system and the
+GenericWikiStorage
+(for queries and search); this is the "ultimate" combination touted in
+GenericTrac#History
+implement
+AdvancedWikiOperations
+for the backend that support it (
+RepositoryWikiStorage
+and
+RepositoryDbWikiStorage
+)

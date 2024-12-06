@@ -1,0 +1,798 @@
+←
+1.1
+|
+1.4
+→
+Documenting API changes since 1.2.x
+The next stable version of Trac will be named 1.4 and will contain the cumulative changes made in the successive 1.2.x releases.
+These notes reflect the current status for
+1.3.6
+, in
+trunk
+​
+.
+Proposed changes are prefixed with an
+OPEN
+mark and the
+paragraph is written in italics.
+Summary
+Prerequisites
+Modified Dependencies
+jQuery and jQuery UI (bundled)
+Babel (optional)
+Jinja2 (mandatory)
+Genshi (optional, deprecated)
+Databases
+Other
+Compatible Distros
+Deprecated Modules and APIs Removed
+New Dependencies
+Detailed List of Developer Visible Changes
+In Trac 1.3.1
+In Trac 1.3.2
+In Trac 1.3.3
+In Trac 1.3.4
+Other Modifications made to the 1.2 API
+Modified Interfaces
+IAttachmentChangeListener
+(1.3.2)​ (1.2)​
+Uncategorized Changes
+New in the 1.3 API
+Prerequisites
+Only Python version 2.7 is supported.
+The following language features introduced in Python 2.7 can now be used and the related clean-ups can be done:
+OrderedDict
+Set literals
+Set and dictionary comprehensions
+TODO
+List supported browsers. Consider using
+​
+jQuery's list
+.
+Modified Dependencies
+See
+​
+gmessage:trac-dev:nkMUY_8ILF0/rg1rsArDIewJ
+for a discussion about what dependencies we'll support in Trac 1.4.
+jQuery and jQuery UI (bundled)
+Upgraded:
+jQuery to 1.12.4
+jQuery UI to 1.12.1
+jQuery Timepicker to 1.6.3
+Babel (optional)
+Jinja2 (mandatory)
+Jinja2 ≥ 2.9.3 is required.
+Genshi (optional, deprecated)
+Genshi support is deprecated as the templating library, having been replaced by Jinja2. Genshi ≥ 0.6 is still needed to use many plugins.
+The goal is to remove Genshi support during the 1.5.x development cycle, at the latest, so plugin developers will be urged to do the switch as well, as explained in
+PortingFromGenshiToJinja
+.
+Databases
+Database
+SQLite
+≥ 3.0
+PostgreSQL
+≥ 9.1.0
+MySQL / MariaDB
+≥ 5.0
+Database Bindings
+pysqlite
+≥ 2.6.0 (version provided by Python 2.7)
+psycopg2
+≥ 2.0
+PyMySQL
+Any version, but 0.7+ is recommended
+Other
+Package
+Req or Opt?
+Version supported
+SetupTools
+Required
+≥ 0.6, 5.4 - 5.6 are not recommended.
+Git
+Optional
+≥ 1.5.6
+Subversion
+Optional
+≥ 1.6
+DocUtils
+Optional
+≥ 0.3.9
+Textile
+Optional
+≥ 2.0
+Pygments
+Optional
+≥ 1.0
+passlib
+Optional
+Windows only
+Compatible Distros
+The supported dependencies were determined by aiming to be compatible with the versions provided by the package managers on the following distros.
+Package
+Ubuntu 16.04
+Ubuntu 14.04
+Debian 9.3
+Debian 8.8
+Debian 7.8
+CentOS 7.4
+openSUSE 42.1
+Python
+2.7.12
+2.7.5
+2.7.13
+2.7.9
+2.7.3
+2.7.5
+2.7.9
+Python3
+3.5.2
+3.4.0
+3.5.3
+3.4.2
+3.2.3
+n/a
+3.4.1
+Babel
+1.3
+1.3
+2.3.4
+1.3
+0.9.6
+0.9.6
+1.3
+Genshi
+0.7
+0.7
+0.7
+0.7
+0.6
+n/a
+0.7
+SQLite3
+3.11.0
+3.8.2
+3.16.2
+3.8.7
+3.7.13
+3.7.17
+3.8.10.2
+PostgreSQL
+9.5.3
+9.3.6
+9.6.6
+9.4.12
+9.1.15
+9.2.23
+9.4, 9.3.11, 9.4.6
+MySQL
+5.7.13
+5.5.41, 5.6.19
+n/a
+5.5.55
+5.5.41
+n/a
+5.6.30
+MariaDB
+10.0.25
+5.5.41
+10.1.26
+10.0.30
+n/a
+5.5.56
+10.0.22
+psycopg2
+2.6.1
+2.4.5
+2.6.2
+2.5.4
+2.4.5
+2.5.1
+2.6
+PyMySQL
+0.7.2
+0.7.10
+n/a
+n/a
+SetupTools
+20.7
+3.3.1
+33.1.1
+5.5.1
+0.6.24
+0.9.8
+18.0.1
+Git
+2.7.4
+1.9.1
+2.11.0
+2.1.4
+1.7.10
+1.8.3.1
+2.6.6
+Subversion
+1.9.3
+1.8.8
+1.9.5
+1.8.10
+1.6.17
+1.7.14
+1.8.10
+DocUtils
+0.12
+0.11
+0.13.1
+0.12
+0.8.1
+0.11
+0.11
+Textile
+2.2.2
+2.1.5
+2.3.5
+2.1.5
+2.1.5
+n/a
+n/a
+Pygments
+2.1
+1.6
+2.2.0
+2.0.1
+1.5
+1.4
+1.6
+Apache
+2.4.18
+2.4.7
+2.4.25
+2.4.10
+2.2.22
+2.4.6
+2.4.16
+mod_wsgi
+4.3.0
+3.4
+4.5.11
+4.3.0
+3.3
+3.4
+4.4.8
+mod_python
+3.3.1
+3.3.1
+3.3.1
+3.3.1
+3.3.1
+n/a
+3.5.0
+Nginx
+1.10.0
+1.4.6
+1.10.3
+1.6.2
+1.2.1
+n/a
+1.8.1
+Last Updated
+2018-02-13
+2017-05-25
+2018-02-13
+Deprecated Modules and APIs Removed
+API change for
+IEnvironmentParticipant
+methods
+removal of `db` parameter
+, is now effective, see for example
+r15304
+New Dependencies
+Detailed List of Developer Visible Changes
+In Trac 1.3.1
+Component: admin/console
+(1 match)
+Ticket
+Summary
+#12242
+TracAdmin "permission add" command should be atomic
+API Changes
+PermissionSystem.grant_permission
+raises
+PermissionExistsError
+rather than
+IntegrityError
+when the user already has the action or is a member of the group.
+Component: database backend
+(1 match)
+Ticket
+Summary
+#12496
+Include PostgreSQL version in environment_info table
+API Changes
+Added
+get_system_info
+to
+IDatabaseConnector
+interface.
+DatabaseManager
+implements
+ISystemInfoProvider
+to return the database version.
+MySQLConnector
+,
+PostgreSQLConnector
+and
+SQLiteConnector
+no longer implement
+ISystemInfoProvider
+.
+Moved
+IEnvironmentSetupParticipant
+and
+ISystemInfoProvider
+from
+trac.env
+to
+trac.api
+.
+Component: general
+(2 matches)
+Ticket
+Summary
+#11874
+Allowing logger to be extended with different handlers
+API Changes
+EnvironmentStub
+logs to a
+MemoryHandler
+and a list of
+(debug_level, message)
+tuples can be retrieved through the
+log_messages
+property.
+logger_handler_factory
+no longer returns the handler as the second return parameter. The handler can be accessed through
+Environment.log.handlers[0]
+.
+Added function
+trac.log.shutdown
+for cleaning up logger handlers.
+Added dictionary
+LOG_LEVEL_MAP
+in
+trac.log
+module, for mapping string log levels to integer log levels.
+#12558
+Add contextmanager for Popen
+API Changes
+Added context manager for
+Popen
+to
+trac.util.compat
+. The code is copied from the Python 3.2 implementation.
+Component: search system
+(1 match)
+Ticket
+Summary
+#11748
+Disabling SearchModule does not remove search box
+API Changes
+PermissionSystem.get_user_permissions
+returns only defined permissions, unless the
+undefined
+parameter is
+True
+. The default value of
+undefined
+is
+False
+.
+Component: wiki system
+(1 match)
+Ticket
+Summary
+#9612
+`WikiPage` doesn't need the `ipnr` attribute
+API Changes
+Added
+upgrade_tables
+method to
+DatabaseManager
+class. Added method to
+Table
+class for removing columns:
+remove_columns
+.
+In Trac 1.3.2
+Component: admin/console
+(2 matches)
+Ticket
+Summary
+#11419
+More user-friendly error message from trac-admin console commands when IntegrityError in database
+API Changes
+Added
+ResourceExistsError
+, which is raised when inserting a resource that already exists.
+Fixed Cached fields returned by
+TicketSystem.get_ticket_fields
+were not updated when milestone due or completed dates were changed.
+#12667
+Make test case in trac.admin.tests.console reusable by plugins
+API Changes
+Added base class
+TracAdminTestCaseBase
+to
+trac.admin.test
+, for implementing console admin test cases in Trac packages and plugins.
+Component: attachment
+(1 match)
+Ticket
+Summary
+#12870
+Add API to rename attachments
+API Changes
+Added
+Attachment.move
+.
+Attachment.reparent
+is deprecated and will be removed in
+1.5.1
+.
+Added
+IAttachmentChangeListener.attachment_moved
+.
+IAttachmentChangeListener.attachment_reparent
+is deprecated and will be removed in
+1.5.1
+.
+Component: database backend
+(1 match)
+Ticket
+Summary
+#12643
+Check for table existence in DatabaseManager.upgrade_tables
+API Changes
+DatabaseManager.upgrade_tables
+checks table existence before migrating data for a table, allowing new tables to be specified in
+schema
+.
+Added
+has_table
+method to
+DatabaseManager
+and
+ConnectionBase
+.
+get_column_names
+and
+drop_columns
+of
+DatabaseManager
+raises an
+OperationalError
+when the given table is missing.
+Component: general
+(5 matches)
+Ticket
+Summary
+#11317
+Allow navigation items to be added through the mainnav or metanav sections
+API Changes
+Added the
+deregister
+entry to the
+ComponentMeta
+class. This is mainly useful in tests for removing a component with extension points from the cache so that's it's not visible outside of the test case in which it is used.
+#12231
+Add is_authenticated property to Request class
+API Changes
+Added
+is_authenticated
+method to
+Request
+class.
+#12649
+Simplify configuration parsing in svn_authz module
+API Changes
+Refactored
+svn_authz
+module to use
+UnicodeConfigParser
+.
+Added
+ignorecase_option
+to
+UnicodeConfigParser
+(applied to 1.2-stable).
+#12684
+_RequestArgs.get should alias getfirst
+API Changes
+_RequestArgs.get
+aliases
+getfirst
+, so
+req.args.get
+will no longer return a list when there are duplicate keys in the parameter string.
+This change is not backward-compatible.
+#12812
+Move test helpers to test.py modules
+API Changes
+Ticket test helper methods can be found in the
+trac.ticket.test
+module.
+Component: i18n
+(2 matches)
+Ticket
+Summary
+#12348
+Now button in datetime picker use wrong time when timezones are different between Trac and browser
+API Changes
+Upgraded:
+jQuery to 1.12.4
+jQuery UI to 1.12.1
+jQuery Timepicker to 1.6.3
+#12852
+extract_messages command failing without Genshi
+API Changes
+Error is raised when extracting messages from Genshi template if Genshi is not installed.
+Component: query system
+(1 match)
+Ticket
+Summary
+#11723
+Call ticket manipulators during batch modify
+API Changes
+Ticket manipulators are called for a batch modify request.
+Added
+validate_comment
+method to the
+ITicketManipulator
+interface. The method is optional for classes implementing
+ITicketManipulator
+.
+Moved attributes
+max_comment_size
+,
+max_description_size
+and
+max_summary_size
+from
+TicketModule
+to
+TicketSystem
+. The
+TicketModule
+has accessors for backward compatibility, to be removed in 1.5.1.
+Component: rendering
+(2 matches)
+Ticket
+Summary
+#12639
+Integrate Jinja2 branch
+API Changes
+Major changes in
+trac.util.html
+,
+trac.web.Chrome
+,
+trac.web.RequestFilter
+to support Jinja2.
+trac.web.ITemplateStreamFilter
+is deprecated.
+#12680
+TypeError: wiki_page_changed() takes exactly 7 arguments (6 given)
+API Changes
+Improved exception trapping and logging when executing
+ExtensionPoint
+s:
+IEnvironmentSetupParticipant
+,
+INavigationContributor
+and
+ITimelineEventProvider
+. Added context managers for wrapping execution of extension point methods:
+Environment.component_guard
+in
+trac.env
+, which logs a
+TracError
+at
+warning
+level, and a
+Exception
+a
+error
+level with a traceback.
+component_guard
+in
+trac.web.chrome
+, which executes
+Environment.component_guard
+and also renders a warning.
+Component: report system
+(2 matches)
+Ticket
+Summary
+#11550
+folding.js not available on report pages
+API Changes
+folding.js
+is included in all Trac views.
+#12704
+TypeError: unicode argument expected, got 'str'
+API Changes
+Report.insert
+and
+Report.update
+raise a
+TracError
+when
+query
+is empty (
+1.2.1
+).
+Component: ticket system
+(2 matches)
+Ticket
+Summary
+#11865
+Workflow macro could read files from the repository
+API Changes
+Added method
+read_file_by_path
+to
+RepositoryManager
+, which returns the contents from the specified repository-scoped file at the specified revision, or HEAD revision if no revision is specified.
+#12807
+Make it easier to customize the allowed owners for a ticket
+API Changes
+Added
+get_allowed_owners
+method to
+ConfigurableTicketWorkflow
+class, which returns the allowed ticket owners that will populate the assign-to select. The allowed ticket owners can be programmatically controlled by subclassing
+ConfigurableTicketWorkflow
+and overriding the
+get_allowed_owner
+method.
+Component: version control
+(1 match)
+Ticket
+Summary
+#12653
+git support under "Bash for Ubuntu for Windows"
+API Changes
+Added
+trac.util.native_path
+utility.
+Component: wiki system
+(1 match)
+Ticket
+Summary
+#9487
+Control the default wiki page through trac.ini
+API Changes
+Extracted variables in
+WikiModule
+for the start page and title index page, so they can be overridden by a plugin.
+In Trac 1.3.3
+Component: admin/console
+(1 match)
+Ticket
+Summary
+#12891
+Refactor do_initenv method
+API Changes
+Environment.create
+raises a
+TracError
+if the base directory of the
+path
+does not exist or the
+path
+is not an empty directory.
+RepositoryManager.get_real_repositories
+returns a sorted
+list
+rather than a
+set
+.
+Component: attachment
+(1 match)
+Ticket
+Summary
+#12905
+Make it easier to get file upload from request
+API Changes
+Added
+getfile
+and
+getfilelist
+arguments to
+req.args
+.
+Component: general
+(2 matches)
+Ticket
+Summary
+#12879
+Use consistent styling for reporter and owner property changes
+API Changes
+Values in owner, reporter and CC property changes are decorated with
+trac-author-*
+classes (by
+Chrome.authorinfo
+).
+#12915
+Add method to PermissionSystem for retrieving user groups
+API Changes
+Added
+PermissionSystem.get_permission_groups(username)
+, which returns a sorted list of all groups that
+username
+belongs to.
+DefaultPermissionStore
+implements
+IPermissionGroupProvider
+.
+Added
+skip
+argument to
+PermissionSystem.get_actions_dict
+, for skipping an
+IPermissionRequestor
+, for consistency with
+PermissionSystem.get_actions
+method arguments (applied to 1.0-stable).
+Component: web frontend
+(1 match)
+Ticket
+Summary
+#13042
+Request.send_error shouldn't load and render the error template
+API Changes
+Moved error template rendering from
+Request.send_error
+to
+trac.web.main
+.
+Request.send_error
+has a new signature that sends a rendered template.
+Component: wiki system
+(1 match)
+Ticket
+Summary
+#12847
+TypeError: unicode argument expected, got 'str'
+API Changes
+Fixed
+TracHTMLSanitizer
+raising exceptions and decoding refs twice in title attributes.
+In Trac 1.3.4
+Component: ticket system
+(1 match)
+Ticket
+Summary
+#13044
+Clone button is missing if the description is empty
+API Changes
+CoffeeScript 1.x should be used for compiling. The Makefile returns an error if CoffeeScript version is not 1.x.
+Other Modifications made to the 1.2 API
+Modified Interfaces
+IAttachmentChangeListener
+(1.3.2)
+​
+(1.2)
+​
+Attachments can now be renamed, so
+attachment_moved(attachment, old_parent_realm, old_parent_id, old_filename)
+has been added to allow plugins to be notified of this.
+Uncategorized Changes
+New in the 1.3 API
+Be sure to have a look at the new
+ApiDocs
+(
+​
+for latest trunk
+).
+This is a work in progress - coverage is still not yet complete.

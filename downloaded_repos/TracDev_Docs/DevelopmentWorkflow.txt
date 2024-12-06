@@ -1,0 +1,224 @@
+Development Workflow for Trac
+The public branches listed in
+TracDownload#LatestDevelopmentSourceCode
+should remain bug free and always usable from an end-user perspective, as we support installing directly from the branches. To achieve this, we follow the practices listed below.
+Initial code review
+Except for trivial fixes, it's usually a good idea to start with a patch or an experimental branch, to provide some visibility of the changes to the other contributors. Create a patch as a
+unified diff
+.
+A patch is always attached to a ticket. If there is no ticket, then create one and attach the patch to it.
+When there are many iterations or spin-off changes needed, it's a good idea to start a branch, either in the svn
+sandbox
+for those who have the commit permission or inside an external DVCS repository, by forking our Mercurial or Git mirrors (see
+TracRepositories
+).
+Writing Commit Messages
+What follows is a brief outline of what constitutes a good commit message. More extensive guidelines can be found
+​
+here
+and
+​
+here
+.
+Commits should be atomic. If three separate issues are being fixed (unless they are all fixed by one change), they need to be done as three separate commits. This also applies to whitespace and style changes, which should be done in their own commit. Whitespace commits should not include code or content changes. Accordingly, code change commits should not include whitespace changes (unless the whitespace changes are on the same lines as the code being changed).
+Commit messages should describe what changed, and reference the issue number if the commit closes or is associated with a particular issue.
+Example:
+Version: Short Description
+ 
+Optional Long Description
+
+[skip ci] (optional)
+
+Refs #zzz
+Subject
+This is the first line. It consists of the development version, like
+1.2.2dev
+. This line must be 72 characters or less. There should be no full stop (period) at the end and the imperative form should be used (example:
+Add a command for setting wiki attributes
+).
+Long description
+There are two line breaks between the subject and the long description. The description can have any length and formatting, like lists, but it must be hard-wrapped at 80 characters.
+Skipping Build
+If you are confident the continuous integration tests don't need to be run for this commit (e.g. a documentation change), add
+​
+[skip ci]
+.
+References
+List the issues being addressed, using either
+Refs
+or
+Fixes
+. A comma-separated list of issues can be used:
+Refs #12, #34
+.
+Integration in release branches
+We commit the change first on one of the stable branches, eg
+branches/0.12-stable
+​
+, then merge the fix to later branches using svn's mergeinfo support.
+Merging in this direction (
+porting
+or
+forward porting
+) makes it quite easy to merge all pending changes from one stable branch to the next, eg
+0.12-stable
+​
+to
+1.0-stable
+​
+, then to
+trunk
+​
+. This workflow is much simpler than the opposite one,
+back porting
+, which involves cherry-picking or careful "blocking" of changes which shouldn't be merged back. The SCM tools have generally better support for merging in this forward direction, even Subversion since v1.5.
+While this pattern of
+forward porting
+makes it easy to merge all pending changes, in practice we cherry-pick changes as they are committed in order to keep all branches in sync and prevent pending changes from accumulating on a branch. Multiple changesets can be cherry-picked in a single merge command using a comma-separated list of changesets:
+-c 15407,15409
+.
+As a walk-through example, we start by developing on
+0.12-stable
+​
+:
+0
+.12-stable$ ed trac/attachment.py
+# or your other favorite editor
+0
+.12-stable$ make
+test
+...
+(
+all is good
+)
+0
+.12-stable$ svn ci -m
+"0.12.6dev: fixed ... (#xyz)"
+...
+Committing transaction...
+Committed revision
+15410
+.
+Now we want to port the change to
+branches/1.0-stable
+​
+:
+0
+.12-stable$
+cd
+../1.0-stable
+1
+.0-stable$ svn merge -c
+15410
+^/branches/0.12-stable
+1
+.0-stable$ make
+test
+...
+xxx
+1
+.0-stable$
+# some fixes needed for API changes
+1
+.0-stable$ svn ci -m
+"1.0.2dev: Merged from 0.12-stable."
+...
+Committing transaction...
+Committed revision
+15411
+.
+Now we want to port the change to
+trunk
+​
+:
+1
+.0-stable$
+cd
+../trunk
+trunk$ svn merge -c
+15411
+^/branches/1.0-stable
+trunk$ make
+test
+...
+xxx
+trunk$
+# some fixes needed for API changes
+trunk$ svn ci -m
+"1.1.2dev: Merged from 1.0-stable."
+...
+Committing transaction...
+Committed revision
+15412
+.
+Among the possible porting related fixes that should be done when porting:
+Use Python idioms adapted to the minimal version on the branch, eg for Trac 0.12 the baseline is Python 2.4, for Trac 1.0 and trunk it's 2.5; this means that among other things we can use
+with ...
+as appropriate.
+Use newer APIs and conventions, eg the
+DatabaseApi#Trac1.0API
+; see the
+ApiChanges
+subpage for the corresponding target branch.
+If a changeset should not be forward ported, for example when extracting new messages to the catalog, the commit should be blocked using a
+​
+record only
+merge. The
+record only
+merge is the same as a cherry-pick merge, with the addition of the
+--record-only
+switch.
+Note
+: you can always review the pending changes by viewing the
+svn:mergeinfo
+property in the
+TracBrowser
+, eg
+trunk
+​
+, which shows the changesets that are
+eligible
+for merge to the target branch.
+Pushing from a DVCS to SVN
+If the changes were staged in
+your dev Git or Hg repository
+, some additional steps are needed to commit the changes to Subversion. The steps will be described for a Git repository, but will be similar for an Hg repository.
+You should first interactively rebase (
+git rebase -i
+) your changes to get them in a form that is appropriate for committing to the Subversion repository. In doing so, consider how you'd like the changes to be represented in the repository history, taking into account that we frequently interrogate the repository history to discover the cause of regressions or understand the purpose and intent of code. For example, logically related changesets may be squashed if they were staged as multiple changesets for the purpose of easing code review. However, unrelated changes and refactorings should be pushed as separate changesets so that they don't obfuscate functional changes.
+Next, reword your log messages in a form that is appropriate for the central repository: prefix each log message with the target version (e.g.
+1.0.10dev:
+) and reference the appropriate ticket(s). See the
+log
+for examples.
+Once you've interactively rebased your Git branch and prepared your log messages, the process to push changes to Subversion is:
+Rebase your staging branch against the HEAD of the branch you'll be committing to
+Checkout an svn working copy of the branch you'll be committing to
+Copy the svn metadata directory (
+.svn
+) of the working copy into the root of your git repository
+Step through checkouts of your repository changesets and commit each of them to svn
+Here are the same steps described in command line form:
+$ svn checkout <target-branch> trac-svn-wc
+$ cp -r trac-svn-wc/.svn trac-git-repos/
+$
+cd
+trac-git-repos
+$ git status -sb
+## tXYZ
+$ git checkout tXYZ~3
+$ git log --format
+=
+"%B"
+> commit.txt
+$ svn add ...
+;
+svn del ...
+$ svn ci -F commit.txt
+$ git checkout tXYZ~2
+...
+$ git checkout tXYZ~1
+...
+$ git checkout tXYZ
+...
+Note that it's also perfectly workable to keep a single checkout under the control of multiple revision control systems simultaneously, for the long run.

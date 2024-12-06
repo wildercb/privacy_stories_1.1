@@ -1,0 +1,340 @@
+Journaling Proposal
+Note:
+This proposal has been superseded by
+TracDev/Proposals/CacheInvalidation
+. The
+#JournalingTables
+section is superseded by
+TracDev/Proposals/DataModel
+.
+The Problem
+Trac maintains coherency upon data changes by using various
+I...Listener
+extension points.
+While this works in many cases, this approach is somewhat flawed or insufficient in 
+situations where there are multiple server processes. And this is quite a common
+scenario, with the widespread use of the Apache/prefork web front-end.
+Some examples
+Reacting on Wiki content change
+Several Wiki pages are used to facilitate interactive configuration by the users.
+This is the case of the
+InterMapTxt
+, for maintaining the list of
+InterWiki
+prefixes,
+the
+BadContent
+page for maintaining a list of regexps used to filter out SPAM, 
+and probably more in the future. 
+See my original explanation about what's going on with
+​
+updating InterMapTxt
+.
+Reacting on Wiki page creation/deletion
+In order to not have to check in the DB for the existence of a Wiki page
+every time a
+WikiPageNames
+is seen in wiki text, we maintain a cache of
+the existing wiki pages.
+This list could be easily maintained using the change listener, but
+this would
+not
+work if a creation and deletion would be done
+by another process. A workaround for this is currently implemented:
+every once in a while, the cache is cleared and updated
+(see from
+source:trunk/trac/wiki/api.py@3362#L114
+​
+).
+This is a very ad-hoc solution. It should be possible to do this
+better and in a more generic way.
+A solution
+See
+TracDev/JournalingProposal
+for a more concise solution.
+Now, what is described below is still useful for what has been discussed in
+#1890
+(improved recording of ticket changes) and will eventually be consolidated with
+TracDev/Proposals/DataModel#ResourceChangeHistory
+one day.
+Current Situation
+For example, all the ticket  changes are journaled, in the
+ticket_change
+table:
+CREATE
+TABLE
+ticket_change
+(
+ticket
+integer
+,
+time
+integer
+,
+author
+text
+,
+field
+text
+,
+oldvalue
+text
+,
+newvalue
+text
+,
+UNIQUE
+(
+ticket
+,
+time
+,
+field
+)
+);
+There's currently some discussion about adding to the above 
+the
+ipnr
+and
+authenticated
+columns, to better track
+who did what (see
+#1890
+for details).
+But adding those to the above table would lead to even more duplication of data than what we currently have.
+Currently this duplication (of the ticket/time/author values)
+is even used to group together related changes!
+Step in the Right Direction
+A cleaner approach, for
+#1890
+, would be:
+CREATE
+TABLE
+ticket_change
+(
+tid
+integer
+,
+field
+text
+,
+oldvalue
+text
+,
+newvalue
+text
+,
+);
+CREATE
+TABLE
+ticket_transaction
+(
+tid
+integer
+PRIMARY
+KEY
+,
+ticket
+integer
+,
+time
+integer
+,
+author
+text
+,
+ipnr
+text
+,
+authenticated
+boolean
+);
+The
+_journal
+and
+_history
+tables
+Now, with this proposal, this could be extended to:
+CREATE
+TABLE
+ticket_history
+(
+tid
+integer
+,
+id
+int
+,
+field
+text
+,
+value
+text
+);
+CREATE
+TABLE
+ticket_journal
+(
+tid
+integer
+PRIMARY
+KEY
+,
+id
+int
+,
+change
+text
+,
+time
+integer
+,
+author
+text
+,
+ipnr
+text
+,
+authenticated
+boolean
+);
+ticket_history
+could eventually be spread in multiple, type-specialized tables (
+ticket_int_property
+, …).
+The
+change
+column in
+<resource>_journal
+could contain some keyword about
+the nature of the change:
+CREATE
+,
+DELETE
+,
+MODIFICATION
+, etc.
+Each process would write into the
+<resource>_journal
+table during the same
+transaction that modifies the object model tables themselves.
+This could be something along the lines of the following API:
+class
+WikiModule
+():
+def
+_do_create
+(
+self
+,
+pagename
+):
+...
+# Getting a new transaction for creating a Wiki page
+tnx
+=
+ModelTransaction
+(
+self
+.
+env
+.
+get_db_cnx
+())
+tnx
+.
+prepare
+(
+req
+.
+authname
+,
+'CREATE'
+)
+tnx
+.
+save
+(
+'wiki'
+,
+id
+=
+pagename
+,
+readonly
+=
+readonly
+,
+content
+=
+content
+)
+tnx
+.
+commit
+()
+# flush all changes to disk
+self
+.
+notify
+(
+tnx
+)
+# dispatch change information to listeners
+class
+TicketModule
+():
+def
+_do_save
+(
+self
+,
+ticket
+):
+tnx
+=
+ModelTransaction
+(
+self
+.
+env
+.
+get_db_cnx
+())
+tnx
+.
+prepare
+(
+req
+,
+'MODIFY'
+)
+tnx
+.
+save
+(
+'ticket'
+,
+ticket
+)
+tnx
+.
+commit
+()
+# flush all changes to disk
+self
+.
+notify
+(
+tnx
+)
+# dispatch change information to listeners
+The actual
+ModelTransaction
+object would know how to modify the underlying (generic) data model, hence the "Model" in the name.
+Notifying changes
+See
+TracDev/Proposals/Journaling@3
+for the older proposal and see
+TracDev/JournalingProposal
+for how this could be handled in a simpler way.

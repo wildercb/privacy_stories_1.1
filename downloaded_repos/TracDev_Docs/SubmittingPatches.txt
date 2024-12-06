@@ -1,0 +1,219 @@
+Submitting Patches
+Contents
+What is a good patch?
+Getting started
+Make some changes
+Adding files
+Make the patch
+Submit the patch
+Multiple Changesets
+Have you made some changes you'd like to submit to Trac? Great! We love to see them. To make things go smoothly for everyone, here are some guidelines on submitting your changes.
+What is a good patch?
+Providing a patch is no guarantee that the change will actually make it into the repository.
+The patch has to be endorsed by a Trac developer, who will carry the burden to maintain that change over time. So the patch has to feature the following:
+clarity
+no spurious changes like whitespace change or other random reformattings
+no unrelated changes; if some refactoring really needs to be done prior to the actual change, better do that in a separate patch
+strict adherence to the
+CodingStyle
+maintainability
+comments for the parts that needs to be commented, no more, no less
+add
+UnitTests
+or
+FunctionalTests
+make sure existing tests still pass with your change applied
+code quality: the pertinence of the fix or the feature is the main criterion
+See for example
+#8935
+,
+#9718
+.
+That can be hard to get right the first time, so you'll certainly get asked to improve your patch. You should be willing to take feedback into account and maybe do a few iterations of the patch.
+Getting started
+First you will need to get a copy of the Trac source to make and test your changes. Use
+​
+Subversion
+to get the source so that you can easily generate your patch.
+Bug fixes for a current release may be added on the "stable" branch:
+$ svn checkout https://svn.edgewall.org/repos/trac/branches/1.2-stable trac-1.2-stable
+Features should be added on the "trunk" development version:
+$ svn checkout https://svn.edgewall.org/repos/trac/trunk trac-trunk
+If you're familiar with version control systems like Git or Mercurial, all the better, you should rather pick one of the official mirrors (see
+TracRepositories#OfficialMirrors
+) and develop your patches using these tools. The advantage over Subversion is that you can "document" your patches by directly adding a commit log message to them and the tool will help you maintain your patches while Trac continues to evolve upstream.
+Then see
+how to setup a development environment
+.
+Make some changes
+Go ahead and make your changes to the Trac code.
+It is a good idea to apply the
+CodingStyle
+of the Trac project to your changes, so that we won't ask you to rework your changes later on.
+Test the changes using
+tracd
+.
+Ideally, you should write some tests (
+UnitTests
+or
+FunctionalTests
+) demonstrating the problem you're trying to address - the tests should
+fail
+before the fix and
+pass
+with your changes. Also, by running the tests, you will see if you didn't break anything else with your changes.
+A sentence like "Added some more tests - all tests pass" in your commit message is guaranteed to earn you points from the maintainers!
+Adding files
+Did you create any new files? If you only modified existing Trac files you can skip this. However, if you added any new files be sure to tell Subversion you're adding them:
+$ svn add trac/my_new_file.py
+The same applies if you use Mercurial, and in Git you'll also have to "add" modified files to the index.
+Make the patch
+A patch is a single file listing the changes you've made in a format that can be applied with the
+​
+GNU patch
+tool. It will look something like this:
+Index: /branches/0.9-stable/trac/scripts/admin.py
+===================================================================
+--- /branches/0.9-stable/trac/scripts/admin.py (revision 2822)
++++ /branches/0.9-stable/trac/scripts/admin.py (revision 3521)
+@@ -12,9 +12,10 @@
+ # history and logs, available at http://projects.edgewall.com/trac/.
+ #
+ 
++from __future__ import generators
++
+ __copyright__ = 'Copyright (c) 2003-2006 Edgewall Software'
+ 
+-from __future__ import generators
+ import cmd
+ import getpass
+ import os
+This format is called a "unified diff format".
+From the root of the repository, save your changes to the file "my_patch_file.diff":
+$ svn diff > my_patch_file.diff
+Pick an appropriate filename for the changes you've made.
+Note that
+svn diff
+will generate a diff in the unified format. If you are using the
+diff
+tool to produce the patch, then please use
+diff -u
+, otherwise the diff won't be an unified diff.
+With Mercurial or Git, make a commit with a detailed log message, the one you'd like to see later on in Trac itself! Then export it.
+With Mercurial, assuming your patch corresponds to the latest commit:
+$ hg
+export
+tip > my_patch_file.diff
+With Git, assuming your patch corresponds to the head:
+$ git show > my_patch_file.diff
+Submit the patch
+If there is an existing ticket related to the changes you've made, attach your patch file to that ticket. Otherwise please create a new ticket and attach your patch file. Provide a brief comment explaining your changes.
+Add the keyword
+​
+patch
+as a hint to developers that a patch has been provided.
+After that, depending on lots of factors, your patch will be reviewed and eventually integrated. Most likely, you'll be asked to rework your patch a bit, according to the preferences of the Trac maintainers.
+Multiple Changesets
+For work that requires more than a single changeset, or if you are simply more comfortable working with Git or Mercurial, it can be easier to stage the changes in a DVCS repository fork. The following will discuss how to work from the
+​
+GitHub mirror
+.
+​
+Fork the repository
+to your own
+GitHub
+account. To keep your fork in sync you'll want to configure your repository to pull in upstream changes from the Trac mirror.
+$ git clone https://github.com/rjollos/trac.git
+$
+cd
+trac
+$ git remote add mirror https://github.com/edgewall/trac.git
+$ git branch -a
+* trunk
+  remotes/origin/0.11-stable
+  remotes/origin/0.12-stable
+  remotes/origin/1.0-stable
+  remotes/origin/1.2-stable
+  remotes/origin/HEAD -> origin/trunk
+  remotes/origin/trunk
+# Add remote tracking branches, as needed
+$ git branch -b
+1
+.2-stable origin/1.2-stable
+Branch
+1
+.2-stable
+set
+up to track remote branch
+1
+.2-stable from origin.
+$ git branch
+1
+.2-stable
+* trunk
+Create a local topic branch to work from. It's useful to use the ticket number as a prefix when naming the branch (e.g.
+t12905
+). Be sure to base your work on the branch that the ticket is targeted against, e.g.
+1.2-stable
+or
+trunk
+. Never commit directly to a remote tracking branch (i.e.
+trunk
+or one of the
+-stable
+branches), as you'll need to pull upstream changes to those branches for rebasing your topic branch or creating new topic branches.
+$ git status -sb
+## trunk...origin/trunk
+$ git checkout -b t12905_request_getfile
+# or if the current branch was not trunk
+$ git checkout -b t12905_request_getfile trunk
+Do some work, staging your changes atomically. Use
+​
+interactive rebase
+and
+git add -p
+to breakup large changeset into atomic commits. Finally, push your changes back to your GitHub fork.
+# Edit files
+$ git add -p
+$ git commit
+# Repeat edit, add, commit cycle as needed
+$ git push -u origin t12905_request_getfile
+Publish your work to a Trac ticket. Please use a proper
+TracLink
+when adding a link to your topic branch, rather than pasting the URL in a ticket comment (e.g.
+​
+t12905_request_getfile.1
+):
+[https://github.com/rjollos/trac/commits/t12905_request_getfile.1 t12905_request_getfile.1]
+If your topic branch has fallen behind the target branch for integration, you should rebase your work and publish it again to the ticket. Never rebase a published branch, instead rename your branch before rebasing it. A common convention is to append
+.1
+,
+.2
+, … to the branch name. Rebasing is preferred to merging, as a rebased branch is cleaner and easier to integrate upstream.
+$ git rev-parse --abbrev-ref HEAD
+t12905_request_getfile.1
+$ git co trunk
+&&
+git pull
+&&
+git co -
+$ git branch -m t12905_request_getfile.2
+$ git rev-parse --abbrev-ref HEAD
+t12905_request_getfile.2
+$ git rebase trunk
+The same branch-renaming pattern should be followed if you need to revise a branch by editing commits (e.g. by interactive rebase). New changesets may be added to an already published branch, but the history of an already published branch must not be changed. A hint that you are changing the history of a published branch is when you need to use the
+-f
+/
+--force
+flag when
+push
+ing the branch to your remote origin.
+It's not necessary, or even helpful, to submit a pull request through the
+GitHub
+mirror, as the mirror is currently readonly. This may change in the future.
+See also:
+​
+Mercurial:ContributingChanges#Patch_descriptions
+,
+TracDev/DevelopmentWorkflow
+.

@@ -1,0 +1,689 @@
+Interface IWikiSyntaxProvider
+The IWikiSyntaxProvider is an Interface you could use to write plugins that allow you to bring your own wiki syntax into trac.
+Like the e.g.
+#5
+to see Ticket with id 5. Or the e.g
+{1}
+way to see report number 1.
+File: trac/wiki/api.py
+Here is the interface description from IWikiSyntaxProvider taken from the source file trac/wiki/api.py:
+class
+IWikiSyntaxProvider
+(
+Interface
+):
+def
+get_wiki_syntax
+():
+"""Return an iterable that provides additional wiki syntax.
+Additional wiki syntax correspond to a pair of (regexp, cb),
+the `regexp` for the additional syntax and the callback `cb`
+which will be called if there's a match.
+That function is of the form cb(formatter, ns, match).
+"""
+def
+get_link_resolvers
+():
+"""Return an iterable over (namespace, formatter) tuples.
+Each formatter should be a function of the form
+fmt(formatter, ns, target, label), and should
+return some HTML fragment.
+The `label` is already HTML escaped, whereas the `target` is not.
+"""
+Let's try to implement the following example wiki syntax:
+We want to be able to use something like
+s:w:someword
+to generate a link to a search in the wiki pages for
+someword
+.
+Searching in Tickets and Milestones should work equally by using
+s:t:someword
+and
+s:m:someword
+.
+We need to implement the method
+get_link_resolvers()
+to make that happen.
+You could also use the
+search:?q=searchword&wiki=on
+syntax, but this is for illustrative purposes only.
+As you can see in the source above, there are just 2 methods you must implement to get your own wiki syntax up and running.
+The easiest one is
+get_link_resolvers()
+.
+You need to return an iterable of tuples consisting of a string used as the prefix for a new linktype in trac and a callback, to be called when the prefix matches. In our example the string will be
+s
+shorthand for search:
+def
+get_link_resolvers
+(
+self
+):
+return
+[
+(
+'s'
+,
+self
+.
+_format_search_link
+)
+]
+It just returns one tuple, but you could return more if you want. This tuple tells Trac that it should call our
+_format_search_link()
+method every time it finds the string s:
+anystring
+in some wiki content.
+The real work will be done in our next method:
+_format_search_link
+. This method is called anytime Trac encounters one of our prefixes (inside wiki context), we registered through
+get_link_resolvers()
+:
+def
+_format_search_link
+(
+self
+,
+formatter
+,
+ns
+,
+target
+,
+label
+):
+self
+.
+env
+.
+log
+.
+debug
+(
+'formatter:
+%s
+ns:
+%s
+'
+%
+(
+formatter
+,
+ns
+))
+domains
+=
+{
+'w'
+:
+'wiki'
+,
+'t'
+:
+'ticket'
+,
+'m'
+:
+'milestone'
+}
+domain
+=
+'wiki'
+searchword
+=
+None
+if
+":"
+in
+target
+:
+domain
+,
+searchword
+=
+target
+.
+split
+(
+':'
+)
+else
+:
+searchword
+=
+target
+domain
+=
+domains
+.
+get
+(
+domain
+,
+'wiki'
+)
+return
+tag
+.
+a
+(
+label
+,
+href
+=
+formatter
+.
+href
+.
+search
+()
++
+'?q='
++
+searchword
++
+'&'
++
+domain
++
+'=on'
+,
+title
+=
+"Search for
+%s
+in
+%s
+(s)"
+%
+(
+searchword
+,
+domain
+))
+The method gets 4 arguments:
+a formatter object.
+a namespace, this string is our prefix for the linktype, in this case
+s
+.
+a target, this is the string which followed the namespace prefix of the link without the trailing
+:
+after namespace.
+a label, this the full string of the link, e.g.
+s:searchword
+.
+The return value should be some html, in our case it is a link to the specified search query.
+The first thing the method does is splitting the target into the domain and searchword:
+domain
+,
+searchword
+=
+target
+.
+split
+(
+':'
+)
+Then we return a valid link to a search page with our given searchquery. If there is no domain specified we use default to
+wiki
+and use the
+target
+string as
+searchword
+.
+Part two
+In the second part we implement the following wiki syntax using the second interface method
+get_wiki_syntax()
+:
+?t_searchword? Creates a link to a search for
+searchword
+in the Ticket domain.
+?m_searchword? Creates a link to a search for
+searchword
+in the Milestone domain.
+?w_searchword? Creates a link to a search for
+searchword
+in the wiki domain.
+You are not limited in creating new link types with this Interface, but mostly you would use
+WikiMacros
+instead.
+We have to implement get_wiki_syntax() to be able to use regular expressions in our new wiki syntax:
+def
+get_wiki_syntax
+(
+self
+):
+#group numbers dont work, why? Must use group names inside the regex.
+yield
+(
+r
+'\?(?P<domain>[tmw])_(?P<searchword>.+?)\?'
+,
+self
+.
+_format_regex_link
+)
+All this method does is telling Trac that whenever it encounters a hit with our given regular expression(s) - as in
+get_link_resolvers()
+you can have more than one - it should call the given callback method.
+Attention
+Group numbers cannot be used, because the regexp is integrated into a larger expression, therefore not preserving the position of the groups. Group names must be used instead.
+The given callback method must take 3 arguments:
+a formatter object
+a namespace,  this is full match of the regex as string, same as match.group(0)
+a match, this is a regex match object.
+Here is the callback method:
+def
+_format_regex_link
+(
+self
+,
+formatter
+,
+ns
+,
+match
+):
+domains
+=
+{
+'w'
+:
+'wiki'
+,
+'t'
+:
+'ticket'
+,
+'m'
+:
+'milestone'
+}
+searchword
+=
+match
+.
+group
+(
+'searchword'
+)
+or
+'test'
+label
+=
+match
+.
+group
+(
+0
+)
+domain
+=
+match
+.
+group
+(
+'domain'
+)
+domain
+=
+domains
+.
+get
+(
+domain
+,
+'wiki'
+)
+return
+tag
+.
+a
+(
+label
+,
+href
+=
+formatter
+.
+href
+.
+search
+()
++
+'?q='
++
+searchword
++
+'&'
++
+domain
++
+'=on'
+,
+title
+=
+"Search for
+%s
+in
+%s
+(s)"
+%
+(
+searchword
+,
+domain
+))
+All it does is extracting the
+domain
+and
+searchword
+out of the match object and then returning a link to the search page.
+Here the full source for our little IWikiSyntaxProvider Test:
+# -*- coding: utf-8 -*-
+"""
+WikiSyntaxProviderTest.py
+Created by Karsten Fuhrmann on 2009-12-14.
+Copyright (c) 2009 Karsten Fuhrmann (karsten_fuhrmann AT web.de) All rights reserved.
+"""
+from
+genshi.builder
+import
+tag
+from
+trac.core
+import
+*
+from
+trac.wiki
+import
+IWikiSyntaxProvider
+class
+WikiSyntaxProviderTest
+(
+Component
+):
+"""This is a test Component to demonstrate the use of the
+IWikiSyntaxProvider Interface of Trac."""
+implements
+(
+IWikiSyntaxProvider
+)
+# IWikiSyntaxProvider methods
+def
+get_link_resolvers
+(
+self
+):
+return
+[
+(
+'s'
+,
+self
+.
+_format_search_link
+)
+]
+def
+get_wiki_syntax
+(
+self
+):
+# Note that group numbers don't work as the following is only a regexp
+# fragment which will be part of a larger regexp, therefore one must
+# use group names, with reasonably unique names
+yield
+(
+r
+'\?(?P<domain>[tmw])_(?P<searchword>.+?)\?'
+,
+self
+.
+_format_regex_link
+)
+def
+_format_regex_link
+(
+self
+,
+formatter
+,
+ns
+,
+match
+):
+self
+.
+env
+.
+log
+.
+debug
+(
+'formatter:
+%s
+ns:
+%s
+'
+%
+(
+formatter
+,
+ns
+))
+domains
+=
+{
+'w'
+:
+'wiki'
+,
+'t'
+:
+'ticket'
+,
+'m'
+:
+'milestone'
+}
+searchword
+=
+match
+.
+group
+(
+'searchword'
+)
+or
+'test'
+label
+=
+match
+.
+group
+(
+0
+)
+domain
+=
+match
+.
+group
+(
+'domain'
+)
+domain
+=
+domains
+.
+get
+(
+domain
+,
+'wiki'
+)
+return
+tag
+.
+a
+(
+label
+,
+href
+=
+formatter
+.
+href
+.
+search
+()
++
+'?q='
++
+searchword
++
+'&'
++
+domain
++
+'=on'
+,
+title
+=
+"Search for
+%s
+in
+%s
+(s)"
+%
+(
+searchword
+,
+domain
+))
+def
+_format_search_link
+(
+self
+,
+formatter
+,
+ns
+,
+target
+,
+label
+):
+self
+.
+env
+.
+log
+.
+debug
+(
+'formatter:
+%s
+ns:
+%s
+'
+%
+(
+formatter
+,
+ns
+))
+domains
+=
+{
+'w'
+:
+'wiki'
+,
+'t'
+:
+'ticket'
+,
+'m'
+:
+'milestone'
+}
+domain
+=
+'wiki'
+searchword
+=
+None
+if
+":"
+in
+target
+:
+domain
+,
+searchword
+=
+target
+.
+split
+(
+':'
+)
+else
+:
+searchword
+=
+target
+domain
+=
+domains
+.
+get
+(
+domain
+,
+'wiki'
+)
+return
+tag
+.
+a
+(
+label
+,
+href
+=
+formatter
+.
+href
+.
+search
+()
++
+'?q='
++
+searchword
++
+'&'
++
+domain
++
+'=on'
+,
+title
+=
+"Search for
+%s
+in
+%s
+(s)"
+%
+(
+searchword
+,
+domain
+))
+See also:
+source:tags/trac-0.12/sample-plugins/revision_links.py
+​

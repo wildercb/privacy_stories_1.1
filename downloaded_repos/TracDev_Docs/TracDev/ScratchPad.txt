@@ -1,0 +1,21 @@
+Scratchpad for user interface design
+This part of the
+TracDev
+hierarchy is complementary to the
+Proposals
+and collects improvement ideas at the level of pages, so we mainly focus here on the feature set and the user interface.
+Beside the obvious goals of trying to keep our interface as simple and intuitive as possible, we can also try to be consistent with what other similar systems do ("convergence").
+This is also a place where multiple tickets for a similar functional module can be discussed together with suggestions for improvements so that we can design something coherent.
+List of pages:
+ChangesetModule
+DataModels
+DatabaseBackend
+DefaultTheme
+TicketModule
+TracQuery
+TracRoadmap
+See also:
+TracProject/UiGuidelines
+,
+TracIdeas
+(user-oriented)

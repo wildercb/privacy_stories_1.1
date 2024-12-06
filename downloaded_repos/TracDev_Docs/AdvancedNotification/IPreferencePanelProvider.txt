@@ -1,0 +1,255 @@
+This page was a draft of changes now integrated to
+TracDev/PluginDevelopment/ExtensionPoints/trac.prefs.api.IPreferencePanelProvider
+.
+Extension Point :
+IPreferencePanelProvider
+Interface
+IPreferencePanelProvider
+Since
+0.11
+Module
+trac.prefs
+Source
+api.py
+​
+The
+IPreferencePanelProvider
+allows adding panels to Trac's preferences dialog.
+Purpose
+Trac provides a
+user preferences
+system. Plugins can participate in this system by implementing the IPreferencePanelProvider. This allows a unified web UI where all preferences are configured in the same place, the preferences dialog.
+When a user browses to the preferences dialog, all implementations are called to provide any implemented panels, which are shown as tabs. When the user activates a tab the respective implementation is called to render the page corresponding to that tab.
+Since Trac 1.1.3 different implementations can provide
+child panels
+. These show up as sections in a tab of their parent panel, which can be implemented by a different plugin. A modular ecosystem of thematically related plugins can use this to populate a shared preferences page.
+Usage
+Implementing the interface follows the standard guidelines found in
+TracDev/ComponentArchitecture
+and of course
+TracDev/PluginDevelopment
+.
+The implementation has to render a panel by returning a template file name and a data dictionary to be used by that template. (See
+ITemplateProvider
+and
+IRequestHandler
+)
+The panel template should
+<xi:include href="prefs.html" />
+to provide the consistent common UI to all preference panels. Including this will also add a "Save changes" button if the template contains no forms of its own. Note that the
+IPreferencePanelProvider
+still has to implement any actual save functionality!
+Saving preferences is usually handled by storing the value with an appropriate unique key in the
+session
+. With the default "Save changes" button this means checking for
+req.method == 'POST'
+(and possibly
+req.args['action']=='save'
+if there are other
+POST
+usages?)
+Examples
+The following example provides a simple scratchpad text area in the preferences. Any entered text is stored in the session. In a real preference panel, the saved preference value should of course be read from the session by some other (part of the) component to configure some of its functionality.
+from
+trac.core
+import
+*
+from
+trac.prefs
+import
+IPreferencePanelProvider
+class
+ScratchpadPreferencePanel
+(
+Component
+):
+implements
+(
+IPreferencePanelProvider
+)
+# IPreferencePanelProvider methods
+def
+get_preference_panels
+(
+self
+,
+req
+):
+yield
+(
+'scratchpad'
+,
+_
+(
+'Scratchpad'
+))
+def
+render_preference_panel
+(
+self
+,
+req
+,
+panel
+):
+if
+req
+.
+method
+==
+'POST'
+:
+new_content
+=
+req
+.
+args
+.
+get
+(
+'scratchpad_textarea'
+)
+if
+new_content
+:
+req
+.
+session
+[
+'scratchpad'
+]
+=
+new_content
+add_notice
+(
+req
+,
+_
+(
+'Your Scratchpad text has been saved.'
+))
+req
+.
+redirect
+(
+req
+.
+href
+.
+prefs
+(
+panel
+or
+None
+))
+return
+'prefs_scratchpad.html'
+,
+{
+'scratchpad_text'
+:
+req
+.
+session
+.
+get
+(
+'scratchpad'
+,
+'your text'
+)
+}
+The accompanying
+prefs_scratchpad.html
+:
+<!DOCTYPE html
+PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html
+xmlns=
+"http://www.w3.org/1999/xhtml"
+xmlns:py=
+"http://genshi.edgewall.org/"
+xmlns:xi=
+"http://www.w3.org/2001/XInclude"
+>
+<xi:include
+href=
+"prefs.html"
+/>
+<head>
+<title>
+Scratchpad
+</title>
+</head>
+<body>
+<p><label>
+A Scratchpad text field:
+<textarea
+rows=
+"10"
+cols=
+"40"
+name=
+"scratchpad_textarea"
+>
+$scratchpad_text
+</textarea>
+</label></p>
+</body>
+</html>
+Available Implementations
+trac.prefs.web_ui.PreferencesModule
+​
+Defines most of Trac's core preference panels.
+trac.mimeview.pygments.PygmentsRenderer
+​
+Defines the
+Syntax Highlighting
+preference panel for
+TracSyntaxColoring
+with
+​
+Pygments
+.
+In third-party plugins:
+​
+AccountManagerPlugin
+Defines an
+Account
+panel for account/password management.
+​
+AnnouncerPlugin
+Advanced implementation with pluggable announcer preference boxes.
+Additional Information and References
+​
+epydoc
+​
+API Reference
+Tickets relating to userpreferences
+#9673
+: Proposal for linking preferences and
+TracIni
+options
+#6002
+: Ticket with a patch defining a
+get_session_option
+helper method
+#9162
+: Ticket with a patch to split the core
+IPreferencePanelProviders
+from the
+PreferencesModule
+#9313
+: Ticket about documenting preference session saving
+API History
+0.11
+introduced the interface.
+1.1.3
+added possibility to return tuples with a third item
+parent_panel
+for
+modular preference pages
+. (
+#11853
+)

@@ -1,0 +1,491 @@
+←
+0.10
+|
+0.12
+→
+TracDev/ApiChanges/0.11
+Summary
+New Dependencies
+Genshi
+jQuery
+Modifications made to the 0.10 API
+Date and Time Manipulations
+Caveats for Macros Developers
+Modified Interfaces
+ITimelineEventProvider
+(0.11)​ (0.10)​
+ISearchSource
+(0.11)​ (0.10)​
+IWikiMacroProvider
+(0.11)​ (0.10)​
+IHTMLPreviewRenderer
+(0.11)​ (0.10)​
+IRequestFilter
+(0.11)​ (0.10)​
+Other Changes to the 0.10 API
+New in the 0.11 API
+New Classes
+trac.resource.Resource
+(0.11)​
+trac.mimeview.api.Context
+(0.11)​
+New Interfaces
+trac.resource.IResourceManager
+(0.11)​
+trac.perm.IPermissionPolicy
+(0.11)​
+trac.attachment.ILegacyAttachmentDelegate
+(0.11)​
+trac.ticket.api.ITicketActionController
+(0.11)​
+trac.ticket.roadmap.ITicketGroupStatsProvider
+(0.11)​
+trac.web.ITemplateStreamFilter
+(0.11)​
+trac.prefs.api.IPreferencePanelProvider
+(0.11)​
+trac.versioncontrol.web_ui.browser.IPropertyRenderer
+(0.11)​
+trac.versioncontrol.web_ui.changeset.IPropertyDiffRenderer
+(0.11)​
+trac.admin.api.IAdminPanelProvider
+(0.11)​
+New Dependencies
+Genshi
+ClearSilver
+has proven too limited and “uncomfortable”, so research for better alternatives was done. The
+​
+Kid
+templating language was unanimously found appealing, to the point that
+ChristopherLenz
+did a port of Trac to Kid during the development of
+DrProject
+(a fork of Trac). This in turn was found painful, and prompted Christopher to start his own, enhanced, version of Kid currently maturing as
+​
+Genshi
+.
+The migration from
+ClearSilver
+to Genshi was done on trunk in
+r3832
+.
+You can start porting your plugins
+from Clearsilver to Genshi
+.
+jQuery
+Advanced
+JavaScript
+Support
+​
+jQuery
+is included in Trac, and it is advised to use this library when writing
+JavaScript
+code.
+Modifications made to the 0.10 API
+Date and Time Manipulations
+Since
+r3935
+, Trac uses
+datetime
+objects internally, instead of timestamps.
+More precisely, the database layer still uses
+int
+timestamps, but manipulation of time values is now done on
+datetime
+objects as soon as possible, see e.g. the
+Timeline
+module.
+Those
+datetime
+values are directly added by the controllers to the data model, and it's the responsibility of the
+templates
+to pick up the appropriate time representation, using one of the built-in date formatting utilities:
+format_date
+,
+format_datetime
+,
+http_date
+,
+pretty_timedelta
+(see
+chrome.py
+), or even the
+$dateinfo()
+macro.
+Those utilities automatically take into account the
+timezone
+information set by the user, so that the dates are presented in a meaningful way to him.
+Caveats for Macros Developers
+The Trac macros will need to be adapted:
+the old-style wiki-macros are not supported anymore (due to the drop of
+ClearSilver
+and the HDF); they need to be converted to the new-style macros
+new-style macros are
+#IWikiMacroProvider
+plugins. They can be written as full plugins or simple one file drop-in plugins, see
+source:tags/trac-0.11b2/sample-plugins
+​
+for some examples.
+Modified Interfaces
+ITimelineEventProvider
+(0.11)
+​
+(0.10)
+​
+First thing, the timeline module has now its own package (
+trac.timeline
+), and the ITimelineEventProvider interface itself should now be imported from
+trac.timeline
+. However, note that the case has changed here, as you would previously have imported
+trac.Timeline
+. If you want to support both versions, try something like this:
+try
+:
+from
+trac.timeline.api
+import
+ITimelineEventProvider
+except
+ImportError
+:
+from
+trac.Timeline
+import
+ITimelineEventProvider
+Also note that the
+start
+and
+stop
+arguments to the
+get_timeline_events
+method are now
+datetime
+objects where they previously were floats/ints. Again, if you want to support both Trac 0.11 and previous versions, use something like the following code:
+def
+get_timeline_events
+(
+self
+,
+req
+,
+start
+,
+stop
+,
+filters
+):
+if
+isinstance
+(
+start
+,
+datetime
+):
+# Trac>=0.11
+from
+trac.util.datefmt
+import
+to_timestamp
+start
+=
+to_timestamp
+(
+start
+)
+stop
+=
+to_timestamp
+(
+stop
+)
+...
+Then, the return type for the
+get_timeline_events
+event has changed. 
+Instead of a 6-tuple
+(kind, href, title, date, author, markup)
+(which still supported for compatibility reasons in 0.11), 
+the returned value can now be a 4 or 5-tuple
+(kind, date, author, data[, provider])
+, which is far more flexible than
+before, especially because the
+data
+can be anything that will be used by a new
+render_timeline_event(context, field, event)
+method called when actually displaying the events.
+ISearchSource
+(0.11)
+​
+(0.10)
+​
+Similar to the timeline package, the search module has also been migrated to a package (
+trac.search
+), with the same case change. Again, if you want to support both versions, try something like this:
+try
+:
+from
+trac.search
+import
+ISearchSource
+except
+ImportError
+:
+from
+trac.Search
+import
+ISearchSource
+IWikiMacroProvider
+(0.11)
+​
+(0.10)
+​
+render_macro(req, name, content)
+has been deprecated (see
+r4621
+)
+expand_macro(formatter, name, content)
+has been added and supersedes
+render_macro
+.
+The
+req
+was not enough for most of the macros, which needed to resort to various hacks to get more information about the formatting at work. 
+The more pertinent
+formatter
+object is now provided instead. The
+req
+object can still be obtained from the formatter, with
+formatter.req
+,
+but this is going to be deprecated. Instead, you should access to the following set of information:
+formatter.resource
+is the resource identifier which owns the text being formatted  (this is a
+trac.resource.Resource
+, see below),
+formatter.context
+is the rendering context in which this wiki formatting takes place (this is a
+trac.mimeview.api.Context
+, see below)
+formatter.perm
+the permission cache which can be used in order to perform fine-grained permission checks (this is a
+trac.perm.PermissionCache
+).
+render_macro(req, name, content)
+will likely be removed in
+0.12
+.
+IHTMLPreviewRenderer
+(0.11)
+​
+(0.10)
+​
+Similar to the above change,
+render(req, mimetype ...)
+is now
+render(context, mimetype ...)
+,
+context
+being a rendering
+Context
+(see below).
+It doesn't matter that much however, as it looks like that this interface is going to be integrated in
+IContentConverter
+anyway (see
+#3332
+- 0.12 topic unfortunately).
+IRequestFilter
+(0.11)
+​
+(0.10)
+​
+The
+post_process_request
+method has now the following arguments
+(req, template, data, content_type)
+instead of
+(req, template, content_type)
+.
+data
+is the data dictionary used while generating the template.
+The old signature is still supported for backward compatibility, though.
+Other Changes to the 0.10 API
+The
+trac.versioncontrol.api.Repository.sync()
+method was not made "official" (i.e. part of the
+Repository
+class) until 0.10.4. Altough the API has not changed since then, in 0.11 there's no compatibility code to cope with the previous "unofficial"
+sync()
+method which didn't take any argument.
+The
+trac.util.Markup
+class is now the Genshi
+Markup
+class, and during Genshi 0.5dev (which is the version advised to use with Trac 0.11), the constructor method of that class changed. Before, extra arguments were taken to be string mapping arguments (simply '%s' style arguments). Now, you need to explicitly use '%' (see e.g.
+#7255
+).
+New in the 0.11 API
+Several new interfaces and modules have been added in 0.11.
+There are a few new utilities of general interest:
+presentation.py
+​
+- various helper functions that are intended to be used in Genshi templates
+translation.py
+​
+-
+i18n
+utilities. Those are placeholders for now, but you can already pick the habit of enclosing your human-readable strings in
+_(...)
+calls, it may pay off one day…
+compat.py
+​
+- make available some usefull new utilities to older Python versions. Those used to live in
+trac.util.__init__.py
+are still importable through the
+trac.util
+module.
+Also of interest are a few helper functions in
+trac.web.chrome
+​
+that can be used to add warnings and notifications at the top of the page (
+add_warning
+,
+add_notice
+) and contextual navigation links (
+add_context_nav
+) at the upper right corner of the page.
+New Classes
+trac.resource.Resource
+(0.11)
+​
+The
+resource identifier
+class
+Resource
+is used to specify in a convenient way which Trac
+resources
+is being manipulated.
+A Trac resource is mostly anything in Trac that can be addressed with its own URL and to which some content is attached.
+A resource is mainly identified by a
+realm
+string and an
+id
+string or a number. 
+Also, a
+version
+can be specified in a Resource object, in order to refer to the content of a resource at a particular moment of its history.
+A version specification of
+None
+simply refers to the latest version of the resource.
+Finally, a resource can be parented in another resource. This relationship usually means that a removal of the parent resource implies a removal of the children resources.
+trac.mimeview.api.Context
+(0.11)
+​
+The
+rendering context
+class is used to specify
+how
+the content should be rendered.
+It holds together all the needed contextual information that will be needed by individual renderer components.
+It is notably hodling together a
+Resource
+identifier for specifying the owning resource of the content being rendered, 
+a
+PermissionCache
+for restricting the display of information to the authorized parts only and an
+Href
+object that
+can be used for creating links.
+Also,
+Context
+can be parented and this relationship usually correspond to some kind of embedding of the data
+(typical example, ticket information displayed within a Wiki page by the way of a macro).
+New Interfaces
+trac.resource.IResourceManager
+(0.11)
+​
+The
+IResourceManager
+let components claim ownership of some realms. 
+For the managed realms, the manager component will know how to build URLs to access the resources belonging to that realm and will know how to describe those resources.
+Various utility functions exist in the
+trac.resource
+module in order to manipulate the
+Resource
+identifier objects in a generic way.
+trac.perm.IPermissionPolicy
+(0.11)
+​
+The
+IPermissionPolicy
+components can be used to grant or reject any kind of permissions, based on the identity of the user and the targeted resource, subject of the action. The API is conceptually simple, as the permission policies are chained (using the sequence defined in the
+[trac] permission_policies
+configuration entry), and the first policy in the chain which makes a decision about the given (action, user, resource) triple wins. Making a decision consist in returning
+True
+for allowing the action,
+False
+for rejecting the action.
+None
+can also be returned to let the next policy in the chain decide. If no decision has been made in the end, the action is not allowed.
+Look at the API documentation for a few more details (what to return when no resource or a "realm" resource is specified, usage of the permission cache).
+trac.attachment.ILegacyAttachmentDelegate
+(0.11)
+​
+This interface is mostly like the above
+IPermissionPolicy
+one, except that it enables attachment providers to hook automatically into the default legacy attachment policy, which is already enabled by default.
+trac.ticket.api.ITicketActionController
+(0.11)
+​
+Enable plugins to add their own actions and operations to the ticket workflow. More ambitious plugins can even replace the ConfigurableTicketWorkflow completely if they want a different basis than the configurable workflow provided by default. This description simply scratches the surface of the topic. For more details, you should read the
+TracWorkflow
+and study the
+​
+workflow
+sample plugins.
+trac.ticket.roadmap.ITicketGroupStatsProvider
+(0.11)
+​
+This enables plugins to modify the milestone completion progress bars by changing the way ticket statistics are collected. Note that for simply having more ticket groups displayed, a change of
+configuration
+is enough.
+trac.web.ITemplateStreamFilter
+(0.11)
+​
+In Trac 0.11, while it's still possible to customize the Genshi templates like it was for the Clearsilver ones in previous versions, this is no longer the only way, neither the preferred. What makes the use of the Genshi templating system fairly unique is that you can manipulate the generated output at run-time, in order to filter out some content, modify it or even inject new content.
+Among other things, leaving the original templates alone make it much easier to benefit from bug fixes and improvements made in newer mainstream Trac versions. All you need for that is to write a plugin implementing the ITemplateStreamFilter interface, which allows you to have complete control on the generated Genshi event stream.
+Some useful references:
+​
+sample-plugins/ticket_clone.py
+, an example of such a plugin, which adds a "Clone" button in the ticket description box:
+​
+genshi.filters.transform
+, the API documentation for genshi transform filters which makes such manipulations a breeze
+trac.prefs.api.IPreferencePanelProvider
+(0.11)
+​
+New preference panels can be added, and components implementing this interface will have complete control over the logic and rendering of such panels. This is a kind of "contextual" IRequestHandler, much like the
+IAdminPanelProvider
+.
+trac.versioncontrol.web_ui.browser.IPropertyRenderer
+(0.11)
+​
+The presentation of version control properties for files and directories can be customized to a great extent.
+The revision properties can be customized in a similar way.
+trac.versioncontrol.web_ui.changeset.IPropertyDiffRenderer
+(0.11)
+​
+Likewise, the presentation of changes for version control properties can be customized.
+trac.admin.api.IAdminPanelProvider
+(0.11)
+​
+WebAdmin is now part of the core.
+The previously external interface
+webadmin.web_ui.IAdminPageProvider
+is now a core interface:
+trac.admin.api.IAdminPanelProvider
+.
+Also its
+get_admin_pages
+method became
+get_admin_panels
+.

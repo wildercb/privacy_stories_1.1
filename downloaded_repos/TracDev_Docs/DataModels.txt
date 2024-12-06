@@ -1,0 +1,84 @@
+Improvements to Trac's data models
+Trac's datamodels are usually implemented in the
+<subsystem>/model.py
+files.
+In the current situation (1.0.x/1.1.1), we have different APIs and different conventions for the datamodels. This page describes a few issues where the API and conventions can be improved and made more consistent.
+Representation of data
+Standardize missing values
+For tickets, when a field is unset the database value is set to
+None
+/
+NULL
+(
+#11018
+). When retrieving
+NULL
+values from the database, we get
+None
+in Python, and the value returned from the model depends on the field type:
+For text fields, the empty string is returned from the model using the special value
+​
+empty
+. See for example what we do for
+ticket fields
+​
+.
+For time fields,
+None
+is returned.
+The pattern could be extended to other model classes, and even the
+Ticket
+model should be reviewed to ensure that all fields follow the pattern.
+NOT NULL
+columns
+Validation of the ticket summary is done in the
+IRequestHandler
+​
+, to prevent creating a ticket with an empty summary. The schema could be changed to use
+NOT NULL
+in the column specification, since the empty string is
+replaced with NULL
+​
+. Alternatively, a
+TracError
+could be raised in the
+Ticket
+model when
+insert
+ing or
+update
+ing a ticket with an empty summary (
+#12458
+).
+Class methods
+Class methods are used for table-wide queries. One such example is
+select
+.
+The signature of the
+select
+method is not consistent across all classes.
+The
+Milestone
+class has an
+include_completed
+​
+parameter in the
+select
+method.
+We could reconcile the inconsistency by having
+where
+,
+limit
+and
+order_by
+parameters on each method, with the parameters directly mapping to phrases in the SQL query.
+This would make the methods more generally useful to plugin developers.
+Not only is the interface inconsistent, but also the return value. In most cases a generator is returned by
+select
+, however some
+select
+methods return a list:
+trunk/trac/ticket/model.py@13060:1137#L1128
+​
+trunk/trac/ticket/model.py@13060:1234#L1222
+​

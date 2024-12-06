@@ -1,0 +1,282 @@
+←
+0.9
+|
+0.11
+→
+TracDev/ApiChanges/0.10
+General Changes
+Use
+unicode
+strings
+Using
+self.env.href
+is deprecated
+New Configuration API for Components
+New API for Generating HTML fragments
+Interface Changes
+ISearchSource
+[source:tags/trac-0.10/trac/Search.py@head#L30​ …
+IHTMLPreviewRenderer
+…
+TracDev/ApiChanges/0.10
+This page is aimed to help plugin developers to port their 0.9 plugin to Trac 0.10.
+Most of the initial examples are coming from the migration of the
+​
+DoxygenPlugin
+(
+​
+#TH662
+).
+General Changes
+Use
+unicode
+strings
+The most important single change in 0.10 was the switch to using
+unicode
+everywhere internally.
+See
+TracDev/UnicodeGuidelines
+.
+Using
+self.env.href
+is deprecated
+Generated URLs should most of the time be relative to the URL which was used for the request being processed. So wherever you can,
+use
+req.href
+instead
+. Usage of
+self.env.href
+is still possible when no Request object is available.
+New Configuration API for Components
+Components can still use
+self.config.get...
+, but there's now a better way to do this,
+which among other things make it easy to document your configuration settings.
+When you had:
+class
+DoxygenPlugin
+(
+Component
+):
+implements
+(
+...
+)
+# ...
+def
+match_request
+(
+self
+,
+req
+):
+# Get config variables.
+base_path
+=
+self
+.
+config
+.
+get
+(
+'doxygen'
+,
+'path'
+,
+'/var/lib/trac/doxygen'
+)
+You should now write:
+class
+DoxygenPlugin
+(
+Component
+):
+implements
+(
+...
+)
+base_path
+=
+Option
+(
+'doxygen'
+,
+'path'
+,
+'/var/lib/trac/doxygen'
+,
+"""Directory containing doxygen generated files."""
+)
+# ...
+def
+match_request
+(
+self
+,
+req
+):
+base_path
+=
+self
+.
+base_path
+# actually, use `self.base_path` where you'd used `base_path`
+Besides the string
+Option
+, you have also access to more specialized types for you configuration settings, like
+BoolOption
+,
+IntOption
+,
+ListOption
+, etc. (see
+config.py
+​
+).
+By using the
+TracIni(doxygen)
+macro, you'll get the documentation for all your settings.
+New API for Generating HTML fragments
+Since Trac
+0.9.3
+, the generation of HTML using
+ClearSilver
+has been modified so that by default, every string content will get HTML-escaped (e.g. "<br />" replaced by "&lt;br /&gt;").
+Most plugin developers discovered this change the hard way ;)
+The recommended way for avoiding this escaping was to wrap the strings containing markup in a
+Markup
+instance.
+While this is still valid in 0.10, you should note that
+Markup
+is now defined in the
+trac.util.html
+module, though importing from
+trac.util
+will still work.
+More importantly, there's now a new way to programmatically generate markup content, using the
+html
+object, also defined in that
+trac.util.html
+module.
+That object will dynamically generate
+Element
+objects, that can be nested.
+The way to use it is:
+html.<elementname>(*other_elements_or_strings, **attributes)
+Example: (from the
+​
+DoxygenPlugin
+)
+doxygentrac/doxygentrac.py
+a
+b
+class DoxygenPlugin(Component):
+40
+69
+41
+70
+def get_active_navigation_item(self, req):
+42
+71
+return 'doxygen'
+72
+43
+73
+def get_navigation_items(self, req):
+44
+74
+if req.perm.has_permission('DOXYGEN_VIEW'):
+45
+# Get config variables.
+46
+title = self.env.config.get('doxygen', 'title', 'Doxygen')
+47
+48
+75
+# Return mainnav buttons.
+49
+yield 'mainnav', 'doxygen',
+Markup('<a href="%s">%s</a>' %
+\
+50
+(self.env.href.doxygen() + '/', title
+))
+76
+yield 'mainnav', 'doxygen',
+\
+77
+html.a(self.title, href=req.href.doxygen(
+))
+For more details, refer to the
+Element
+​
+docstring.
+Interface Changes
+ISearchSource
+(0.10)
+​
+(0.9)
+​
+The
+get_search_results(self, req, terms, filters)
+now takes a list of
+terms
+instead of the full
+query
+, as it used to do for its second argument.
+Example: (from the
+​
+DoxygenPlugin
+)
+doxygentrac/doxygentrac.py
+212
+212
+213
+213
+yield('doxygen', title)
+214
+214
+215
+def get_search_results(self, req,
+query
+, filters):
+215
+def get_search_results(self, req,
+keywords
+, filters):
+216
+216
+if not 'doxygen' in filters:
+217
+217
+return
+218
+if query[0] == query[-1] == "'" or query[0] == query[-1] == '"':
+219
+keywords = [query[1:-1]]
+220
+else:
+221
+keywords = query.split(' ')
+222
+218
+223
+219
+base_path = self.config.get('doxygen', 'path')
+IHTMLPreviewRenderer
+(0.10)
+​
+(0.9)
+​
+The
+render
+method has changed. See
+r3124
+for details.
+Note however that this API is being deprecated, and will be superseded in 0.11 by the
+IContentConverter
+(see
+#3332
+).
+See also:
+TracDev/ReleaseNotes/0.10

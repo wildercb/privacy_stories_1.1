@@ -1,0 +1,6 @@
+Request Handling Overview
+On each user request, Trac invokes multiple extension point interface implementations registered with the system.
+How Trac services a given request is shown in the diagrams below. Please note that the diagram is simplified in that it has no error responses and therefore no rendering of error pages.
+Click on an image to display a larger version. Also see the attachments for more request handling.
+Project Index Request Handling
+Generic Request Handling

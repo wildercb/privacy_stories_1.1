@@ -1,0 +1,167 @@
+Contents
+Overview
+Code contributions
+Documentation
+Code clean-up
+Next Releases
+Wiki
+Version Control
+General
+Ticket
+Miscellaneous
+TracDev
+ToDo
+List
+This page clarifies the ongoing development activity in the
+TracTeam
+.
+Overview
+High prio
+Medium to low prio
+High severity
+20
+62
+Medium to low severity
+30
+910
+As a general rule:
+Severity is the degree to which a Trac installation is impacted by the defect or deficiency.
+Priority is a measure to which a developer will prioritise the ticket over other tickets.
+Not evaluated, and therefore no milestone set:
+24
+Code contributions
+Tickets with
+patch
+keyword (initial patch proposed):
+By milestone: 1.7.1
+#1660,​13273
+, next-dev-1.7.x
+#4519,​7628,​7820,​8069,​9222,​10040,​10948
+, next-major-releases
+#3332,​3519,​4080,​8509,​9643,​9648,​10178,​10665,​918,​1804,​2695,​3273,​3584,​3689,​4549,​4612,​5246,​5670,​5997,​6492,​6986,​7026,​7055,​7573,​7793,​7850,​7872,​7898,​8165,​8219,​8541,​8640,​8945,​8961,​9638,​9646,​9674,​9967,​9979,​10201,​10396,​10413,​10425,​10736,​10755,​10983,​548,​6118,​6128,​8135,​8681,​9125
+, next-stable-1.6.x
+#4245,​7687,​6002,​6367,​6682,​8700,​9140,​10884,​5820,​8829,​13346
+, plugin - mercurial
+#8417
+, undecided
+#10203,​10640,​11338
+,
+#12453
+Tickets with
+review
+keyword (patch or branch "ready", need some review):
+By milestone: next-major-releases
+#9643,​8541,​12162
+, next-stable-1.6.x
+#6367,​9771
+, translations
+#5473
+, undecided
+#10640
+, unscheduled
+#2299,​9082,​4329
+Tickets with
+needfixup
+keyword (
+patch or branch already reviewed, need some further work
+):
+By milestone: next-major-releases
+#7872,​8961
+Tickets with no milestone set (need to be triaged)
+{20}
+:
+0
+new this week,
+23
+older and
+0
+with patches
+Documentation
+Finish Sphinx
+ApiDocs
+.
+Add recipes for the
+CookBook
+, notably installations and troubleshooting.
+Review wiki pages: update with descriptions of new features or caveats, remove or replace dead links, fix typos
+Code clean-up
+Post-commit hook for pylint report?
+Add code comments (docstrings) where appropriate
+Refactor code
+Next Releases
+The master list of the upcoming release is the
+roadmap
+. The release guidelines can be found in the
+RoadMap
+.
+Some of the key features that are being developed are:
+Wiki
+#1132
+,
+#3021
+and
+GenericTrac
+, attacking it from the wiki side.
+#31
+and
+#886
+(experimental
+repos:ticket-links
+)
+TracDev/Proposals/MultipleProject
+#4431
+and related wiki improvements (experimental branch
+repos:cboos.git:wikiparser
+)
+Version Control
+CachedRepository.get_path_history
+(
+#9775
+)
+Show merge changesets in revision log (
+#3236
+), seems like follow-first is meaningless;
+git log --first-parent
+support
+Hg: add basic support for cached repo (
+#8417
+)
+More revisions available
+link at the bottom of revision log, when viewing a partial revision set (
+#4854
+).
+General
+#2456
+- users,
+#5648
+- groups
+i18n
+translation for workflow status and action names (
+#5441
+)
+early loading and caching of catalogs (discussed in
+#9439
+)
+Help delegator (
+ticket:2656#comment:26
+)
+#8507
+improve explicit gc
+Ticket
+Sort order of tickets in search results: currently creation time first as opposed to most recent modification time first.
+Miscellaneous
+In
+TracInstall#GeneratingtheTraccgi-bindirectory
+there is mention of
+chicken/egg
+problem with
+trac-admin deploy
+. We should support a direct
+trac-admin deploy <target>
+call syntax, ie without the need to specify a (dummy) environment.
+See also:
+SeaChange/WhatUsersWant
+,
+ToDo
+,
+TracProject/ToDo

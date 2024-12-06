@@ -1,0 +1,62 @@
+Contents
+Display an overview, and two links "report bug", "ask question"
+Show frequently reported bugs, and allow enter title
+Display possible duplicates, and allow enter bug, or notify security team
+MostFrequentDuplicatesPlugin
+Duplicate check when filing new tickets
+A
+new duplicate ticket
+is a new ticket that has been posted before. For the background into the issues surrounding new duplicate tickets, see the following discussions:
+​
+NewTicket duplicates discussion
+​
+ticket duplicate discussion
+Note that a plugin exists that implements a search for possible duplicate ticket entry:
+​
+DuplicateTicketSearchPlugin
+and partially implements the
+#MostFrequentDuplicatesPlugin
+proposal below.
+Good implementations of checking new duplicate tickets are:
+​
+Ubuntu LaunchPad
+. See screenshots below.
+​
+Stackoverflow
+. After you type in a question, the area immediately below the title (summary, in Trac) is populated with a list of questions that possibly match based on the text. This would fit into the existing Trac UI fairly easily.
+Display an overview, and two links "report bug", "ask question"
+Show frequently reported bugs, and allow enter title
+Display possible duplicates, and allow enter bug, or notify security team
+MostFrequentDuplicatesPlugin
+Here is an idea for a plugin that could be used for doing semi-automated duplicate checking. It is a more automated version of what is described in the
+MostFrequentDuplicates
+page, by using the information collected there
+before
+new tickets get created.
+We could use a bit more structure in that page to associate patterns to tickets. Examples:
+Pattern
+HTMLParseError: bad end tag
+Duplicate of
+#4365
+Note
+related to a
+SilverCity
+bug
+Pattern
+PyGIT.py.*cannot concatenate 'str' and 'NoneType' objects
+Duplicate of
+#6976
+Note
+This is a bug in the
+​
+TH:GitPlugin
+for Trac on nonexistent paths, see
+​
+TH:ticket:2671
+Before ticket creation, the ticket description is scanned for the available (multi-line) patterns and if a match is found, a validation warning should be returned (see
+tags/trac-0.11/trac/ticket/api.py@#L127
+​
+). This will prevent ticket creation and show a warning which can display the duplicate ticket and the associated note. See also the
+InterWiki
+​
+module for hints about retrieving data from a Wiki page.

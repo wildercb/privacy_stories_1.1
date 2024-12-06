@@ -1,0 +1,11 @@
+Sandbox Announcer
+sandbox/announcer
+This branch exists to evaluate the intended replacement of current Trac Notification System with the
+​
+TracHacks:AnnouncerPlugin
+.
+References
+initial
+proposal
+notes on
+current development

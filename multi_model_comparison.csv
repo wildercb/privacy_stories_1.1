@@ -1,0 +1,713 @@
+Prompt,Model,Run1,Run2
+"You are a helpful assistant trained to annotate text files with metadata about behaviors, actions, data types, and purposes. For each section in a file, annotate the following:
+
+1. Actions: Actions that are performed or expected in this section.
+2. Data Types: Types of data referenced in this section. Data types may include specific subcategories.
+3. Purposes: Purposes or intentions related to these actions and data types.
+
+After providing your annotations, explain your rationale for these annotations. Place a <R> tag between your annotations and your rationale.
+
+Use only the categories listed below when annotating the sections:
+
+Actions:
+sub, Collect, Process, Share
+
+Data Types:
+sub:
+  anonymize:
+  aggregate:
+Patterns:
+  Minimal-Information-Asymmetry, Awareness Feed, User data confinement pattern
+Synonyms:
+  Personally Identifiable Information, PII, Personal Information, Your Data, Your Information
+Contact Data:
+  Phone Number:
+    Synonyms:
+      mobile number
+  Email address:
+  User ID:
+  Login Information:
+  Job Title:
+  Contact List:
+  Company Name:
+  Address:
+    Synonyms:
+      postal addess, mailing address, shipping address
+  Name:
+    First Name:
+    Last Name:
+  Date of Birth:
+    Synonyms:
+      birthday
+  Image (Photos, Pictures, Video):
+    Synonyms:
+      photo, picture, video
+  Government ID:
+    Synonyms:
+      National identification number
+    Driver's License:
+    Passport:
+    Social Security Number:
+    Tax ID Number:
+    License Plate Number:
+  Biographical Data:
+    CV:
+      Synonyms:
+        Curriculum Vitae
+    Education:
+    Employment:
+Health Data:
+  Synonyms:
+    medical information
+  Physical activity:
+Social Media:
+Location:
+  Patterns:
+    Location Granularity
+  Approximate location:
+  Precise location:
+  GPS:
+  Localisation:
+  Address:
+Financial:
+  Synonyms:
+    economic, spending, commercial information
+  Orders:
+  Payment Card:
+  Payment History:
+  Purchase History:
+    Synonyms:
+      order history
+  Carts:
+  Order:
+  Card Data:
+  Bank Account:
+  Credit Score:
+  Income Information:
+  assets:
+    vehicle:
+    Insurance:
+Usage Data:
+  App Interactions:
+    Patterns:
+      Use-of-dummies
+    Pages Visited:
+      Synonyms:
+        app activity
+    Timestamps:
+    Interaction with Ads:
+    Content Viewing Order:
+    User Engagement:
+    Content Moderation:
+    Clicks:
+    Transportation Data:
+  Device Information:
+    Synonyms:
+      Log Data, App data
+    IP Address:
+    Identifier:
+      Synonyms:
+        User IDs
+      Device ID:
+        Synonyms:
+          device identifier
+      Advertisement ID:
+        Synonyms:
+          Advertisement identifier, ad identifiers
+      Browser:
+      Operating System:
+        Synonyms:
+          OS
+      Device Settings:
+      Make:
+      Model:
+      Network Information (Mobile Network):
+      Wi-Fi Access:
+      Diagnostics:
+      Sensor Data:
+      Audio:
+      Browsing history:
+Tracking:
+  Cookies:
+    Patterns:
+      Protection-against-tracking
+  Web Beacons/Pixels:
+  Tags:
+Account Information:
+  Patterns:
+    Whoâ€™s Listening, Unusual-activities
+  Synonyms:
+    account credentials
+  User id:
+  Username:
+  Password:
+    Patterns:
+      Informed Secure Passwords
+  Files:
+  Account Balance:
+  Messages:
+  Friends:
+
+Purposes:
+Contact, Analytics, Customization, Advertisement, Security, Tracking, Functionality, Accounts, Requirements, Save, Identification
+
+Here is an example of annotated sections:
+
+--- File: Accounts_&_Transactions.txt ---
+Full Cleaned Text:
+Using Actual
+Accounts & Transactions
+
+Overview
+    You can add as many accounts as you like. Adding all of your accounts (including things like mortgages) is a nice way to get an overview of all your finances.
+
+Off-budget accounts
+â€‹
+
+Actual makes a distinction between accounts being
+for
+budget or
+off
+budget. Off budget accounts don't effect the budget and are meant to track stuff like investments and mortgages. Transactions in off budget accounts can't be categorized; they simply track balances over time.
+
+For budget
+accounts affect the budget, and transactions can be categorized. These are accounts where you want to track cash flow and use the budget, like checking accounts and credit cards.
+
+Depending on your usage, savings accounts can either be on or off the budget. If you're not sure, we recommend keeping it on budget at the start.
+
+Adding a new account
+â€‹
+
+You can add an account to your budget at any time, however when you first install Actual you can use the
+Add Account
+button in the middle of the screen.
+
+You can also add an account using the
++ Add account
+button in the sidebar.
+
+Two successive screens will appear with boxes asking you to fill in a few options
+
+Create a Local Account or Link to GoCardless (See
+Connecting Your Bank
+)
+Give your account a name
+Is the account on or off budget
+The current account balance
+
+Off budget means that the balance is not reflected when you assign money to categories in your budget register
+
+Here you can see how that looks when the options are completed.
+
+If you select the Off Budget checkbox then change the account type the Off Budget checkbox will reset and will need to be re-selected each time the account type is changed
+
+You can now see the account in the sidebar of Actual
+
+Closing or deleting an account
+â€‹
+
+Navigate to the account by clicking on it in the sidebar
+Click on the 3 dots (top right of the transactions list) to show the actions menu
+Select
+Close Account
+You need to select another account to transfer the existing balance to. Choose the account that you have moved funds to.
+Press
+Close Account
+
+You can still access this account under
+Closed Accounts
+in the sidebar, and even reopen it from the same actions menu.
+
+If you want to delete an account
+even if it has existing balances, in the popup after selecting
+Close Account
+, click the
+force close
+at the bottom.
+
+Renaming an existing account
+â€‹
+
+Click the account name in the sidebar of Actual
+
+Hovering your cursor close to the account name at the top will reveal two icons.
+The page icon allows you to write a note about this account, and the pencil icon allows you to rename the account.
+
+After editing a note for the account or its name, hit 'Enter' to save your changes.
+
+Off-budget accounts
+Adding a new account
+Closing or deleting an account
+Renaming an existing account \s
+
+--- New File Text ---
+<PI>
+Direct Messaging with LibreEHR and EMR Direct phiMail(R)
+Version 1.3, 19 Jul 2014
+
+A. Purpose: To provide a secure method from within LibreEHR for sending/receiving 
+protected health information to/from another Direct address using the Direct Project 
+messaging standard, as a step toward the goal of satisfying the three MU2 criteria 
+requiring the use of Direct messaging.  (For general information about Direct messaging, 
+see http://www.emrdirect.com/about-directed-exchange-and-secure-direct-messaging.html)
+
+B. IMPORTANT:  Please be aware of the following limitations when using the LibreEHR 
+Direct Messaging features with PHI in a production environment:
+
+1. the current code only supports a single shared ""group"" Direct Address for each LibreEHR 
+installation. Note that this model is fully compliant with the Direct Project 
+requirements for Direct messaging, but we may add additional models in the future 
+should we determine that doing so would provide a higher degree of interoperability for 
+LibreEHR users.
+
+2. the current code only sends the CCR or CCD XML data that is already available in LibreEHR; 
+these files as currently generated by existing LibreEHR code do not meet the requirements 
+of the MU2 criteria, and the current CCD files do not pass strict CDA validation tests.
+
+C. Problems Solved:
+
+1. Patient-initiated transmission of clinical data from the Report section of the Patient 
+Portal interface.
+
+2. Provider-initiated transmission of clinical data from the Report section of the Patient 
+pane in the main LibreEHR interface.
+
+3. Log all data transmissions including date/time, patient, and whether transmission 
+was initiated by the patient through the Patient Portal or by an LibreEHR user through the 
+main interface.
+
+4. Receive Direct messages from other sources.
+
+D. How it Works:
+Once configured, LibreEHR will interface with a phiMail Direct messaging server to complete the
+required message transactions. The phiMail platform is described on the EMR Direct website, 
+http://www.emrdirect.com and http://www.emrdirect.com/phimail-faq.html.
+
+E. What you need before enabling Direct Messaging in LibreEHR:
+
+1. Test Mode: Developers may request a complimentary test address at 
+https://www.emrdirect.com/subscribe-developer  
+Access to a sandbox server is available for testing and development purposes.
+
+2. Production Mode: Healthcare provider users should begin by signing up for a production 
+Direct messaging account with EMR Direct by registering at https://www.emrdirect.com/subscribe
+
+Subscribers will receive the username, password, and server address information with which to 
+configure LibreEHR.  
+
+F. How to enable the Direct Messaging Features in LibreEHR:
+Setup of phiMail Direct messaging Service is done in the Administration::Globals::Connectors 
+tab
+
+1. Check the ""Enable phiMail Direct Messaging Service"" checkbox.
+
+2. Enter the Server Address, Username, and Password provided to you. The server address
+will be of the form ""ssl://servername.example.com:32541"" - replace the hostname and port
+with the values provided to you by EMR Direct. The Username is your Direct Address. Do not 
+enter the server URL into your browser address bar, as this will not work.
+
+3. Specify the LibreEHR user who will receive notification of new incoming Direct messages. 
+Enter their LibreEHR username in the notification user field.
+
+4. Specify the interval for automatic message checking; we suggest 5 or 10 minutes as a
+starting point, but installations processing a large number of Direct messages may want a 
+shorter interval. To disable automatic message checking through LibreEHR's background service
+manager, set the interval to 0 (zero). Disabling automatic checking would be appropriate 
+if message checking is managed through another mechanism, such as a system cron job.
+
+5. Optionally check ""phiMail Allow CCD Send"" and/or ""phiMail Allow CCR Send"" to enable
+the Transmit feature for these data types. If you do not select at least one of these,
+LibreEHR will operate in a receive-only mode.
+
+6. Click the ""Save"" button.
+
+7. Confirm that a valid Notification Email Address is set in the Administration::
+Globals::Notifications tab to receive error notifications from the Direct Messaging service.
+
+8. Install the EMR Direct trust anchor certificate.  
+
+Note: This is *not* your Direct certificate; it is the trust anchor for the SSL 
+certificate issued to our servers, and is used only to validate the SSL certificate 
+presented by the phiMail server on the other side of LibreEHR's connection.  Your Direct private
+key and certificate are managed by the phiMail Server and are not installed in LibreEHR.
+Your Direct certificate is made availabe for your review by EMR Direct, but you will not
+need to install it anywhere.
+
+For added security, the trust anchor for the phiMail Server should be installed in the LibreEHR 
+installation tree at:
+
+[installation_root]/sites/[site_id]/documents/phimail_server_pem/phimail_server.pem
+
+This phimail_server_pem directory and its contents should be readable by the the 
+webserver process, but only writable by trusted local users. The certificate file 
+itself must be PEM encoded. You can identify a PEM encoded certificate file because 
+it begins with the text ""-----BEGIN CERTIFICATE-----"". Although LibreEHR will connect 
+to phiMail servers without installing this certificate, this is a required configuration 
+step for all production  accounts to ensure that you are connecting to the correct 
+server. You can obtain the correct certificate at the following URLs:
+
+  a. Test accounts: http://certs.emrdirect.com/EMRDirectTestCA.crt
+     Important: Don't forget to rename the file to phimail_server.pem and install it
+     in the correct directory.
+
+  b. Production accounts: https://www.phicert.com/certs/phiCertDirectRootCA.crt
+     Important: The production root must be converted to PEM format as follows:
+     $ openssl x509 -in phiCertDirectRootCA.crt -inform DER -out phimail_server.pem
+     Don't forget to install phimail_server.pem in the correct directory. As an added
+     security measure, please call us to confirm the thumbprint on this certificate.
+
+G. Debugging background connections to the server.
+
+You may review the connection activity to the server by Selecting Administration::Other::Logs,
+selecting ""direct-message"" in the ""Name of events:"" drop-down menu, and clicking ""[Refresh]"".
+If the background service is succesfully connecting, you will see ""message check completed""
+events in the log as well as any message related entries (see below for instructions to
+view more detailed message related status information). If you see no entries, make sure that
+the background service is enabled (See F.4 above). If you see ""could not connect to server""
+entries, each entry will also contain an error code:
+
+  C1: phiMail is disabled in the global configuration. Fix: enable.
+  C2: the phiMail server URL entered in the global configuration is invalid. Fix: Confirm
+      the URL has been entered correctly. It should be of the form 
+      ""ssl://server.example.com:32541"".
+  C3: unable to create stream context. Fix: Usually this is because the server certificate 
+      file installed in F.8 above is not the correct certificate or is in the wrong format.
+  C4: failed to open connection. Fix: Confirm you Internet service and local DNS servers are
+      online and your firewall is not blocking connections to the phiMail Server.
+
+H. Checking the status and history of the Direct Messaging Service in LibreEHR:
+Administrators may view the status of the service by Selecting Reports::Services::Background 
+Services from the main LibreEHR left navigation bar. The ""View Log"" link on this page or 
+Reports::Services::Direct Message Log will open the messaging history log showing each message 
+sent or received and the current status of that message (Received, Sent, Delivery Confirmed, 
+or Failed).
+
+I. Note of message status messages: Receiving message status updates requires that Direct message
+checking be enabled. When receiving messages, the phiMail back-end is fully compliant with the 
+Direct messaging protocols to notify the sender and provide final delivery confirmation, but 
+please note that  many other Direct providers do not yet support these features. If a message 
+is sent to a recipient using one of these other systems, LibreEHR probably won't ever receive a 
+final delivery confirmation for that message.
+
+J. How to use the Direct Messaging Features in LibreEHR:
+
+1. Sending:
+When the phiMail Direct Messaging service is enabled, an additional ""Transmit"" button will
+appear in the Continuity of Care Record (CCR) and/or Continuity of Care Document (CCD) block 
+of the Reports section in both the Patient Portal and the Patient pane of the main provider 
+interface. 
+
+To transmit a CCR or CCD, first click the ""Transmit"" button. This will open a small dialog 
+immediately below the button with a form field to enter the intended recipient's Direct Address. 
+Clicking ""Transmit"" again will hide the dialog.
+
+A Direct Address should have the same form as a regular email address, e.g. 
+jonesclinic@direct.example.com. Enter the address in the field and click the ""Send"" button 
+immediately to the right of the field. Only a single recipient may be specified in the field.
+The Send button will be temporarily disabled while LibreEHR is communicating with the phiMail 
+server. This will only work for properly-configured Direct addresses. Attempts to send to a 
+regular email address or Direct address outside of our test mode ""trust sandbox"" will fail
+during testing. Production accounts have wide interoperability with other Direct service
+providers. Should you encounter a trust community with which LibreEHR does not interoperate,
+please let us know at support@emrdirect.com.
+
+LibreEHR will then display a status message immediately below the Address field, the 
+success or failure of the message transmission, or an error message. If the message is
+successfully submitted to the server, the Address field will be cleared to prevent accidental
+re-transmission. If multiple recipients are required, the next recipient can now be entered.
+
+If you receive an error message, it will be followed by an error code. For a discussion
+of error codes beginning with the letter ""C"" please see section G above. Error codes
+beginning with ""EC"" are listed here:
+
+  EC 1: phiMail disabled in global configuration. Fix: enable.
+  EC 4: authentication failure. Fix: The Username and Password entered in the
+        global configuration must be corrected.
+  EC 5: request to add text failed. Fix: Confirm total message length < 5MB.
+  EC 6: problem sending the text. Fix: Confirm your local network connectivity is stable.
+  EC 7: request to add clinical document failed. Fix: see EC 5.
+  EC 8: problem sending the clinical document. Fix: see EC 6.
+
+2. Receiving:
+When the phiMail Direct Messaging service is enabled, and message checking is enabled either 
+through the background services manager of another mechanism, LibreEHR will automatically process 
+message status updates and new messages. Status updates will be reflected immediately in the 
+Direct Messaging log. Additionally, if a ""Failed"" notification is received for a previously sent 
+message, a regular email message will be generated to the Notification Email Address specified 
+in the Notifications tab of the Global Settings panel (accessed by selecting Administration::
+Globals from the main left navigation menu).
+
+New Direct messages will be processed as follows. A new ""Patient Note"" will be generated and 
+sent to the phiMail notification user specified in the Connectors tab of the Global settings. 
+The patient note will contain information about the message, including any text at the beginning 
+of the message from the sender. Any attachments (and any non-text content) will be automatically 
+converted to separate LibreEHR Documents, which will be referenced in the new Patient Note.  
+The Documents and the Patient Note are initially created without an assigned patient. 
+
+At this time, the envisioned workflow is that the notification user will review the message text
+and any included Documents to determine which patient the content belongs to and will then set the 
+patient using the existing Patient Note interface for choosing a patient. Once the patient is sent, 
+the Patient Note can be forwarded to another provider or staff member as appropriate using the 
+existing forwarding mechanism for Patient Notes. The unassigned Documents can be viewed by Selecting 
+Miscellaneous::New Documents from the main left navigation menu, which opens a Documents list. Once 
+the specified document is opened, the user can optionally categorize the document and, when 
+appropriate, assign the document to a specific patient using the ""Move to Patient #"" feature in the 
+Documents interface.
+
+
+Trademark Notice: phiMail is a registered trademark of EMR Direct.
+
+Copyright (c) 2013-2014 EMR Direct.
+
+
+
+Annotate the sections of the above text with actions, data types, and purposes as demonstrated, using only the categories from the list provided. For each section, provide your annotations followed by your rationale, and place a <R> tag between your annotations and your rationale.
+",openai:gpt-4o-mini,"--- File: Direct_Messaging_with_LibreEHR.txt ---
+
+**Section A: Purpose**
+- Actions: 
+  - sub: 
+    - anonymize: 
+  - Share
+- Data Types: 
+  - Health Data:
+    - Synonyms: medical information
+- Purposes: 
+  - Identification, Security
+
+<R> 
+In this section, the action focuses on sharing protected health information (PHI) securely. The data type is health-related due to the mention of PHI, which falls under medical information. The purpose is to identify and ensure the security of data being transmitted, as indicated by the secure method referenced.
+</R>
+
+---
+
+**Section B: IMPORTANT**
+- Actions: 
+  - Share
+- Data Types: 
+  - Health Data:
+    - Synonyms: medical information
+- Purposes: 
+  - Security
+
+<R> 
+This section highlights the limitations of the messaging feature, emphasizing the need for security in the transmission of health data. The action of sharing is implied, as it discusses how data may be transmitted. The data type remains health data, and the purpose is primarily security, focusing on the compliance and limitations of the system.
+</R>
+
+---
+
+**Section C: Problems Solved**
+- Actions: 
+  - Share
+- Data Types: 
+  - Health Data:
+    - Synonyms: medical information
+- Purposes: 
+  - Functionality, Identification
+
+<R> 
+This section outlines the problems the Direct Messaging feature solves, which includes transmitting clinical data. The action of sharing is evident as it discusses how data is transmitted. The data type is health data, and the purposes are functionality (enabling better communication) and identification (recognizing the source of data).
+</R>
+
+---
+
+**Section D: How it Works**
+- Actions: 
+  - Share
+- Data Types: 
+  - Health Data:
+    - Synonyms: medical information
+- Purposes: 
+  - Functionality
+
+<R> 
+This section describes the operational aspect of the messaging service, indicating how data is shared through the phiMail Direct messaging server. The data type is still health data, and the purpose is functionality, as it aims to facilitate the transmission of health information between users.
+</R>
+
+---
+
+**Section E: What you need before enabling Direct Messaging in LibreEHR**
+- Actions: 
+  - Collect
+  - Share
+- Data Types: 
+  - Account Information:
+    - Synonyms: account credentials
+- Purposes: 
+  - Requirements
+
+<R> 
+In this section, actions involve collecting necessary information to enable messaging, as well as sharing this information with the system. Data types include account credentials, as users need to register and provide their account details. The purpose is requirements, indicating the prerequisites for using the messaging system.
+</R>
+
+---
+
+**Section F: How to enable the Direct Messaging Features in LibreEHR**
+- Actions: 
+  - Process
+  - Share
+- Data Types: 
+  - Account Information:
+    - Synonyms: account credentials
+- Purposes: 
+  - Requirements, Functionality
+
+<R> 
+This section details the process of enabling messaging features, indicating actions to process settings and share configuration information. The data type remains account information, and the purposes are functional (enabling the feature) and requirements (steps needed to set it up).
+</R>
+
+---
+
+**Section G: Debugging background connections to the server**
+- Actions: 
+  - Process
+- Data Types: 
+  - Usage Data:
+    - App Interactions
+- Purposes: 
+  - Functionality, Security
+
+<R> 
+This section focuses on processing debugging information to ensure the messaging service works correctly. The data type includes usage data, specifically app interactions, as it involves reviewing logs. The purposes relate to functionality (keeping the service running) and security (ensuring connections are secure).
+</R>
+
+---
+
+**Section H: Checking the status and history of the Direct Messaging Service in LibreEHR**
+- Actions: 
+  - Process
+- Data Types: 
+  - Usage Data:
+    - App Interactions
+- Purposes: 
+  - Analytics, Functionality
+
+<R> 
+Here, the action is processing the status and history of message transactions, which involves app interactions as users check logs. The purposes are analytics (reviewing transmission data) and functionality (ensuring the messaging service operates as expected).
+</R>
+
+---
+
+**Section I: Note of message status messages**
+- Actions: 
+  - Share
+- Data Types: 
+  - Usage Data:
+    - App Interactions
+- Purposes: 
+  - Tracking, Functionality
+
+<R> 
+This section discusses the sharing of status updates related to message delivery through the system. The data type is usage data, specifically app interactions, as it relates to how messages are processed and tracked. The purposes are tracking (monitoring message statuses) and functionality (ensuring operational effectiveness).
+</R>
+
+---
+
+**Section J: How to use the Direct Messaging Features in LibreEHR**
+- Actions: 
+  - Share
+  - Process
+- Data Types: 
+  - Health Data:
+    - Synonyms: medical information
+  - Account Information:
+    - Synonyms: account credentials
+- Purposes: 
+  - Functionality, Identification
+
+<R> 
+This section instructs users on how to share health data through the Direct Messaging features. Actions include sharing and processing the information needed for transmission. The data types include health data (for the content of messages) and account information (for user credentials). The purposes are functionality (effectively using the messaging system) and identification (ensuring messages are sent to the correct recipients).
+</R>","--- File: Direct_Messaging_LibreEHR.txt ---
+
+### Section A: Purpose
+1. Actions: sub
+2. Data Types: Health Data
+3. Purposes: Requirements
+
+<R>
+In this section, the action of 'sub' is evident as it describes the purpose of the Direct Messaging feature in LibreEHR. The data type referenced is Health Data, specifically protected health information (PHI), which is essential in healthcare communication. The purpose is to outline the requirements for implementing this secure messaging system, aligning with regulatory criteria.
+</R>
+
+### Section B: Important Limitations
+1. Actions: Share
+2. Data Types: Health Data
+3. Purposes: Requirements, Security
+
+<R>
+This section describes limitations on the usage of Direct Messaging features. The action 'Share' is relevant as it conveys important user information about the system's capabilities. Health Data is again the data type referenced, focusing on the transmission of clinical data. The purposes here are to ensure compliance with requirements and maintain security regarding how data is handled in the system.
+</R>
+
+### Section C: Problems Solved
+1. Actions: Process
+2. Data Types: Health Data
+3. Purposes: Functionality
+
+<R>
+In this section, the action 'Process' is indicated as it discusses how the system will handle clinical data transmissions. Health Data is the data type involved, specifically referring to clinical data. The purpose is to enhance the functionality of the messaging system by solving specific problems related to data transmission.
+</R>
+
+### Section D: How it Works
+1. Actions: Process
+2. Data Types: Health Data
+3. Purposes: Functionality
+
+<R>
+The action 'Process' is noted here as it details how LibreEHR interfaces with the phiMail server to manage message transactions. The data type remains Health Data, emphasizing the clinical information being transmitted. The purpose is to explain the functionality of the system, illustrating how it achieves secure messaging.
+</R>
+
+### Section E: Prerequisites for Enabling Direct Messaging
+1. Actions: Collect
+2. Data Types: Account Information
+3. Purposes: Requirements
+
+<R>
+The action 'Collect' is present as it outlines what is needed to set up Direct Messaging. Account Information is the data type referenced, as it involves user accounts and credentials for access. The purpose is to specify the requirements necessary for enabling the feature properly.
+</R>
+
+### Section F: Enabling Direct Messaging Features
+1. Actions: Process
+2. Data Types: Account Information
+3. Purposes: Functionality
+
+<R>
+This section involves the action 'Process' as it explains the steps to enable Direct Messaging features. The data type here is again Account Information, as users need to input their credentials. The purpose is to enhance functionality by providing clear instructions for users on how to set up the messaging features.
+</R>
+
+### Section G: Debugging Connections
+1. Actions: Process
+2. Data Types: Usage Data
+3. Purposes: Security
+
+<R>
+The action 'Process' is used to describe how to check the connection activity to the server. Usage Data is the data type involved, as it refers to logs and connection status. The purpose is to ensure security by allowing users to monitor the status of their connections to prevent unauthorized access or issues.
+</R>
+
+### Section H: Status and History of Messaging Service
+1. Actions: Share
+2. Data Types: Usage Data
+3. Purposes: Analytics
+
+<R>
+The action 'Share' is indicated here as it discusses how the status and history of the messaging service can be viewed. Usage Data is the data type involved, focusing on logs of messages sent and received. The purpose is analytic; it allows users to review the performance and status of their messaging system for better management.
+</R>
+
+### Section I: Message Status Notifications
+1. Actions: Share
+2. Data Types: Usage Data
+3. Purposes: Functionality
+
+<R>
+In this section, the action 'Share' is implied as it explains the notifications that will be sent regarding message status. Usage Data is the data type, focusing on the status updates of messages. The purpose is functionality, ensuring that users are informed about their messaging transactions and any potential issues.
+</R>
+
+### Section J: Using Direct Messaging Features
+1. Actions: Process, Share
+2. Data Types: Health Data
+3. Purposes: Functionality, Contact
+
+<R>
+This section involves both 'Process' and 'Share' actions as it explains how to send and receive messages. Health Data is the primary data type, as it pertains to clinical documents being transmitted. The purposes are both functionality, by detailing how to use the features effectively, and contact, as it facilitates communication between providers and patients.
+</R>
+
+### Conclusion 
+The annotations provided reflect the actions, data types, and purposes found throughout the text. Each section is analyzed for its specific context regarding the use of Direct Messaging in LibreEHR, focused on secure communications and clinical data management."

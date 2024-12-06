@@ -1,0 +1,310 @@
+Extension points
+Trac offers an increasing number of
+extension points
+that allow you to plugin custom extensions for various functions. This functionality is based on the
+component architecture
+and particularly good introductions can be found at the following sections:
+Declaring an extension point
+Plugging in to an extension point
+How components are used in Trac's code
+Trac Extension Points
+Below you find a list of extension points available in Trac. If you want to contribute documentation on any of the below described extension point interfaces, feel free to add the documentation. Please use the template
+PageTemplates/TracDev/PluginDevelopment/ExtensionPoints
+when authoring new documentation.
+Extension Point Interface
+Source
+Description
+trac.admin.api.IAdminCommandProvider
+(
+source
+​
+)
+Allows plugins to add additional commands to the trac-admin console command.
+trac.admin.api.IAdminPanelProvider
+(
+source
+​
+)
+Allows plugins to add additional admin panels to the web-based administration module.
+trac.attachment.IAttachmentChangeListener
+(
+source
+​
+)
+Observe attachment add, delete and reparent operations.
+trac.attachment.IAttachmentManipulator
+(
+source
+​
+)
+Validate uploaded attachments before being stored in database.
+trac.attachment.ILegacyAttachmentPolicyDelegate
+(
+source
+​
+)
+Participate in legacy permission checking for attachments.
+trac.db.api.IDatabaseConnector
+(
+source
+​
+)
+By implementing this interface you can add additional database backends to the system. Currently available are backends for MySQL, PostgreSQL and SQLITE2/3.
+trac.env.IEnvironmentSetupParticipant
+(
+source
+​
+)
+Plugins that provide their own data models must implement this interface to be able to create the required tables in the database on either the creation of a new environment, or during the upgrade of an existing environment.
+trac.env.ISystemInfoProvider
+(
+source
+​
+)
+Provide system information displayed on the "About Trac" page and in internal error reports.
+trac.mimeview.api.IContentConverter
+(
+source
+​
+)
+Allows plugins to implement conversion strategies for arbitrary content types. (NOTE: API is likely to change in the future)
+trac.mimeview.api.IHTMLPreviewAnnotator
+(
+source
+​
+)
+Allows plugins to add additional information to an XHTML representation of a given file, for example meta data on the file and so on.
+trac.mimeview.api.IHTMLPreviewRenderer
+(
+source
+​
+)
+Allows plugins to provide support for rendering specific content of a specific type as HTML (used for
+TracSyntaxColoring
+and image preview).
+trac.notification.api.IEmailSender
+(
+source
+​
+)
+Implement this interface to be able to send notification mails.
+trac.notification.api.INotificationDistributor
+(
+source
+​
+)
+Implement this interface to distribute notifications over other channels.
+trac.notification.api.INotificationFormatter
+(
+source
+​
+)
+Implement this interface to convert notification events to different formats.
+trac.notification.api.INotificationSubscriber
+(
+source
+​
+)
+Implement this interface for new subscription rules.
+trac.notification.api.IEmailAddressResolver
+(
+source
+​
+)
+Implement this interface to lookup email addresses for users.
+trac.notification.api.IEmailDecorator
+(
+source
+​
+)
+Implement this interface to add or tweak email headers.
+trac.perm.IPermissionGroupProvider
+(
+source
+​
+)
+Implement this extension point interface when you can provide information on groups that a given user is a member of.
+trac.perm.IPermissionPolicy
+(
+source
+​
+)
+By implementing this interface you can do more finely grained permission checks.
+trac.perm.IPermissionRequestor
+(
+source
+​
+)
+Plugins can use this extension point to define additional "actions", or permission roles, for the permission system.
+trac.perm.IPermissionStore
+(
+source
+​
+)
+Plugins can use this extension point to implement a storage for permissions and also to handle user authorization.
+trac.prefs.api.IPreferencePanelProvider
+(
+source
+​
+)
+Allows plugins to add additional preferences panels to the user's preferences page.
+trac.resource.IResourceManager
+(
+source
+​
+)
+Allows plugins to take over full control of the realms that they provide, incl. also introducing new resource types to the system.
+trac.search.api.ISearchSource
+(
+source
+​
+)
+Allows plugins to provide additional searchable (re)sources to the system.
+trac.ticket.api.IMilestoneChangeListener
+(
+source
+​
+)
+Allows plugins to listen on changes to either existing or newly created milestones.
+trac.ticket.api.ITicketActionController
+(
+source
+​
+)
+Allows plugins to participate in a ticket's workflow.
+trac.ticket.api.ITicketChangeListener
+(
+source
+​
+)
+Extension point interface for components that require notification on when tickets are created, modified, or deleted.
+trac.ticket.api.ITicketManipulator
+(
+source
+​
+)
+Allows plugins to both prepare tickets on creation and also to validate them prior to that they get stored in the database.
+trac.ticket.roadmap.ITicketGroupStatsProvider
+(
+source
+​
+)
+Allows plugins to implement their own scheme of ticket stats, and provide that to the system via the RoadmapModule.
+trac.timeline.ITimelineEventProvider
+(
+source
+​
+)
+Allows plugins to contribute events to the
+timeline
+.
+trac.versioncontrol.api.IRepositoryConnector
+(
+source
+​
+)
+Support a new version control system.
+trac.versioncontrol.api.IRepositoryChangeListener
+(
+source
+​
+)
+Components implementing this interface are notified when new changesets are added to a repository, and when metadata for changesets is modified.
+more here
+trac.versioncontrol.api.IRepositoryProvider
+(
+source
+​
+)
+Provide information about known version control repositories.
+trac.versioncontrol.web_ui.browser.IPropertyRenderer
+(
+source
+​
+)
+Render node properties in
+TracBrowser
+and
+TracChangeset
+views.
+trac.versioncontrol.web_ui.changeset.IPropertyDiffRenderer
+(
+source
+​
+)
+Render differences between node properties in
+TracBrowser
+and
+TracChangeset
+views.
+trac.web.api.IAuthenticator
+(
+source
+​
+)
+Allows plugins to authenticate users and HTTP sessions thereof. The first authenticator able to authenticate a user is the authoritative authenticator, meaning that other authenticators available in the system will not be called. Users that cannot be authenticated by the request and an associated session thereof are called 'anonymous'.
+trac.web.api.IRequestFilter
+(
+source
+​
+)
+Allows plugins to both preprocess and postprocess HTTP requests.
+trac.web.api.IRequestHandler
+(
+source
+​
+)
+Allows plugins to process HTTP requests.
+trac.web.api.ITemplateStreamFilter
+(
+source
+​
+)
+Allows plugins to filter existing
+​
+Genshi
+streams prior to that the template will be rendered.
+trac.web.chrome.INavigationContributor
+(
+source
+​
+)
+Allows plugins to extend the navigation menus of the web interface.
+trac.web.chrome.ITemplateProvider
+(
+source
+​
+)
+Extension point interface for components that provide their own templates and accompanying static resources.
+trac.wiki.api.IWikiChangeListener
+(
+source
+​
+)
+Allows plugins to observe creation, modification and renaming (since trac-0.12), and deletion of wiki pages.
+trac.wiki.api.IWikiMacroProvider
+(
+source
+​
+)
+Allows plugins to contribute
+WikiMacros
+to Trac.
+trac.wiki.api.IWikiPageManipulator
+(
+source
+​
+)
+Allows plugins to validate wiki pages prior to that they get stored in the database.
+trac.wiki.api.IWikiSyntaxProvider
+(
+source
+​
+)
+Plugins can extend this extension point to add custom syntax rules to the wiki formatting system. In particular, this allows registration of additional
+TracLinks
+types.
+You can view a complete list of the provided and implemented extension points by Trac or plugins installed in your Trac environment using the
+​
+TracDeveloperPlugin
+.

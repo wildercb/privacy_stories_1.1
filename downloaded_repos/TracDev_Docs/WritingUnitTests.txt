@@ -1,0 +1,311 @@
+Contents
+Start writing
+TestCase
+s
+Using several test methods
+Writing unit tests
+This wiki page shows how to write your own unit tests for Trac or a Trac plugin.
+Start writing
+TestCase
+s
+Any
+unit test
+should derive from class
+unittest.TestCase
+to be called from
+unittest.makeSuite
+. Thus you can make a set of
+test cases
+, which are called
+test suite
+.
+Usually you need to setup your
+Environment
+to have any access to your Trac environment. This can be done using
+EnvironmentStub
+.
+This test suite can be executed as a normal Python code.
+Here is a simple test case from Trac plugin
+​
+LogWatcherPlugin
+to explain the above:
+# -*- coding: utf-8 -*-
+import
+os
+import
+shutil
+import
+tempfile
+import
+unittest
+from
+trac.test
+import
+EnvironmentStub
+from
+logwatcher
+import
+api
+class
+TestApi
+(
+unittest
+.
+TestCase
+):
+def
+setUp
+(
+self
+):
+self
+.
+env
+=
+EnvironmentStub
+(
+enable
+=
+[
+'trac.*'
+,
+'logwatcher.api'
+])
+self
+.
+env
+.
+path
+=
+tempfile
+.
+mkdtemp
+()
+os
+.
+mkdir
+(
+'
+%s
+/log'
+%
+self
+.
+env
+.
+path
+)
+self
+.
+env
+.
+config
+.
+set
+(
+'logging'
+,
+'log_type'
+,
+'file'
+)
+self
+.
+env
+.
+setup_log
+()
+def
+tearDown
+(
+self
+):
+self
+.
+env
+.
+reset_db
+()
+self
+.
+env
+.
+shutdown
+()
+shutil
+.
+rmtree
+(
+self
+.
+env
+.
+path
+)
+def
+test_get_logfile_name
+(
+self
+):
+test_api
+=
+api
+.
+LogViewerApi
+(
+self
+.
+env
+)
+logfile_name
+=
+test_api
+.
+get_logfile_name
+()
+self
+.
+assertNotEqual
+(
+None
+,
+logfile_name
+,
+"log file name is None"
+)
+def
+suite
+():
+print
+"Starting **API** test suite"
+suite
+=
+unittest
+.
+TestSuite
+()
+suite
+.
+addTest
+(
+unittest
+.
+makeSuite
+(
+TestApi
+,
+'test'
+))
+return
+suite
+if
+__name__
+==
+'__main__'
+:
+unittest
+.
+main
+(
+defaultTest
+=
+'suite'
+)
+Using several test methods
+You can use several test methods within a
+TestCase
+class; they need to start with
+test
+. When you use method
+setUp
+it will be executed for each test method. If you only want to "set up" your test environment once for your test case, you need to use class method
+setUpClass
+.
+Note that
+setUpClass
+and
+tearDownClass
+are available since Python 2.7.
+For example:
+# ... imports and such ...
+class
+TestApi
+(
+unittest
+.
+TestCase
+):
+@classmethod
+def
+setUpClass
+(
+self
+,
+port
+=
+None
+):
+super
+(
+TestApi
+,
+self
+)
+.
+setUpClass
+()
+self
+.
+env
+=
+EnvironmentStub
+(
+enable
+=
+[
+'trac.*'
+,
+'logwatcher.api'
+])
+# ... more lines ...
+def
+test_get_logfile_name
+(
+self
+):
+# ... more lines ...
+def
+test_get_log_settings_default
+(
+self
+):
+# ... more lines ...
+@classmethod
+def
+tearDownClass
+(
+self
+):
+super
+(
+TestApi
+,
+self
+)
+.
+tearDownClass
+()
+# you should also shutdown environment before deleting directory,
+# since it closes log files, shutdowns database connection and such
+self
+.
+env
+.
+shutdown
+()
+shutil
+.
+rmtree
+(
+dirPath
+)

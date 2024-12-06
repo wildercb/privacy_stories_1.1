@@ -1,0 +1,9 @@
+Sandbox Testing
+sandbox/testing
+status: merged in trunk -
+r6805
+This branch has 2 (somewhat related) goals:
+Increase the automated test coverage of the Trac code base using functional testing of user-visible features.
+Provide a semi-stable version of Trac that follows /trunk as closely as it can.
+Getting started: read
+trunk/TESTING-README

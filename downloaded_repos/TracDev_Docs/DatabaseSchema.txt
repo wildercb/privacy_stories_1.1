@@ -1,0 +1,86 @@
+Contents
+Overview
+Database Schema Trac 0.11
+Database Schema Trac 0.12
+Trac Database Schema
+The database schema is defined in
+trac.db_default
+​
+, along with the initial contents of the database. The schema includes the tables listed below.
+Overview
+Common
+Attachments
+Wiki System
+Version control system
+Ticket system
+Report system
+Notification system
+Table Name
+Purpose
+attachment
+Descriptions of attachments, the files themselves are stored on disk.
+auth_cookie
+User login cookies.
+cache
+Synchronization table for process- and thread-local caches.
+component
+Values that can be used in a ticket's "component" field. The
+owner
+column is used as the default assignee for new tickets, if not overridden at the time of ticket submission.
+enum
+Maps integer IDs for issues' priorities, severities, etc. to human-readable names.
+milestone
+Project milestones.
+node_change
+First half of the repository cache: for every changeset (as identified by the revision number), this table contains the nodes (files or directories) that have been added, modified or deleted.
+notify_subscription
+User preferences for notification subscriptions.
+notify_watch
+User preferences for notification watches.
+permission
+Username/action pairs describing who is allowed to do what. This table's contents also hold permission groups.
+report
+Stores the SQL to generate canned database reports.
+repository
+Stores cached and configured repository properties.
+revision
+Second half of the repository cache: changesets, containing the revision number, author, time, and log message. The list of files and directories modified by a changeset can be found by joining with
+node_change
+on the
+rev
+column.
+session
+Last user visit time.
+session_attribute
+Information about user settings, including name, email, and diff options.
+system
+System information such as the database version and repository cache metadata.
+ticket
+Tickets.
+ticket_change
+Changes to tickets, on a field-by-field basis. The field value
+comment
+is special: it associates a comment with a set of field changes.
+ticket_custom
+The values of custom ticket fields.
+version
+As in
+component
+and
+milestone
+, this holds the options of the drop-down
+version
+list on the ticket form. Every version can have a
+time
+set, although that is not presently used other than for ordering the list of versions in the UI.
+wiki
+Wiki pages, including old revisions.
+Database Schema Trac 0.11
+Note that some of the pictured relations are not "true" relations in the traditional relational meaning. Also, there's no "real" user table. The particular cases are explained in the embedded notes.
+This schema is incomplete and Trac 0.11 is no longer supported.
+Database Schema Trac 0.12
+This schema is not reviewed or validated by Trac developers.
+See also:
+TracDev
+,
+TracDev/DatabaseUpgrades

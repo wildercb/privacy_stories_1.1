@@ -1,0 +1,6 @@
+Sandbox Wiki Blame
+sandbox/wiki-blame
+This branch exists to stabilize the annotate support for wiki edits.  See
+#5821
+.
+Example

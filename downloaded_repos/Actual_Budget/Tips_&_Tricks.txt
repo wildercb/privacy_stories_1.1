@@ -1,0 +1,125 @@
+<PI>
+Using Actual
+Tips & Tricks
+
+Tips & Tricks
+
+Undo/redo
+​
+
+If you ever make a mistake, pressing
+
+
+
+Keyboard shortcuts
+​
+
+Firstly, a few global shortcuts for the Electron App that is still in development. Please be aware that these global shortcuts do not work in the web app:
+
+Cmd
+1
+will show the budget
+Cmd
+2
+will show reports
+Cmd
+3
+will show all accounts
+
+BUT here is one that WILL work in the web app as well:
+
+Cmd
+O
+(O not zero) this will close the file and list other available files to open
+
+Enter
+while editing a budget amount will move to the next category.
+Shift
+Enter
+will move to the previous category.
+
+When editing,
+Enter
+and
+Shift
+Enter
+will move down and up. If a dropdown is open and you've typed a new value, this will instead save the value and close the dropdown.
+When editing,
+Tab
+and
+Shift
+Tab
+will move left and right
+When adding a new transaction,
+Cmd
+Enter
+will add it regardless of where you are editing. Pressing
+Enter
+in either the Payment or Deposit columns will add it as well.
+
+F
+Show only selected transactions.
+D
+Delete selected transactions.
+A
+Set account for selected transactions.
+P
+set payee for selected transactions.
+N
+Set notes for selected transactions.
+C
+Set category for selected transactions.
+L
+Toggle cleared for current transaction.
+
+The following require a transaction to have been selected first:
+
+J
+/
+↓
+Move to the next transaction down.
+K
+/
+↑
+Move to the next transaction up.
+Space
+Toggle selection of current transaction.
+Shift
+Space
+Add all transactions between current transaction and most recently selected transaction.
+
+View multiple months at once
+​
+
+In the top left of the budget, you will see this control:
+
+This sets the maximum amount of months to render at once, and defaults to 1. If you want to view multiple months on the same page, click the boxes to increase the number.
+
+This only controls the
+maximum
+number of months. If the app is too small to render all of them it will only render the months that fit on the screen.
+
+Show running balances
+​
+
+A "running balance" is the balance of the account after every transaction over time. This is very useful for reconciling accounts with banks because you can see the balance at a specific date and use it to compare it with your bank.
+
+To enable this:
+
+Click on an account
+Click on the 3 dots to show the actions menu
+Select "Show running balance"
+
+A new column should appear which shows the balance of the account after each transaction:
+
+Undo/redo
+Keyboard shortcuts
+Budget
+Transaction Editing
+Transaction Management
+View multiple months at once
+Show running balances
+
+Budget
+Transaction Editing
+Transaction Management

@@ -1,0 +1,156 @@
+Discussing Advanced Wiki Operations
+Operations
+Delete
+Rename
+Copy
+Merge
+Diff
+Edit
+Section Editing
+Comments per paragraph
+User Interface
+Better Hierarchy Navigation
+The Trac wiki currently lacks some advanced features you can find in more mature wikis, operations like
+rename
+,
+copy
+and
+merge
+.
+This will summarize and expand the proposals found in
+#1106
+and other places.
+Operations
+Delete
+By default, mark a page as deleted instead of purging it from the db (
+#9222
+).
+Rename
+Basic renaming was implemented for 0.12, but this feature can be enhanced further. See
+WikiRename
+.
+Copy
+Mainly interesting if supporting
+batch
+copies, a.k.a. Subversion style branching.
+Merge
+Note that there are several kinds of merge.
+The one which is directly in line with the
+advanced wiki rename and copy operations
+is the operation consisting of
+merging two pages into one
+. This can also be seen as renaming a page to an
+existing
+page, which is currently forbidden. That operation can be used to consolidate several small topics into one umbrella topic, or for merging two synonym pages into one, etc.
+In any case, this would involve to solve the following issues:
+merge the two wiki texts (
+#152
+). The existing interface for this is rather minimal, it only shows the differences without the possibility to say which side(s) should be kept.
+bringing over the attachments. We should also take care of possible conflicts at that level. The attachment
+rename
+methods from
+WikiRename
+will also be relevant for this operation
+merge the two lines of history. Maybe simply concatenate the two lines?
+v1 page a
+v2 page a
+v3 page a
+v1 page b (merged in)
+v2 page b (merged in)
+v6 page a (with b merged in)
+The diff between 3. and 4. would be meaningless, but besides this, it should be enough.
+merge the potentially conflicting fields besides the wiki text. Fortunately there's only the read-only flag, shouldn't be that hard ;-) But well, there's
+#695
+,
+#3911
+.
+The other kind of improved merge is simply the resolution of conflicts in case of concurrent edits (
+#152
+). An improved interface for this situation should actually also handle the different points listed above (except merging the two lines of history).
+Note that this advanced conflict resolution method would also benefit to
+other
+kind of resources, in particular
+#7145
+(not to mention the possibility to merge tickets, in case of duplicates for example -
+#3006
+).
+Diff
+Compare different Wiki pages
+I can see this useful for Trac itself, comparing 0.11 and 0.12 versions of a page.
+Current wiki diff link is:
+http://trac.edgewall.org/wiki/TracLinks?action=diff&version=76&old_version=75
+Possible suggestion:
+http://trac.edgewall.org/wiki/TracLinks?action=diff&version=76&old_page=wiki/0.11/TracLinks/&old_version=75
+But along with the
+TracDev/Branches/WikiBlame
+idea (and even the copy operation), I can't help but note that this would come for free if we had
+#1132
+support ;-)
+Now that we have
+MultipleRepositorySupport
+and "unlisted" repositories
+(hidden = true)
+for those who would prefer that ancillary repository to remain invisible, this is increasingly becoming a more realistic option.
+(rblank) I agree with that. Even more, I would like to be able to have the source code, wiki
+and tickets
+in a single DVCS repository, so that I can take the whole thing on the road. Something along the lines of
+​
+Fossil
+. I guess the most difficult part is creating a GUI for merging that is simple enough.
+(cboos) See also related discussion in
+DistributedTrac
+and above, in
+#Merge
+.
+Edit
+Section Editing
+Many wiki's allow you to edit paragraphs or sections while leaving the rest of the page un-edited, like
+​
+in Wikipedia
+, for example.
+One idea could be to allow for double-click editing, with the smallest section under the mouse being extracted for edition (e.g. a paragraph, a list item, or the content of a #!th block). From that edit interface it should be possible to widen the scope of edition, gradually taking more context (the surrounding section, or list, or table, up to the whole page).
+This can be achieved by retrieving the current "location" trail. Special care should be taken with transcluded content.
+See also
+#1024
+.
+Comments per paragraph
+Maybe this does not belong in Trac and should be plugin instead - but the neatest way of collecting user feedback I have ever seen was the Django book
+​
+http://www.djangobook.com/about/comments/
+(mmm)
+I think it makes sense to think about a generic comment system, as wiki pages (or sections) are not the only parts of Trac that could benefit from comments / annotations. We have also
+#2035
+, commenting on changesets and sources. Commenting on attachments (patches) would be a similar feature. And although tickets have "comments", those are in fact more changelog messages, and as such allowing comments on them could also make sense. (cboos)
+All these "comments" are snippets of Wiki text that are attached to a main resource corresponding to the
+context
+of that text, and they are attached to a specific place in the main content of that context (the location trail sketched above in
+#SectionEdition
+).
+See also
+#4279
+.
+User Interface
+The advanced operations should not clutter the wiki page. 
+Instead of
+Copy
+and
+Merge
+buttons coming in addition to the
+Rename
+one, maybe a single
+Advanced…
+button would be preferable. 
+This could go to a single page containing the different forms, one for each advanced operation. Plugins could add their own advanced operation there.
+Better Hierarchy Navigation
+In 0.12 we introduced the wiki page name
+path
+trail, visible in the top left corner of the page, which makes it easy to quickly navigate to any ancestor (
+#8857
+).
+It would be nice if this could be used to navigate to children and, perhaps, siblings:
+if there are children, the path trail would end with a
+...
+link, leading to a page list (URL could be
+/wikilist/<wikipath>
+). If Javascript is enabled, the link could be disabled and replaced by an action that would query that same list with an XHR and display a selection list (or a more elaborate form of menu; but a simple <select> would probably do).
+the same could be done for siblings actually, by turning each '/' path separator into a similar link

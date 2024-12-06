@@ -1,0 +1,10 @@
+Ideas for improving the query module
+User interface
+Column sorting
+interesting patch on
+#10425
+, need to follow-up on
+#10178
+as well
+#7026
+- redo with jQuery UI drag'n'drop?

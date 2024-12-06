@@ -1,0 +1,500 @@
+Web Layer Refactoring: Controller API
+Status Quo
+Proposal: Controller Class
+Conventions and Convenience Features
+ControllerMixin
+Implementation Notes
+Status Quo
+The current web layer in Trac is quite low-level. It builds directly on the component architecture, and requires a “controller” to implement the
+IRequestHandler
+interface and expose two methods:
+match_request(req)
+and
+process_request(req)
+. The former method is called by the request dispatcher to determine which controller should handle a particular request. The latter is then called on the controller that was chosen.
+The following example defines a (heavily simplified) controller based on that API:
+class
+ExampleModule
+(
+Component
+):
+implements
+(
+IRequestHandler
+)
+# IRequestHandler implementation
+def
+match_request
+(
+self
+,
+req
+):
+match
+=
+re
+.
+match
+(
+r
+'/example/(\w+)/?'
+,
+req
+.
+path_info
+)
+if
+match
+:
+req
+.
+args
+[
+'name'
+]
+=
+match
+.
+group
+(
+1
+)
+return
+True
+else
+:
+return
+False
+def
+process_request
+(
+self
+,
+req
+):
+action
+=
+req
+.
+args
+.
+get
+(
+'action'
+,
+'view'
+)
+if
+req
+.
+method
+==
+'POST'
+:
+if
+action
+==
+'edit'
+:
+self
+.
+_do_save
+(
+self
+,
+req
+)
+elif
+action
+==
+'delete'
+:
+self
+.
+_do_delete
+(
+self
+,
+req
+)
+else
+:
+if
+action
+==
+'edit'
+:
+self
+.
+_render_form
+(
+self
+,
+req
+)
+elif
+action
+==
+'delete'
+:
+self
+.
+_render_confirm
+(
+self
+,
+req
+)
+else
+:
+self
+.
+_render_view
+(
+self
+,
+req
+)
+add_stylesheet
+(
+req
+,
+'example.css'
+)
+return
+(
+'example.cs'
+,
+None
+)
+# Internal methods
+def
+_do_save
+(
+self
+,
+req
+):
+name
+=
+req
+.
+args
+.
+get
+(
+'name'
+)
+# process the form submission
+def
+_do_delete
+(
+self
+,
+req
+):
+name
+=
+req
+.
+args
+.
+get
+(
+'name'
+)
+# process the form submission
+def
+_render_confirm
+(
+self
+,
+req
+):
+name
+=
+req
+.
+args
+.
+get
+(
+'name'
+)
+req
+.
+hdf
+[
+'title'
+]
+=
+'Confirm deletion:'
+def
+_render_editor
+(
+self
+,
+req
+):
+name
+=
+req
+.
+args
+.
+get
+(
+'name'
+)
+req
+.
+hdf
+[
+'title'
+]
+=
+'Edit me:'
+def
+_render_view
+(
+self
+,
+req
+):
+name
+=
+req
+.
+args
+.
+get
+(
+'name'
+)
+req
+.
+hdf
+[
+'title'
+]
+=
+'An example:
+%s
+'
+%
+name
+As shown in this example, pretty much every implementation of
+process_request()
+dispatches to one of several internal methods depending on the request method and the action parameter. Furthermore, the different
+match_request()
+methods always check the request path info against a regular expression, and maybe set parameters depend on some parts of that path (for example, “/ticket/123” results in the parameter “id” being set to “123”).
+Either in the main
+process_request()
+function, or in the individual
+action handlers
+, a common task is to extract the required parameters from the request for further processing. The method then returns the template (and optionally the content type) to use for rendering the response.
+Proposal: Controller Class
+This proposal extracts these common patterns from the individual controllers, and introduces a base class called
+Controller
+that allows for more convenient handling of requests. That class extends
+Component
+and implements the
+IRequestHandler
+interface, so that a concrete controller can still directly extend other extension points, such as
+INavigationContributor
+.
+When a controller is derived from the
+Controller
+base class, it should not need to implement
+match_request()
+or
+process_request()
+. Instead:
+it may define a class attribute called
+url_pattern
+that provides the regular expression that is tested against the request path info, and
+it can define a number of different functions for handling requests that are marked with the
+@Controller.action
+decorator
+Consider the following example:
+class
+ExampleController
+(
+Controller
+):
+stylesheets
+=
+[
+'example.css'
+]
+@Controller.action
+(
+template
+=
+'example_view.html'
+)
+def
+_process_view
+(
+self
+,
+req
+,
+name
+,
+format
+=
+None
+):
+req
+.
+hdf
+[
+'title'
+]
+=
+'An example'
+@Controller.action
+(
+'delete'
+,
+template
+=
+'example_confirm.html'
+)
+def
+_process_delete
+(
+self
+,
+req
+,
+name
+):
+if
+req
+.
+method
+==
+'POST'
+:
+# process the form submission, redirect if all is well
+req
+.
+hdf
+[
+'title'
+]
+=
+'Confirm deletion:'
+@Controller.action
+(
+'edit'
+,
+template
+=
+'example_form.html'
+)
+def
+_process_edit
+(
+self
+,
+req
+,
+name
+,
+description
+=
+None
+):
+if
+req
+.
+method
+==
+'POST'
+:
+# process the form submission, redirect if all is well
+req
+.
+hdf
+[
+'title'
+]
+=
+'Edit me:'
+This sets up three different methods for handling requests, each decorated with the
+@Controller.action
+decorator. That decorator takes the name of the action as the first parameter. When the base class processes a request, it extracts the value of the action parameter (which defaults to “view” if not provided), and looks for a method that declares to handle that action. The decorator also accepts the template file name and a list of stylesheet names, so that those don't need to be setup in each method body.
+In addition, request parameters that the controller method declares as keyword arguments are automatically extracted from the request and passed as parameters (although always as string, so that sometimes the parameter value will still need to be casted).
+One difference to the current code in Trac is that both
+GET
+and
+POST
+requests are handled by the same method. This will make it easier to implement user-friendly validation where a
+POST
+request with validity errors results in the form being redisplayed.
+Conventions and Convenience Features
+The example controller above does not provide an explicit
+url_pattern
+class attribute. In that case, the controller base class uses a generic pattern based on the name of the class, passing additional path segments as a positional argument. So the request dispatcher would respond to a request like:
+GET /example/foo?format=rss HTTP/1.1
+by invoking:
+ExampleController
+(
+env
+)
+.
+_process_view
+(
+req
+,
+'foo'
+,
+format
+=
+'rss'
+)
+Also, the name of the template does not need to be explicitly specified if it follows the following convention:
+[classname](_[actionname])?(_[format])?.cs
+For example, for the
+ExampleController._process_edit
+action above, the default template name would be
+example_edit.cs
+.
+For convenience, the
+Controller
+base class provides direct access to various chrome methods such as
+add_link()
+or
+add_stylesheet()
+. These can simply be invoked as instance methods and thus don't need to be explicitly imported.
+ControllerMixin
+While the
+Controller
+base class assumes that the controller is a top-level
+IRequestHandler
+, the action dispatching functionality is also available to other kinds of components, such as
+WebAdmin
+panels. To use this feature, a class should extend the
+ControllerMixin
+base class instead of
+Controller
+. In that case, no automatic matching against requests is made, but requests can be conveniently dispatched to actions by invoking the
+process_request()
+method.
+Implementation Notes
+The proposed API leaves the low-level
+IRequestHandler
+mechanism in place, but adds a convenience layer between the request dispatcher and the concrete controller components. This means that the change can be implemented incrementally, by converting each controller individually.
+The code can be checked out from the
+sandbox/controller
+branch of the
+SubversionRepository
+.
+Note that the branch currently requires Python 2.4 due to the use of decorators, but will be backported to 2.3 before/if it gets merged.
+See also:
+TracDev/Proposals
+,
+TracDev

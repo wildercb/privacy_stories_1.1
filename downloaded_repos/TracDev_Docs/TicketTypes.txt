@@ -1,0 +1,155 @@
+Ticket Types
+This feature is now integrated in Trac since
+milestone:0.9
+(see
+[1691]
+)
+Rationale
+When creating a new ticket, Trac enables you to select 
+the appropriate type for that ticket.
+Indeed, a
+ticket
+can represent anything ranging from
+a problem report, a support request, an idea for a new feature
+or actually any artifact that fits in your development process.
+Among issue trackers, Trac was initially on the
+undifferentiated
+camp,
+everything was treated the same and it was only from the description
+that one could tell in which category a ticket would fit.
+However, the need for a more structured partitioning of the ticket type
+appeared (e.g.
+#919
+,
+#1399
+) and several Trac sites were actually 
+tweaking the
+severity
+field to be the
+ticket type
+, or creating
+TracTicketsCustomFields
+for that purpose.
+Now, with the ticket
+type
+field, one is able to store this information as 
+part of the core properties of the ticket, which permits to display
+the type of a ticket in more interesting places, usually next to 
+the ticket number.
+What does it look like?
+Those screenshot correspond to intermediate development status: to be updated (or removed?)
+in the Ticket page's title:
+in the
+TracTimeline
+:
+Also, it's the first field you can select when creating a new ticket:
+What if I don't like ticket types?
+No problem. With
+trac-admin
+, you can
+use the
+ticket_type
+command to perform a few actions on ticket types:
+add
+change
+list
+order
+remove
+You can customize the ticket types to match your local requirements.
+If you delete
+all
+ticket types, then the feature is gone!
+Trac will work the same way it ever did without ticket types
+(i.e.
+Trac 0.[5-8].x
+behavior).
+Why is the severity field gone?
+Trac strives to be a simple to install, simple to use system.
+Offering in the default setup a combination of ticket type, 
+severity, priority and milestone was deemed too daunting 
+for new users.
+The advised configuration is therefore:
+type
+, for categorizing the ticket
+Defect
+:  a bug, anything that does not work as expected
+Enhancement
+: a new feature or an improvement over an existing one
+Task
+: everything else, something that needs to be done
+milestone
+used for scheduling
+priority
+, for asserting the importance of a ticket
+blocker
+: basic functionality is not available until this is fixed
+critical
+: severe loss of data due to the defect or highly needed enhancement
+major
+: defect with major impact / big enhancement
+minor
+: defect with minor impact / small enhancement
+trivial
+: defect with little or no impact / cosmetic enhancement
+However, some users would like to keep the current distinction
+between
+severity
+and
+priority
+:
+type
+, for categorizing the ticket
+milestone
+used for scheduling
+severity
+for trying to assert the
+objective
+importance or impact of the ticket
+(the values would be the same as those listed for the
+priority
+field above)
+priority
+to help organize the scheduling within a given milestone
+(fields like
+highest
+,
+high
+,
+normal
+,
+low
+,
+lowest
+).
+This is more a
+subjective
+field, based on other considerations than the
+objective severity (typically those of a product manager :-) ).
+In order to support that usage, the
+severity
+field has been kept
+in the database. It simply needs to be "activated" by using
+trac-admin
+'s
+severity add
+command, or through the web administration page.
+Other issues
+Different custom fields depending on ticket type
+By:
+pkou at ua.fm
+It would be nice if different sets of custom fields are visible to end user when ticket type is changed.
+Rationale: Different ticket types can require different types of additional information that needs to be entered, for example:
+Event
+: Due date, location;
+Enhancement
+: Source, Benefit, Link to business case/requirement, Review status, Approval status, Links to specifications;
+Defect
+: Customer ID
+Task
+:
+No additional custom fields.
+Hidden custom fields are initialized with zero/empty values.
+Standard fields represent common information that should be available in every ticket.
+Affected areas of functionality:
+When existing ticket is displayed, then unnecessary custom fields are hidden;
+When new ticket is created, then custom fields are displayed depending on selected ticket type.

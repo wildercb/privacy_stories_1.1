@@ -1,0 +1,112 @@
+Contents
+Third party libraries
+jQuery
+$(document).ready()
+Upgrade
+jQuery UI
+Upgrade
+jQuery UI Timepicker Addon
+TracIni settings
+JavaScript for Trac and plugin development
+JavaScript is used in Trac to add dynamics to web interface elements on the browser side:
+expanding/folding in the
+TracBrowser
+providing
+keyboard shortcuts
+and many other features
+This page lists some of the uses of this language in Trac.
+We also adhere to a
+JavaScript coding style
+.
+Third party libraries
+jQuery
+Trac makes heavy use of the
+​
+JQuery
+library. Access to this library contents is provided through the main function named
+$
+, which is shorthand for the
+jQuery
+namespace and it is possible to use the full name instead. However, other libraries may use
+$
+too, which may cause conflicts. To avoid these conflicts, switch jQuery into non-conflict mode with
+jQuery.noConflict()
+call, see
+​
+http://docs.jquery.com/Using_jQuery_with_Other_Libraries
+.
+You will see many blocks in Trac that use $ for jQuery. They do it in their local scope defined by nameless function or closure:
+(function($) { /* some code that uses $ */ })(jQuery)
+There is a good description of closures and
+(function(){})()
+construct at
+​
+https://developer.mozilla.org/en-US/docs/Web/JavaScript/Closures
+.
+$(document).ready()
+To execute and modify the DOM tree the
+JavaScript
+function should wait until a page fully loads. With jQuery it looks like:
+$(document).ready(function_name);
+In non-conflicting mode, code that executed in Trac on page startup is enveloped in closure and looks like:
+jQuery(document).ready(function($) { ... });
+Upgrade
+Minified versions of a given release
+x.y.z
+of jQuery can be found in URLs with the following pattern:
+http://code.jquery.com/jquery-x.y.z.min.js
+Don't forget to update the default value for the
+jquery_location
+setting. See for example
+r16094
+.
+jQuery UI
+Since Trac version 1.0, we also bundle
+​
+jQuery UI
+, a set of standard user interface elements (UI).
+Upgrade
+A specific
+x.y.z
+version of the minified Javascript code can be downloaded from URLs using the following pattern:
+http://code.jquery.com/ui/x.y.z/jquery-ui.min.js
+This corresponds to the minified version of the whole of jQuery UI, ie we don't use a subset of what is currently used by Trac on purpose, so that plugins can assume they have access to all jQuery UI components.
+We use a custom theme built using the
+​
+Themeroller jQuery UI Theme Roller
+for Trac 1.0.0.
+The
+jquery-ui.css
+​
+file contains a link to the theme roller with preselected values.
+jQuery UI Timepicker Addon
+We use the
+​
+Timepicker extension
+for the standard jQuery UI datepicker.
+Get the release that matches the jQuery UI version:
+https://github.com/trentrichardson/jQuery-Timepicker-Addon/tree/v1.1.1
+The
+jquery-ui-timepicker-addon.js
+file is compressed using the
+​
+Google Closure Compiler
+, which gives good results. The minified file is saved in
+trac/htdocs/js/jquery-ui-addons.js
+​
+.
+Finally, the
+jquery-ui-timepicker-addon.css
+file is merged with the
+trac/htdocs/css/jquery-ui-addons.css
+​
+file.
+TracIni
+settings
+After an upgrade, don't forget to update the default values for the
+jquery_ui_location
+and
+jquery_ui_theme_location
+settings. See for example
+r16094
+.

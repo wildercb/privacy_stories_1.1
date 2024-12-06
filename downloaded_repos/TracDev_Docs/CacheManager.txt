@@ -1,0 +1,104 @@
+Caching and cache invalidation
+Trac uses caches at the component level to speed-up costly tasks:
+Ticket fields cache (
+#6436
+)
+InterMapTxt
+cache
+User permission cache
+Wiki page cache
+Those caches are held at the level of
+Component
+instances. For a given class, there's one such instance per environment in any given server process. The first thing to take into account is that those caches must be safely accessed and modified when used in concurrent threads (in multi-threaded web front ends, that is).
+But because of the possibility of concurrent access at the underlying database level by
+multiple processes
+, there is also a need to maintain a consistency and up-to-date status of those caches across all processes involved. Otherwise, you might do a change by the way of one request and the next request (even the GET following a redirect after your POST!) might be handled by a different server process which has a different "view" of the application state.
+This doesn't even have to imply a multi-process server setup, as all what is needed is for example a modification of the database done using trac-admin.
+The Cache Manager
+Starting with Trac
+0.12
+(
+r8071
+), we introduced a CacheManager component. That component is mostly transparent to the developer, which only has to deal with a decorator that can be used to create
+cached attributes
+.
+Creating a cached attribute
+is done by defining a retrieval function and decorating it with the
+@cached
+decorator. For example, for the wiki page names:
+@cached
+def
+pages
+(
+self
+,
+db
+):
+"""Return the names of all existing wiki pages."""
+cursor
+=
+db
+.
+cursor
+()
+cursor
+.
+execute
+(
+"SELECT DISTINCT name FROM wiki"
+)
+return
+[
+name
+for
+(
+name
+,)
+in
+cursor
+]
+Invalidating a cached attribute
+is done by
+del
+eting the attribute:
+def
+wiki_page_added
+(
+self
+,
+page
+):
+if
+not
+self
+.
+has_page
+(
+page
+.
+name
+):
+del
+self
+.
+pages
+The cache is
+consistent within a request
+. That is, a cached attribute will always have the same value during a given transaction. Obviously, cached values should be treated as immutable.
+The
+CacheManager
+component contains all the logic for data retrieval, caching and invalidation. Cache invalidation across processes is done by incrementing a generation counter for the given attribute in the
+cache
+database table. The invalidation granularity is at the attribute level.
+There are two cache levels:
+A thread-local (per-request) cache is used to minimize locking and ensure that the cached data is consistent during a request. It is emptied at the beginning of every request.
+A process cache keeps retrieved data as long as it has not been invalidated.
+The
+cache
+table is read the first time a cached attribute is accessed during a request. This avoids slowing down requests that don't touch cached attributes, like requests for static content for example.
+See also
+TracDev/Proposals/CacheInvalidation
+for the history of the implementation details and
+​
+th:CacheSystemPlugin
+for a plugin that implements caching for wiki pages.

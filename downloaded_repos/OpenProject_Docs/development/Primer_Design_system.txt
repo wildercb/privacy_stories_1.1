@@ -1,0 +1,6 @@
+Design System and Component Libraries
+Starting in OpenProject 13.0., the
+Primer Design System
+is being used in OpenProject. Relevant reusable components from Primer as well as common patterns and compositions of these components will be documented in our
+Lookbook
+.

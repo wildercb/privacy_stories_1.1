@@ -1,0 +1,94 @@
+Trac Development Proposals
+Current Proposals
+This auto-generated list (and the one on
+TracDev
+) includes some finished proposals while other proposals may have stalled or been abandoned. —psuter
+AdvancedNotification
+AdvancedNotification/DatabaseSchema
+AdvancedNotification/IEmailAddressResolver
+AdvancedNotification/IEmailDecorator
+AdvancedNotification/INotificationDistributor
+AdvancedNotification/INotificationFormatter
+AdvancedNotification/INotificationSubscriber
+AdvancedNotification/IPreferencePanelProvider
+AdvancedNotification/NotificationApi
+AdvancedWikiFormatting
+AdvancedWikiOperations
+Announcer
+BatchModification
+CacheInvalidation
+ConfigEnumTranslation
+ControllerApi
+DataModel
+EmailValidation
+EvenFinerGrainedPermissions
+ITicketQueryRenderer
+Jinja
+Jinja/TracInterfaceCustomization
+Journaling
+MultipleProject
+NewHelp
+NewTicketDuplicateCheck
+PortalTrac
+ProjectLabels
+Setuptools
+ThemePlugins
+TicketLinks
+TicketTypes
+TracRelations
+TracTicketsCustomTimeFields
+UserSystem
+VerticalHorizontalParsing
+WikiNamespaces
+WikiParserFormatterSplit
+WikiStorage
+And also:
+AdvancedSearch
+TracObjectModelProposal
+GenericTrac
+TracCrossReferences
+TighterSubversionIntegration
+SubTickets
+VcRefactoring
+SearchRefactoring
+FieldRefactoring
+MultipleRepositorySupport
+In some way, the
+TracMultipleProjects
+pages are also proposals for how multiple project support could be implemented:
+ByProductAndSearch
+ComprehensiveSolution
+MultiTrac
+MultipleEnvironments
+MultipleEnvironmentsSingleDatabase
+SingleEnvironment
+One quite concrete proposal for multiple project support is described here:
+TracMultipleProjects/SingleEnvironment#ProposedImplementation
+Older Proposals
+TracPluggableModules
+original proposal which became the
+TracDev/ComponentArchitecture
+TracDiff
+integrated in
+0.10
+InterTrac
+and
+InterWiki
+integrated in
+0.10
+NewWorkflow
+supereseded by
+WorkFlow
+FlexibleWikiPageNames
+has been -1, but I still think it might be interesting for some, especially now that we have the ExtensionOption
+WorkFlow
+integrated in
+0.11
+TracDev/SecurityBranch
+integrated in
+0.11
+?
+See also:
+TracDev
+,
+TracDev/Branches

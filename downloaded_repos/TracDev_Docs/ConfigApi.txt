@@ -1,0 +1,443 @@
+Configuration (trac.ini) API
+Most of Trac's configuration is stored in the
+trac.ini
+file. Trac provides an API to retrieve and set the settings in this configuration file. The
+trac.ini
+file has the following structure:
+[wiki]   ; <= section
+ignore_missing_pages = false  ; <= option with option value
+max_size = 262144
+render_unsafe_content = false
+The file consists of multiple
+sections
+, written as
+[sectionname]
+. Each section consists of multiple
+options
+with their
+option values
+, like
+ignore_missing_pages = false
+in the example above. All options that come after the beginning of a section belong to this section - until a new section begins.
+Note:
+The following examples will use
+env.config
+to access the configuration API. From within a
+component
+method you can use
+self.config
+to access the configuration API as well.
+Retrieving arbitrary option values
+The easiest way to retrieve the value of a certain option is to use:
+value
+=
+env
+.
+config
+.
+get
+(
+'wiki'
+,
+'ignore_missing_pages'
+)
+The method
+get()
+will return the option value as string, type
+unicode
+. Of course, there are also methods to retrieve the option value in other data formats:
+env
+.
+config
+.
+get
+()
+# as string
+env
+.
+config
+.
+getbool
+()
+# as bool
+env
+.
+config
+.
+getint
+()
+# as integer
+env
+.
+config
+.
+getfloat
+()
+# as float; since Trac 0.12
+env
+.
+config
+.
+getlist
+()
+# as list
+env
+.
+config
+.
+getpath
+()
+# as absolute path
+Note:
+Most options have some meta data (data type, description) associated with them. For getting those meta data, see
+Listing Options
+below.
+Setting arbitrary option values
+Setting an option value is almost as easy as retrieving one. Use the method
+set()
+:
+# the last parameter is the new option value ("False" in this case)
+env
+.
+config
+.
+set
+(
+'wiki'
+,
+'ignore_missing_pages'
+,
+False
+)
+env
+.
+config
+.
+save
+()
+You also need to call
+save()
+to store the changes you've made to
+trac.ini
+.
+There's just one thing you need to be aware of:
+The option value must be a string!
+This is not a problem for most data types - except for lists. When you want to save a list, write your code like this:
+my_list
+=
+[
+'test1'
+,
+'test2'
+]
+env
+.
+config
+.
+set
+(
+'my_section'
+,
+'my_option'
+,
+', '
+.
+join
+(
+my_list
+))
+env
+.
+config
+.
+save
+()
+Defining options
+While you can use
+config.set()
+to store values for arbitrary options, there's also a way to tell Trac which options are available. To do this, create a component and specify the option like this:
+from
+trac.core
+import
+*
+from
+trac.config
+import
+Option
+class
+MyComponent
+(
+Component
+):
+my_option
+=
+Option
+(
+'my-section'
+,
+'my-option'
+,
+'my default value'
+,
+doc
+=
+"Here goes the description of this option."
+)
+Note:
+This only works in components, not in "regular" classes.
+This defines the option "my-option" in the section "my-section" with the default value "my default value" and a description. Defining an option like this (rather than just setting the value) has several advantages:
+The most important advantage is that you can access the option's value more easily (see also the
+next section
+):
+class
+MyComponent
+(
+Component
+):
+my_option
+=
+...
+def
+my_method
+(
+self
+):
+# "self.my_option" is equivalent to
+# "self.config.get('my-section', 'my-option')"
+print
+"My option value: "
+,
+self
+.
+my_option
+Secondly, you can define a default value for the option. If no value has been defined in
+trac.ini
+for this specific option, the default value will used as value, regardless which of the two previously mentioned method is used.
+Last, this allows plugins like
+​
+IniAdminPlugin
+or
+​
+TracIniAdminPanelPlugin
+to work. These plugins allow the user to edit
+trac.ini
+via the web administration interface. For this purpose they need to know which options exist which is done like described in this section.
+Retrieving the value of previously defined options
+As describes in the previous section, defining an option (in a component) allows you to retrieve its value more easily. Furthermore, this definition also allows for automatic type conversion. For this you need to use one of the child classes of
+Option
+instead of
+Option
+itself.
+For example, let's assume the option
+my_option
+defined in the next example has the value
+1.234
+. Now consider calling
+my_method
+in the following code:
+class
+MyComponent
+(
+Component
+):
+# using "FloatOption" instead of "Option"
+my_option
+=
+FloatOption
+(
+...
+)
+def
+my_method
+(
+self
+):
+# will print:
+# <type 'float'> : 1.234
+print
+type
+(
+self
+.
+my_option
+),
+':'
+,
+self
+.
+my_option
+The option value has automatically been converted to
+float
+. If you had simply used
+Option
+instead of
+FloatOption
+, the value would have been a string.
+Beside these simple types (
+BoolOption
+,
+IntOption
+,
+FloatOption
+), there are also options with a little bit more complexity:
+PathOption
+simply describes a path that can be absolute or relative. The option always returns an absolute path. Relative paths are resolved relative to the
+conf
+directory of the environment.
+ChoiceOption
+is simply an option that only has a certain set of valid values.
+ListOption
+converts the option value into a list of strings. So a list option allows for iteration like this:
+# with my_option_list = ListOption(...)
+for
+item
+in
+self
+.
+my_option_list
+:
+print
+item
+ExtensionOption
+describes
+exactly one
+enabled component implementing a specific extension point interface.
+OrderedExtensionsOption
+describes an
+ordered list
+of enabled components implementing a specific extension point interface. (Components that also implement the same interface but are not listed in the option can automatically be appended to the list.) This list can be iterated like with
+ListOption
+.
+Note:
+Of course, you can also access the defined options of another component by using:
+OtherComponent
+(
+env
+)
+.
+other_option
+Note:
+Currently (as with Trac
+0.12.1
+) you can't
+set
+an option's value this way, eg with
+self.my_option = new_option_value
+. This will raise an AttributeError, but ticket
+#9967
+aims to fix this.
+Why does this work?
+So, how can one define an option as
+ListOption
+but end up with a list? This works because there are two ways to access the option: as class variable or as instance variable.
+class
+MyComponent
+(
+Component
+):
+my_option
+=
+ListOption
+(
+...
+)
+def
+my_method
+(
+self
+):
+# 1) as instance variable
+# <type 'list'>
+print
+type
+(
+self
+.
+my_option
+)
+# 2) as class variable
+# <class 'trac.config.ListOption'>
+print
+type
+(
+MyComponent
+.
+my_option
+)
+The first way uses the
+instance
+attribute, which is the actual list, while the second way uses the
+class
+attribute which is the actual
+ListOption
+object.
+When you try to access another component's defined options the difference between these two ways is less obvious, so be careful:
+# 1) as instance variable
+# <type 'list'>
+print
+type
+(
+OtherComponent
+(
+env
+)
+.
+my_option
+)
+# 2) as class variable
+# <class 'trac.config.ListOption'>
+print
+type
+(
+OtherComponent
+.
+my_option
+)
+For a deeper understanding of how this implementation works, see the official
+​
+Descriptor HowTo Guide
+, since the
+Option
+class is a data descriptor.
+Listing known options
+Beside retrieving the value of a certain option, there are also methods for listing all known options:
+config.sections()
+: Returns a list of the names of all known sections.
+config.options(section_name)
+: Returns a list of
+(name, value)
+tuples for all known options in the specified section.
+config.defaults()
+: Returns a dict with the default values of all known options (that have one) in all known sections.
+A "known option" in this context is an option that:
+is defined like described in the section
+Defining Options
+above
+and/or has value assigned to it.
+Furthermore, there is a way to list all
+defined
+options. This is done by using
+Option.registry
+which is a dict with
+(section_name, option_name)
+keys. The value for each key is the
+Option
+object that defines the option, not its current value. The following example lists the descriptions of all defined options:
+for
+(
+section_name
+,
+option_name
+),
+option
+in
+Option
+.
+registry
+.
+items
+():
+print
+option
+.
+__doc__

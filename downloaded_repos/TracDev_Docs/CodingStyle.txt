@@ -1,0 +1,205 @@
+Contents
+Naming conventions
+Strings
+Miscellaneous
+JavaScript
+HTML
+SQL
+Trac Coding Style
+Code is read more often than it is written, so we adhere to a coding style. Patches that:
+have tabs rather than spaces
+have long lines
+have multiple statements per line
+break the naming conventions
+do not follow our coding style. On the other hand, a patch that does meet the conventions is much more likely to be a
+good patch
+and has a better chance to get the attention it deserves.
+Like most Python projects, we adhere to
+​
+PEP 8 (Style Guide for Python Code)
+and
+​
+PEP 257 (Docstring Conventions)
+. Be sure to read those documents if you intend to contribute code to Trac.
+Starting with version 1.5.1 the codebase should be compatible with Python 2 and 3, specifically Python 2.7 and Python 3.5+. The
+​
+Django Python 2/3 guidelines
+should be followed.
+Note that some of the current Trac code violates coding style rules. We are always in the process of refactoring the offending modules so that all code adheres to the conventions.
+Naming conventions
+Package and module names should be all lower-case, words
+may
+be separated by underscores.
+Class names use
+CamelCase
+e.g.
+TicketModule
+Class names inheriting from
+trac.core.Interface
+use mostly
+CamelCase
+, but are prefixed by an "I" letter
+e.g.
+ITimelineEventProvider
+The names of functions, variables and class members use all lower-case, with words separated by underscores
+e.g.
+do_delete
+Internal methods and variables are prefixed with a single underscore
+e.g.
+_do_whatever_it_takes_to_delete
+Abstract base classes should use the suffix
+Base
+.
+Use a trailing underscore if the name would shadow a keyword.
+Strings
+Use
+"..."
+for text meant to be read by users,
+use
+'...'
+for string constants, eg keys in dicts, CSS class names, filenames.
+The former strings will usually be translated, so be sure to play nice with the i18n conventions (
+TracL10N#ForDevelopers
+).
+In fact, the only "…" strings that won't get translated are the messages for the log.
+However this is not a very strict convention, rather a help to see what should be translated or not. It is OK to use
+'...'
+when the message contains
+"
+characters, for example, as such messages are often long and can't usually be mistaken for string constants anyway.
+For regular expressions, use
+r'...'
+strings, 
+or multiline
+r'''...'''
+in
+re.VERBOSE
+mode.
+For SQL code, use multiline
+"""..."""
+strings if needed. Single line SQL also use
+"..."
+style most of the time, as they often contain single quotes (
+'
+).
+Miscellaneous
+Lines shouldn't exceed a length of 79 characters
+, so that the diffs look nicer on short lines, especially in side-by-side mode.
+Never use multiple statements on the same line, eg
+if check: a = 0
+.
+Prefer list comprehension to the built-in functions
+filter()
+and
+map()
+when appropriate.
+Use
+raise TracError("message")
+instead of
+raise TracError, "message"
+Only use a
+global
+declaration in a function if that function actually modifies a global variable.
+A little deviation from
+​
+PEP:0257
+: we usually don't
+insert a blank line between the last paragraph in a multi-line docstring and its closing quotes
+.
+docstrings should contain reStructuredText markup, as understood by
+​
+Sphinx
+, as we're using the latter for generating our
+ApiDocs
+.
+In some situations however, like for documenting Macros and Options,
+WikiFormatting
+must be used, as we render these strings with the Wiki engine when using the
+[[MacroList]]
+and
+[[TracIni]]
+macros, respectively.
+Prefer tuples without parenthesis, particularly in
+return
+and
+yield
+statements. When parenthesis are needed for line continuation they can be used rather than a backslash on the continuation line.
+Code blocks are copiously documented, describing the code blocks' functionality concisely.
+Avoid using
+except Exception
+, instead making the exception clause as narrow as necessary to catch the excepted exception.
+Move code out of the
+try
+statement that cannot raise the exception being trapped, placing it before, after, or in an
+else
+clause, as appropriate.
+JavaScript
+JavaScript
+code should follow
+​
+these conventions
+with the following exceptions and additions:
+Lines shouldn't exceed a length of 79 characters.
+Use two spaces for indentation and refrain from using tabs.
+Use
+lowercase
+for variable names.
+Use
+camelCase
+for functions.
+Define non-anonymous functions as
+function fooBar() {...}
+, rather than
+var fooBar = function() {...}
+.
+Keep as much as possible private, by defining private functions in an inner scope. Attach functions you want to export to the
+$
+symbol.
+Use a
+trac-
+prefix for all id and class names. This is for new names, because changing old names would break customizations.
+Prefix variables containing a jQuery object with
+$
+.
+HTML
+Empty tags should have a single whitespace before the closing bracket,
+/>
+. For example,
+<br />
+and
+<input type="text" ... />
+.
+Use curly braces for variables in Genshi templates, using
+${var}
+rather than
+$var
+, as this is required for Jinja2 templates.
+SQL
+While the Python and Javascript coding conventions differ from the SQL coding conventions, it is still important that we have them for code consistency and code legibility. Both of these make SQL code maintenance easier.
+Table and column names are singular and lowercase.
+Separate by underscore:
+milestone_name
+instead of
+milestonename
+.
+Reserved words are uppercase:
+SELECT
+instead of
+select
+,
+INTEGER
+instead of
+integer
+.
+Avoid abbreviations and if you have to use them make sure they are commonly understood.
+Do not prefix with
+tbl
+or any other prefix, or Hungarian notation.
+Do not give a table the same name as one of its columns and vice versa.
+When presenting SQL code in the wiki, use the #sql preprocessor, as in
+{{{!#sql
+, so that the code highlights neatly.
+See also:
+TracDev
+,
+TracDev/DatabaseApi#GuidelinesforSQLStatements

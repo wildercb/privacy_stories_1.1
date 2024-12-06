@@ -1,0 +1,102 @@
+Contents
+The Context
+The Problems
+The Goals
+Proposed Solution
+GUI Mockups
+Initial Set of Portlets
+Initial Set of Portal Modules
+Portal Template
+Sample Portal Template
+Discussion of Design Decisions Made
+Portal Trac
+Note
+: While the initial idea was based on massively patching the existing Trac sources, the portal will instead be a plugin module. However, this requires the availability of the extension point specified in
+#10226
+.
+This page describes an approach to consolidating multiple Trac environments under a unified interface, see
+TracMultipleProjects/MultipleEnvironments
+.
+This was started under ticket
+#10217
+.
+The Context
+Having multiple Trac instances or projects leaves you basically with two options:
+You set up multiple instances of either the Trac standalone server, binding it to either different IP addresses or ports, or configure apache so that you will have multiple virtual hosts prepared for servicing the multiple independent projects, most provably also using different ports for each project. Of course you will also have to configure your resolver, be it either a DNS or your local /etc/hosts database;
+You use the Trac standalone server or a suitable apache virtual host configuration, and Trac's env-parent-dir option to provide a rudimentary index of your projects from which you then can dive into your existing projects;
+The Problems
+While option 1 is definitely more flexible, it leaves you with a lot of host names a/o ports to remember on how to access your projects in the first place;
+While option 2 is more simpler, it already provides you with an aggregated list of your existing projects, from where on you can simply navigate to individual projects that you are currently working on;
+The biggest draw back of option 2 is that it leaves you with only a simple project index that by no means provides you any more options nor the power managing your existing projects from an aggregated point of view;
+And by no means, one will ever be able to search across all projects, nor will one be able to aggregate information from all projects into a single page, for example a dash board, unless you implemented such a feature by yourself, using even more external tools and customizations to get the job done;
+The Goals
+The portal should be omnipresent in that existing projects and their modules blend into the portal's layout and design, but still allow individual projects or nested portals to provide a custom logo and icon for their site;
+Other use cases, for example browser based registration / creation of new projects, or the termination of existing projects, single-sign-on, hierarchical project layouts using nested portals, individual project level sub domains, and even more could be achieved by using the portal approach and proper integration of the existing solutions such as apache etc.;
+Refactor parts of Trac so that different environments can be supported.
+Proposed Solution
+OBSOLETE? A new trac-portal-admin console will be introduced for setting up / administering a portal instance;
+A Trac Portal instance will have its own database, its own configuration and templates and so on;
+Portal specific extension points (IPortal…) will be introduced, which have to be extended upon by user or system provided components. All portal components must be registered with the trac.portal.plugins entry point;
+A new trac.portal.api Portlet API will be introduced, with IPortlet being the sole portlet extension point in the system. Portlets will also be standard Trac Components, and they must also be registered with the trac.portal.plugins entry point;
+Portlets serve as content providers. Some of them might even serve as IRequestHandlerS or IRequestFilterS. Basically a portlet can choose to provide content that is local to the portal or, they are using so called content aggregators aggregating content from across all of the registered projects. These aggregators, in turn, make use of so called content sources. Portlets can support rendering content in multiple different formats, based on so called content types. The least common denominator is considered text/plain, however, in a web based environment we consider it to be text/html. A portlet that supports rendering of its content in for example text/html and text/rdf+xml or even text/atom+xml, will adopt to content-type specific user requests, provided that the portal allows one to retrieve a feed from a single portlet at a time.
+A new <portlet…/> Genshi directive will be introduced for authoring the portal template;
+GUI Mockups
+TBD
+Initial Set of Portlets
+SearchPortlet — allows one to search across all projects under the reign of the portal
+LocalSearchAggregator — aggregates search across all locally accessible projects, available search sources are provided by the project's ISearchSourceS
+TimelinePortlet — allows one to diplay an aggregated time line of events across all projects and even the portal itself
+LocalTimelineAggregator — aggregates time line events across all locally accessible projects, including the portal, available sources are the time line event sources that are provided by the project's ITimeLineProviderS and the portal
+ProjectIndexPortlet — provides a navigable project index
+LocalProjectIndexAggregator — aggregates the locally accessible projects
+TicketPortlet — allows one to display an aggregated ticket list across all projects (except for the portal which does not have a ticket system);
+LocalTicketAggregator — aggregates tickets from the locally accessible projects
+TBD
+Initial Set of Portal Modules
+TBD.portal.prefs — replaces the preferences for all of the projects reigned by the portal;
+TBD.portal.search — provides a search results page and the search portlet(s);
+TBD.portal.admin — provides the trac-portal-admin console and the portal's admin web interface;
+TBD.portal.project — provides a wrapper for existing projects under the reign of the portal;
+TBD.portal.timeline — provides a navigable time line summary page and the time line portlet(s);
+TBD.portal — the portal itself
+TBD
+Portal Template
+Portal templates are genshi templates, however, the portal system will register a new directive prior to rendering the template. This new directive is the <portlet…/> directive.
+Sample Portal Template
+<html xmlns:p="http://trac.edgewall.org/portal" ...>
+
+<body>
+
+...
+
+  <p:portlet name="trac.portal.search.portlets.SearchFieldPortlet"/>
+
+...
+
+  <p:portlet name="trac.portal.timeline.TimelinePortlet"
+             class="contentBox" orderby="date" order="desc" ...>
+
+    <p:portlet name="nested portlet" class="nestedContentBox" .../> 
+
+  </p:portlet>
+
+...
+
+</body>
+
+</html>
+And, since portal templates are just Genshi templates, one can also use the dynamics of Genshi:
+...
+
+<p:portlet py:if="foo" name="${bar}" class="myBar"/>
+
+...
+
+<py:choose test="foo">
+   <p:portlet py:when="bar" name="${baz}" class="myBaz"/>
+   <p:portlet py:when="car" name="${tar}" class="myTar"/>
+</py:choose>
+
+...
+Discussion of Design Decisions Made
+The new entry point trac.portal.plugins will keep the standard environments from loading portal level components and they will also help keep the portal from loading standard environment components during initialization of the environment;

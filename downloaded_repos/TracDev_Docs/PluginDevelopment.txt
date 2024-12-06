@@ -1,0 +1,350 @@
+Contents
+Writing the plugin code
+Extension points
+Component member variables
+Single file plugins
+Packaging plugins
+Internationalization/Localization of plugins
+Plugin deployment
+Disabling built-in components
+Debugging
+Writing Plugins for Trac
+Starting with version
+0.9
+, you can develop plugins for Trac that extend the builtin functionality. The plugin functionality is based on the
+component architecture
+, so please read that document before continuing here. For more information, not covered here, see
+TracDev
+.
+Writing the plugin code
+To extend Trac with custom functionality, you need to implement a
+component
+. For example, to add a new web module to Trac (i.e. a component that handles HTTP requests and extends the navigation bar), you would start with something like the following:
+from
+trac.core
+import
+Component
+,
+implements
+from
+trac.util.html
+import
+html
+from
+trac.web
+import
+IRequestHandler
+from
+trac.web.chrome
+import
+INavigationContributor
+class
+HelloWorldPlugin
+(
+Component
+):
+implements
+(
+INavigationContributor
+,
+IRequestHandler
+)
+# INavigationContributor methods
+def
+get_active_navigation_item
+(
+self
+,
+req
+):
+return
+'helloworld'
+def
+get_navigation_items
+(
+self
+,
+req
+):
+yield
+(
+'mainnav'
+,
+'helloworld'
+,
+html
+.
+a
+(
+'Hello world'
+,
+href
+=
+req
+.
+href
+.
+helloworld
+()))
+# IRequestHandler methods
+def
+match_request
+(
+self
+,
+req
+):
+return
+req
+.
+path_info
+==
+'/helloworld'
+def
+process_request
+(
+self
+,
+req
+):
+content
+=
+'Hello World!'
+req
+.
+send
+(
+content
+,
+'text/plain'
+)
+Extension points
+The above example implements two of Trac's many
+extension point interfaces
+. Look at the extension point specific pages (like
+TracDev/PluginDevelopment/ExtensionPoints/trac.web.chrome.INavigationContributor
+) for an overview, or the  API documentation to see what exactly you're expected to return.
+Component member variables
+Every
+component
+that gets instantiated through the Trac environment gets three extra member variables for convenience:
+env
+: The environment, an instance of the
+trac.env.Environment
+class (see
+trac.env
+​
+).
+config
+: The configuration, an instance of the
+trac.config.Configuration
+class (see
+trac.config
+​
+).
+log
+: The configured logger, see the Python
+​
+logging API
+for more information.
+These variables can also be accessed from the initializer (
+__init__
+) of a component.
+Storing any other objects as instance variables of your component is probably a bad idea: remember that a component is only instantiated once for a given environment. Unless your plugin is used in a CGI deployment of Trac, that means that the same component instance will get invoked for multiple HTTP requests; if the server is multi-threaded, this will even happen concurrently.
+Single file plugins
+Plugins that consist of a single
+.py
+file can be dropped directly into either the project's or the shared
+plugins
+directory. More complex plugins require some packaging.
+Packaging plugins
+TracPlugins
+are packaged  using
+​
+setuptools
+, to create an egg or wheel package.
+The plugin needs to export an
+​
+entry points
+group named
+trac.plugins
+, listing the names of the modules that Trac should import for the plugin-provided components to get registered. For example:
+from
+setuptools
+import
+find_packages
+,
+setup
+setup
+(
+name
+=
+'TracHelloWorld'
+,
+version
+=
+'1.0'
+,
+packages
+=
+find_packages
+(
+exclude
+=
+[
+'*.tests*'
+]),
+entry_points
+=
+{
+'trac.plugins'
+:
+[
+'helloworld = myplugs.helloworld'
+,
+],
+},
+)
+This assumes that the
+HelloWorldPlugin
+example above is defined in the module
+helloworld.py
+in the
+myplugs
+package. The entry point
+name
+(in this example
+helloworld
+) is required by the Python egg runtime, but not currently used by Trac. In most cases, you can simply use the qualified module name there. The
+myplugs
+directory must contain an
+__init__.py
+to make it a regular package, but the file can be empty.
+The structure of files and directories is:
+setup.py
+myplugin/
+myplugin/__init__.py
+myplugin/helloworld.py
+Internationalization/Localization of plugins
+If you plan on supporting your plugin for i18n/l10n, see the
+plugin i18n/l10n cookbook page
+for details. Support for i18n/l10n has been introduced since Trac 0.12 and uses Babel.
+Plugin deployment
+A plugin can either be deployed globally, or only for a specific environment. Global deployment is done by installing the plugin:
+cd
+/path/to/pluginsource
+python setup.py install
+To deploy a plugin only to a specific Trac environment, copy the egg file into the
+plugins
+directory of that environment:
+cd
+/path/to/pluginsource
+python setup.py bdist_egg
+cp dist/*.egg /path/to/projenv/plugins
+During development of a plugin, it is inconvenient to have to install it in either of the ways described above. Instead, you should use the setuptools
+develop
+command:
+cd
+/path/to/pluginsource
+python setup.py develop --multi-version --exclude-scripts --install-dir /path/to/projenv/plugins
+or the short version:
+python setup.py develop -mxd /path/to/projenv/plugins
+You can omit the
+--install-dir
+and
+--multi-version
+arguments to make the development version of your plugin available globally.
+This will install an
+.egg-link
+file instead of the actual egg. That file is basically a link to the source directory of your plugin, so that Trac will always see the latest version of your code. In this case you will have to explicitly enable your plugin in the Trac configuration as explained on
+TracPlugins
+.
+A tutorial to build your own plugins is available
+​
+here
+.
+Disabling built-in components
+Sometimes you might want to write a plugin that completely replaces a built-in component, for example to develop an advanced variant of an existing module. Trac uses a list of default component to load, as specified in the
+default_components
+list in
+trac.db_default
+​
+. These built-in components are always loaded, and might therefore conflict with your replacement plugin.
+You can however disable built-in components using a special
+trac.ini
+section called
+[components]
+. This section contains the qualified name of the components to disable, along with
+disabled
+or
+off
+as the value.
+For example, to disable the built-in Wiki macro
+RecentChanges
+, you'd include the following in
+trac.ini
+:
+[components]
+trac.wiki.macros.RecentChangesMacro
+=
+disabled
+You can also use a wildcard at the end of a name, so you could even disable the complete Wiki module:
+[components]
+trac.wiki.*
+=
+disabled
+Wiki formatting will still work in the remaining modules, of course.
+Debugging
+The logging API is a very good debugging tool. For example, use this code when you want to view the value of a variable:
+env
+.
+log
+.
+debug
+(
+"*** Hey, varname is
+%r
+***"
+,
+varname
+)
+where
+env
+is the
+Environment
+instance.
+If you are inside the methods of a
+Component
+subclass, better use:
+self
+.
+log
+.
+debug
+(
+"Hey, varname is
+%r
+"
+,
+varname
+)
+This will implicitly use the
+self.env
+Environment, but your component name will now be used for the $module (see
+TracLogging#LogFormat
+). This makes it easier to identify the relevant debug lines.
+During development it might become inconvenient to follow the log file. Consider using
+​
+TracDeveloperPlugin
+to access the log directly in the web browser.
+Note that there's no way to log something at the global level, outside the scope of a Trac environment, as the configuration of logging is done at that level and usually the log file is located in
+$tracenv/log/trac.log
+.
+See also:
+TracDev
+,
+TracDev/ComponentArchitecture
+,
+TracDev/PluginDevelopment/ExtensionPoints
+,
+TracPlugins

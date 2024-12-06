@@ -1,0 +1,126 @@
+Custom Ticket Time Fields
+DONE
+This proposal has been integrated for the
+1.1.1
+release. See
+#1942
+for more details about the integration process.
+This page proposes adding a new type 'time' to the list of all currently available
+custom ticket fields
+.
+Alternative approaches
+Making a long story short: They are there for years to cure the lack of custom time fields for various project management purposes. I've seen them, but I don't like all the string manipulation, at least, if it comes to queries and report generation. I met others feeling the same.
+Believe me, it's time for a sane extension of current custom fields support. And custom time fields backed by true POSIX microsecond time stamps stored in ticket_custom db table is the best way I could think of. Read on and, if you like it, join in to make it happen, please.
+Proposed Implementation
+Changes to Trac
+add 'time' to available types, inheriting most of the definition from 'text', a simple (one line) text field
+At that point
+TracQuery
+already shows from..to input fields on selection of custom time fields for query as desired.
+Praise to the flexible, modularized software design of Trac developers! Making it actually work and display results in pretty date/time format is a different thing.
+But now more than basic knowledge on how ticket data is handled inside Trac is needed.
+(I found not much hints so had to study the code and initially did most things wrong. A multiple dozen not working or buggy local code revisions later, after discussion in #python, etc. I decided on the implementation detailed below. Please discuss, if you know better, I'm still a Python beginner.)
+extend
+ticket.model
+,
+ticket.web_ui
+,
+util.datefmt
+and
+ticket/templates/ticket.html
+to
+allow for reading POSIX microsecond time stamps from db table
+ticket_custom
+stored there as string for full compatibility with current custom fields implementation
+convert to datetime.datetime values and go on using that values internally like is done for core time values
+time
+and
+changetime
+prepare time field display in ticket view (ticket.html)
+convert datetime.datetime time stamps to localized time strings
+add single quote arround strings read from db, i.e. left from former string based date field definitions
+add time format hint for input form fields
+parse user input and consolidate different flavors of time stamps
+initially done with help of
+mxDateTime.Parser
+prepared for internal fall back to datetime based parser logic (still to be done) like is done for pytz with some basic internal logic
+write back POSIX microsecond time stamps to db
+take care for data used to send out properly formatted notification
+patched version of
+​
+AnnouncerPlugin
+for now
+still unsure on patching Trac Ticket Notifications itself, since it looks like almost dead code (sorry, but Announcer is years ahead) and Announcer is already officially attempting to replace Trac Ticket Notifications (see below)
+extend
+ticket.query
+and
+ticket/templates/query_results.html
+to
+convert custom time strings with POSIX microsecond time stamps from ticket_custom db table to datetime.datetime values
+format custom time values for display differently than standard time values
+Status of Development
+This is work in progress. For details see the
+development page
+.
+Screenshot
+Trac 0.12dev screenshot with ticket list from query based on custom time field
+Code
+base
+: patches apply cleanly to Trac trunk
+r9443
+r9478
+r9664
+r9705
+r9806
+quality
+: beta - read: code flaws should have not much effect, at least not to trac db,
+start of testing announced on 21-Apr-2010
+, now expect on only minor changes to core of implementation until my stable release
+focus
+: bug-fixes, working ticket change notification for both
+Trac Notification
+system and
+​
+AnnouncerPlugin
+reviews
+: so far just me, I need your help now
+prospect
+: since 0.12 is on the way (congrats!) and new development model published, we'll see this not before trunk for 0.13
+Related tickets
+#710
+asking for basic time tracking in Trac, especially missing native
+due_date
+and custom field type 'numeric'
+#1942
+the main resource
+on requests and considerations
+related to the topic
+#1943
+asking for time based calculations in queries, essentially based on
+#1943
+#1962
+asking for due dates on tickets & email notification on overdue dates, several tricks and workarounds needed for using date strings the way you'd expect true time values to match, sort, etc.
+#2182
+asking for better, directly (user- and system-)configurable date and time formats in contrast to current selection via locale
+#2288
+asked for date/time based ticket query functions, that exist by now
+#6466
+asked for higher time stamp precision introduced with microseconds for
+time
+and
+changetime
+in
+r9210
+#8354
+seeking to get more date/time related information from queries, following
+#2288
+#9209
+suggests code cleanup for trac/ticket/model.py, as side effect of my code review for this project
+​
+th#3565
+asking for periodical email notification per ticket after certain inactivity time, comment points to
+​
+TracReminderScript
+​
+th#5620
+asking for reminder function sending notification before/on current date passing a due_date set as ticket field

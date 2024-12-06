@@ -1,0 +1,39 @@
+
+Using Actual
+Backup & Restore
+Backing up your Actual budget
+
+Backing up your Actual budget
+{#s (A: delete, save) (DT: Files, app interactions) (P: Functionality)
+If your budget is very old, you may have trouble restoring large backups. If you’re encountering this issue, click “Reset Sync” under 'Settings' > 'Show advanced settings' to reset sync, then make the export again. This should reduce the file size.
+/}
+
+{#s (A: Collect) (DT: Personal data, File) (P:Save, Functionality)}
+You can export your data from Actual at any time. To do so,
+
+Login to your budget, click 'More' > 'Settings'
+Scroll down to the Export section and click Export Data
+Save the file somewhere on your computer - that is it done.
+
+Login to your budget, click 'More' > 'Settings'
+
+Scroll down to the Export section and click Export Data
+
+Save the file somewhere on your computer - that is it done.
+
+
+Manually creating a backup from the desktop app
+​
+
+This will force a backup to be created right now. Do this if you are going to do something that you might want to revert later (and don't want to use
+undo
+).
+
+Select the
+File > Load Backup…
+menu item
+Click
+Backup Now
+
+Manually creating a backup from the desktop app 
+/}

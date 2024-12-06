@@ -1,0 +1,649 @@
+Contents
+Changes in the template syntax
+expand a variable
+expand a simple computation
+include another template
+simple if…then (no else)
+if…then…else
+iterate over a collection
+define a macro
+set a variable
+Examples
+Changes in the controllers
+Implementing the
+IRequestHandler
+interface
+Generating content
+Debugging
+Porting Templates from
+ClearSilver
+to Genshi
+This page describes some of the differences between Genshi and Clearsilver. It is not a replacement for the
+​
+Genshi documentation
+and you should go there for a more in-depth understanding of how Genshi actually works and should be used.
+For migrating your own templates, a good way to start is to learn by example.
+Compare the Clearsilver templates found in
+source:trunk/templates@3831
+and their corresponding Genshi ones in
+source:sandbox/genshi/templates@3831
+.
+Then, in the same way, compare the various web_ui.py controllers you'll find in both branches.
+Note that
+ClearSilver
+is supported up to Trac 0.12.x, although no changes happened in that area since Trac 0.11.
+In Trac
+0.13
+, this support has been dropped (
+r10405
+), effectively making the migration to Genshi templates mandatory.
+Changes in the template syntax
+Most of the time, the porting is a straightforward operation.
+expand a variable
+Clearsilver
+<b>
+<?cs var:the_variable ?>
+</b>
+Genshi
+<b>
+$the_variable
+</b>
+expand a simple computation
+Clearsilver
+<b>
+<?cs var:the_variable+1 ?>
+</b>
+Genshi
+<b>
+${the_variable+1}
+</b>
+include another template
+Clearsilver
+<?cs include:the_file.cs ?>
+Genshi
+<xi:include
+href=
+"the_file.html"
+><xi:fallback/></xi:include>
+simple if…then (no else)
+Clearsilver
+<?cs if:flag ?>
+<b>
+OK
+</b>
+<?cs /if ?>
+Genshi
+<py:if
+test=
+"flag"
+><b>
+OK
+</b></py:if>
+or simply
+<b
+py:if=
+"flag"
+>
+OK
+</b>
+if…then…else
+Clearsilver
+<?cs if:flag ?>
+<b>
+OK
+</b>
+<?cs else ?>
+<i>
+!!!
+</i>
+<?cs /if ?>
+Genshi
+<py:choose
+test=
+"flag"
+>
+<py:when
+test=
+"True"
+>
+<b>
+OK
+</b>
+</py:when>
+<py:otherwise>
+<i>
+!!!
+</i>
+</py:otherwise>
+</py:choose>
+or simply:
+<py:choose>
+<b
+py:when=
+"flag"
+>
+OK
+</b>
+<i
+py:otherwise=
+""
+>
+!!!
+</i>
+</py:choose>
+The <py:choose>/<py:when>/<py:otherwise> is a bit heavy-weight for a simple if/else, but on the other hand, the construct is more general (think switch/case, or the equivalent choose/when/otherwise in XSLT).
+iterate over a collection
+Clearsilver
+<ul>
+<?cs
+each:element = list ?>
+<li>
+<?cs var:element ?>
+</li>
+<?cs
+/each ?>
+</ul>
+Genshi
+<ul>
+<py:for
+each=
+"element in list"
+>
+<li>
+$element
+</li>
+</py:for>
+</ul>
+or simply:
+<ul>
+<li
+py:for=
+"element in list"
+>
+$element
+</li>
+</ul>
+define a macro
+Clearsilver
+<?cs def:entry(key, val)?>
+<dt>
+<?cs var:key ?>
+</dt><dd>
+<?cs var:val ?>
+</dd>
+<?cs /def ?>
+Genshi
+<py:def
+function=
+"entry(key, val='--')"
+>
+<dt>
+$key
+</dt><dd>
+$val
+</dd>
+</py:def>
+As you can see, with Genshi it's also easy to specify default values for the macro arguments.
+set a variable
+Clearsilver
+<?cs set:count = len(collection) ?>
+We have
+<?cs if:count > 10 ?>
+too much
+<?cs else ?><?cs var:count ?><?cs /if ?>
+elements.
+Genshi
+<py:with
+vars=
+"count = len(collection)"
+>
+We have ${count
+&gt;
+10 and 'too much' or count} elements.
+</py:with>
+Note that we had to use
+&gt;
+in Genshi, instead of directly
+>
+as in Clearsilver.
+Examples
+Let's first take a simple full-contained example from the Trac source, the simple index.cs / index.html templates:
+Clearsilver
+index.cs
+​
+:
+<!DOCTYPE html
+PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html
+xmlns=
+"http://www.w3.org/1999/xhtml"
+lang=
+"en"
+xml:lang=
+"en"
+>
+<head><title>
+Available Projects
+</title></head>
+<body><h1>
+Available Projects
+</h1><ul>
+<?cs
+each:project = projects ?>
+<li>
+<?cs
+if:project.href ?>
+<a
+href=
+"<?cs var:project.href ?>"
+title=
+"<?cs var:project.description ?>"
+>
+<?cs var:project.name ?>
+</a>
+<?cs
+else ?>
+<small>
+<?cs var:project.name ?>
+:
+<em>
+Error
+</em>
+<br
+/>
+(
+<?cs var:project.description ?>
+)
+</small>
+<?cs
+/if ?>
+</li>
+<?cs
+/each ?>
+</ul></body>
+</html>
+Genshi
+index.html
+​
+:
+<!DOCTYPE html
+PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html
+xmlns=
+"http://www.w3.org/1999/xhtml"
+xmlns:py=
+"http://genshi.edgewall.org/"
+xmlns:xi=
+"http://www.w3.org/2001/XInclude"
+>
+<head><title>
+Available Projects
+</title></head>
+<body>
+<h1>
+Available Projects
+</h1>
+<ul>
+<li
+py:for=
+"project in projects"
+py:choose=
+""
+>
+<a
+py:when=
+"project.href"
+href=
+"$project.href"
+title=
+"$project.description"
+>
+$project.name
+</a>
+<py:otherwise>
+<small>
+$project.name:
+<em>
+Error
+</em>
+<br
+/>
+($project.description)
+</small>
+</py:otherwise>
+</li>
+</ul>
+</body>
+</html>
+Some remarks:
+Note the possible use of multiple Genshi attributes in the same element: in the above, the
+<li>
+element has a
+py:for
+and a
+py:choose
+attribute.
+When there's only one element to output conditionally, use a Genshi attribute: the
+py:for="project in projects"
+and the
+py:when="project.href"
+in the above. Otherwise, use a Genshi element (here, the
+<py:otherwise>
+).
+In this small example, there's no common Trac layout used (as the index is a bit special). For how a "normal" template looks like, see for example
+diff_form.html
+​
+, another small template.
+Note that a Genshi template can usually be rendered directly to have a taste of how it will look like:
+Available Projects
+$project.name
+This comes from an important property of Genshi templates:
+they must themselves be well-formed XML documents
+.
+That was not a constraint in Clearsilver, and sometimes the logic in those templates took "advantage" of that, e.g. by conditionally inserting end/start pairs of tags. Such templates are the hardest to port, because you actually have to think a bit. See for example the
+query.html
+​
+template.
+Of course, the great benefit of this constraint is that you'll end up quite naturally with well-formed content, which was far from being a trivial achievement using Clearsilver templates. You could still insert directly some non well-formed
+Markup
+data in your template, but if you use the
+​
+genshi.builder
+tag
+facility for this, that's hardly a risk.
+Another example from Trac, a bit more complex. 
+This illustrates how to use
+<py:def>
+and
+<py:with>
+, to convert a Clearsilver macro using
+<?cs def: ?>
+and
+<?cs set: ?>
+:
+Clearsilver
+def:browser_path_links(path, file) ?>
+<?cs
+<?cs set:first = #1 ?><?cs
+each:part = path ?><?cs
+set:last = name(part) == len(path) - #1 ?>
+<a
+<?cs
+if:first
+?
+>
+class="first" title="Go to root directory"
+<?cs
+set:first = #0 ?><?cs
+else ?>
+title="View
+<?cs var:part.name ?>
+"
+<?cs
+/if ?>
+href="
+<?cs var:part.href ?>
+">
+<?cs var:part.name ?>
+</a>
+<?cs
+if:!last ?>
+<span
+class=
+"sep"
+>
+/
+</span>
+<?cs /if ?><?cs
+/each ?><?cs
+/def ?>
+<
+?cs
+Genshi
+<py:def
+function=
+"browser_path_links(path_links)"
+>
+<py:for
+each=
+"idx, part in enumerate(path_links)"
+>
+<py:with
+vars=
+"first = (idx == 0); last = (idx == len(path_links) - 1)"
+>
+<a
+class=
+"${first and 'first' or None}"
+title=
+"${first and 'Go to root directory' or 'View ' + part.name}"
+href=
+"$part.href"
+>
+$part.name
+</a>
+<py:if
+test=
+"not last"
+><span
+class=
+"sep"
+>
+/
+</span></py:if>
+</py:with>
+</py:for>
+</py:def>
+Changes in the controllers
+Implementing the
+IRequestHandler
+interface
+Previously, all the data fed to a template had to be placed inside the
+req.hdf
+HDF wrapper object.
+With Genshi, the data for the template is basically a
+dict
+, which has to be returned by
+process_request
+at the same time as the template name. Check
+trac.wiki.web_ui
+​
+for an example.
+Generating content
+When one wants to directly render a template, the Chrome component facilities should be used.
+Check the
+Chrome.load_template
+​
+and
+render_method
+methods. Note however that this API is still rapidly evolving.
+Usage examples:
+Implementing
+Ticket Query
+​
+macro (
+table
+mode)
+Sending
+notification
+​
+e-mails
+Debugging
+Genshi is very different from
+ClearSilver
+. For
+ClearSilver
+the possibilities were essentially defined by the syntax + the HDF dataset that was available. Genshi evaluates Python, and operates in a Python context that makes a large number of objects directly available for use. However, doing
+?hdfdump=1
+on a Genshi template will only show a fraction of this content - whatever is added to the dictionary returned from the request handler and post-processors. Where is the project name? Where is the chrome links? Permissions?
+Here is a starting point for getting insight into the context, and help debugging your own templates. It is an example
+site.html
+file that can be added to global or project 'templates' folder, and which adds a debug output to all pages viewed. If you already have a
+site.html
+, just add the
+<body py:match=...
+element to the bottom of your own file. It contains massive amounts of information; use, trim, add to, and re-style to suit your particular needs.
+Note of warning:
+The debug prints out a lot of things. More often than not that works fine. However, in certain circumstances it could be that it tries to access something that cannot be represented as intended. The response is usually a somewhat cryptic error. When developing, the first instinct is often to re-check your own code (as you were developing when the error occured). Your first instinct should actually be: Comment out/disable the debug printing and try again - make sure it is not an error provoked by rummaging around in areas that were never meant for wrapping in
+repr()
+.
+<html
+xmlns=
+"http://www.w3.org/1999/xhtml"
+xmlns:py=
+"http://genshi.edgewall.org/"
+xmlns:xi=
+"http://www.w3.org/2001/XInclude"
+py:strip=
+""
+>
+<!--! A new debug information <div> at the bottom of all pages -->
+<py:match
+path=
+"body"
+once=
+"True"
+>
+<body
+py:attrs=
+"select('@*')"
+>
+${select('*')}
+<div
+id=
+"debug"
+style=
+"width: 98%; margin: 5px; border: 2px solid green; padding: 10px; font-family: courier;"
+py:with=
+"b_dir = globals()['__builtins__'].dir"
+>
+<p
+style=
+"font-size: 1.15em;"
+><strong>
+Debug output - showing information from the rendering context,
+      and edit
+<code>
+site.html
+</code>
+to test own expressions:
+</strong></p>
+<p>
+Checking some href information:
+<br
+/>
+req.path_info: ${repr(req.path_info)}
+<br
+/>
+req.base_path: ${repr(req.base_path)}
+<br
+/>
+req.href(): ${repr(req.href())}
+<br
+/>
+req.base_url: ${repr(req.base_url)}
+<br
+/>
+req.abs_href(): ${repr(req.abs_href())}
+<br
+/>
+</p>
+<p>
+Try using reg.hef(): ${req.href('wiki')}
+</p>
+<p>
+req.args: ${repr(req.args)}
+</p>
+<p>
+Test fetching an element: ${select('div[@id="mainnav"]')}
+</p>
+<div
+style=
+"text-indent: -30px; padding-left: 30px;"
+>
+<!--! Some potentially very long lists... -->
+<p
+style=
+""
+>
+perm for ${perm.username}: ${repr(perm.permissions())}
+</p>
+<p>
+project: ${repr(project)}
+</p>
+<p>
+trac: ${repr(trac or 'not defined')}
+</p>
+<p>
+context: ${repr(context)}
+</p>
+<p>
+context members: ${repr(b_dir(context))}
+</p>
+<p><strong>
+context __dict__:
+</strong>
+<div
+py:for=
+"item in sorted(context.__dict__.keys())"
+>
+${item}: ${repr(context.__dict__[item])}
+</div></p>
+<p><strong>
+req.environ:
+</strong>
+<div
+py:for=
+"item in sorted(req.environ.keys())"
+>
+${item}: ${repr(req.environ[item])}
+</div></p>
+<p><strong>
+req members:
+</strong>
+${repr(b_dir(req))}
+</p>
+<p><strong>
+req __dict__:
+</strong>
+<div
+py:for=
+"item in sorted(req.__dict__.keys())"
+>
+${item}: ${repr(req.__dict__[item])}
+</div></p>
+<p><strong>
+all objects from locals().['__data__']:
+</strong>
+<div
+py:for=
+"item in sorted(locals()['__data__'].keys())"
+>
+${item}: ${repr(locals()['__data__'][item])}
+</div></p>
+<p><strong>
+__builtins__:
+</strong>
+<div
+py:for=
+"key in sorted(globals()['__builtins__'].keys())"
+>
+${key}: ${repr(globals()['__builtins__'][key])}
+</div></p>
+<p
+py:with=
+"sys = __import__('sys')"
+>
+<strong>
+sys.path:
+</strong><br
+/>
+${pprint(sys.path)}
+</p>
+</div>
+</div>
+</body>
+</py:match>
+</html>

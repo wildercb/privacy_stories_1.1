@@ -1,0 +1,91 @@
+<PI>
+Using Actual
+Schedules
+
+Schedules
+
+Creating a schedule
+​
+
+Schedules can be used to enter anticipated transactions early. Some of the available options to tailor schedules to your needs are:
+
+Set to be recurring or only entered once
+Set to be automatically entered into the account register or choose to manually approve entries
+Options for recurring entries for multiple specific days of the month.
+A single schedule can be created for a Cell phone plan that has multiple users and different payment cycles for each phone. If you have 3 cell phones that all get paid on different days of the month, each day can be defined in a single schedule for each phone.
+Options to determine frequency of payments, such as every month, every 2 months, every 2 years, etc.
+
+A single schedule can be created for a Cell phone plan that has multiple users and different payment cycles for each phone. If you have 3 cell phones that all get paid on different days of the month, each day can be defined in a single schedule for each phone.
+
+Once a schedule is started, Actual will search the transaction history for entries that match the schedule, select the matches, and the option to link those transactions to the schedule is given. You can click to the
+Find missing transactions
+button to have Actual look for matches.
+
+!Example of schedule for a mortgage
+
+!Example of schedule for a mortgage
+
+How Actual finds schedules
+​
+
+In addition to the requirements you have specified when creating a schedule, a transaction must also meet the date requirements to be matched to a schedule. Transactions must be dated within 2 days before or after a schedule.
+
+For example: You have a schedule set up for your power bill for the 15th of every month. Today is the 10th of the month and you can see an upcoming scheduled transaction of your bill in Actual. The utility company decided to withdraw the funds on the 10th this month, so you post the transaction to Actual early and change the date of the transaction to match your bank statement. A problem just occurred because now the posted transaction is outside of the 2 day window to match scheduled transactions. You'll see your bill posted in the Actual account ledger but you'll also see an upcoming transaction for the power bill on the 15th even though you just entered it. This is the expected behavior when using schedules.
+
+You can resolve this issue in one of two ways.
+
+Skip the next schedule by selecting the upcoming scheduled transaction and choosing the "Skip Scheduled Date" from the menu options.
+Accept the date doesn't match and leave it as is so the schedule doesn't prompt a second transaction.
+
+Schedule options that are not supported
+​
+
+Schedules cannot be made that adjust based on the last non-weekend day (Monday-Friday) of a month.
+Schedules do not take into account holidays.
+
+How to use rules with Schedules
+​
+
+Many times it's desired to add notes to the scheduled transactions or to assign categories automatically. This is done with the
+[Rules][rules]
+tool.
+
+Create a schedule.
+
+You can click on it and a new button has now appeared called
+Edit as rule
+.
+
+Click on
+Edit as Rule
+to further customize the automatic entry.
+
+By clicking the
++
+arrow on in the
+Then apply these actions
+area, you can define the category this schedule should be assigned against as well as any notes you might want to include.
+
+You can apply this newly made rule to any other of the linked transactions. Select all of the transactions from the rules dialog and press
+Apply actions
+.
+
+Save the rule and any time this scheduled transaction gets entered into the register it can be automatically categorized with a helpful note.
+
+To create a Schedule from an existing transactions,
+
+Navigate to the Accounts page
+select the tick box in the left hand column for the Transaction you wish to copy.
+Once selected, go to the drop-down menu on the top right of the page
+Click Link Selection
+In the Pop up that appears Click "Create New"
+All fields will populate from the transaction,
+Adjust any additional fields and click Add.
+
+Creating a schedule
+How Actual finds schedules
+Schedule options that are not supported
+How to use rules with Schedules
+Creating Schedules From Transactions
+
+Creating Schedules From Transactions

@@ -1,0 +1,266 @@
+This page was a draft. See
+TracDev/PluginDevelopment/ExtensionPoints/trac.notification.api.INotificationFormatter
+page now.
+The
+Open questions
+section might still contain unimplemented ideas.
+Extension Point :
+INotificationFormatter
+Interface
+INotificationFormatter
+Since
+1.1.3
+Module
+trac.notification
+Source
+api.py
+​
+The
+INotificationFormatter
+formats
+notification
+events to messages in various formats ready to be distributed.
+Purpose
+Trac provides an extendible and flexible notification system, that historically has sent plain text emails for ticket changes. Notifications of different event realms (e.g. wiki notifications), transports (e.g. SMS) and message formats (e.g. HTML messages) might all require different formatting logic though.
+Usage
+Implementing the interface follows the standard guidelines found in
+TracDev/ComponentArchitecture
+and of course
+TracDev/PluginDevelopment
+.
+A simple
+get_supported_styles()
+method lists the supported MIME types and event realms for a given transport.
+The
+format()
+method formats a notification event. It receives the following parameters:
+transport
+: The name of the transports that should be used. (See
+INotificationDistributor
+)
+style
+: The style that should be used. One of those returned by
+get_supported_styles()
+.
+event
+: A
+trac.notification.api.NotificationEvent
+instance describing the event about which the recipients should be notified.
+It should return the formatted message. The exact return type depends on the transport.
+Examples
+The following example formats notifications by SMS. (The
+sms
+library does not exist. Several commercial SMS services provide real APIs.)
+from
+trac.core
+import
+*
+from
+trac.notification.api
+import
+INotificationFormatter
+class
+ShortTicketNotificationFormatter
+(
+Component
+):
+implements
+(
+INotificationFormatter
+)
+# INotificationFormatter methods
+def
+get_supported_styles
+(
+self
+,
+transport
+):
+if
+transport
+==
+'sms'
+:
+yield
+(
+'text/plain'
+,
+'ticket'
+)
+def
+format
+(
+self
+,
+transport
+,
+style
+,
+event
+):
+if
+transport
+==
+'sms'
+and
+event
+.
+realm
+==
+'ticket'
+:
+return
+"#{0} {1} by {2}"
+%
+(
+event
+.
+target
+,
+event
+.
+category
+,
+event
+.
+author
+)
+Available Implementations
+At first only
+trac.ticket.notification.TicketFormatter
+is part of core Trac.
+A
+subsequent part of this proposal
+would add
+trac.wiki.notification.WikiFormatter
+.
+Various other formatters will be part of
+​
+th:AnnouncerPlugin
+.
+Additional Information and References
+​
+epydoc
+​
+API Reference
+Related to the
+INotificationDistributor
+This interface originated in
+​
+th:AnnouncerPlugin
+as
+IAnnouncementFormatter
+.
+DONE
+Dropped the
+alternative_style_for()
+method. (The distributor can select fallbacks without this.)
+DONE
+Dropped the
+realm
+parameter to the
+format()
+method. (Use
+event.realm
+instead.)
+DONE
+Switched from
+styles(transport, realm)
+to
+get_supported_styles(transport)
+(See
+below
+)
+Open questions
+Enumerate all styles?
+Maybe
+styles()
+should be changed to enumerate the supported style / transport / realm combinations as tuples:
+def
+get_supported_styles
+(
+self
+):
+yield
+(
+'text/plain'
+,
+'sms'
+,
+'ticket'
+)
+Advantage: This would give access to the list of all supported styles, without guessing the supported realms. For example a preferences panel could then create a
+preferred style
+selection UI, listing all supported styles.
+Disadvantage: Formatters could not implement catch-all fallbacks that e.g. claim to support all transports. But all current Announcer formatters do just this.
+Possible solutions:
+Do not allow
+formatters to support all transports. Is that actually even feasible? The formatter interface even states that it must be explicitly designed to work with a specific distributor.
+Require
+all formatters to support all transports. Remove the transports parameter. This would prevent using different formatters for different transports. (At least the return type of
+format()
+could then probably be defined to some standardized type.)
+Allow
+formatters to return
+None
+or
+'*'
+to support all transports.
+Define the interface with
+two methods
+. One method with parameters as before; another method without parameters must list all supported styles for any transport or realm.
+Define the interface with one method, with
+optional parameters
+. If the parameters are
+None
+the method must list all supported styles for any transport or realm.
+Introduce a mechanism similar to
+IAnnouncementProducer.realms()
+that enumerates all supported realms. Iterating over all possible realm / transport combinations then gets a complete list of supported styles.
+Similary, could some formatters want to support all realms? If not, another possible solution could be to keep the
+transport
+parameter, but not the
+realm
+parameter:
+def
+get_supported_styles
+(
+self
+,
+transport
+):
+if
+transport
+==
+'sms'
+:
+yield
+(
+'text/plain'
+,
+'ticket'
+)
+This solves the immediate problem for listing the supported styles per transport. (But does not help if in the future we want to allow the user to selected his preferred style per realm-specific rule.)
+The chosen solution should be simple and easy to implement correctly by plugin authors.
+DONE
+This was implemented in
+changeset:ac2132adf2c0/psuter
+Quality level?
+Other extension points that enumerate supported cases (e.g. IRepositoryConnector, IHTMLPreviewRenderer, IContentConverter and IDatabaseConnector) also return some kind of
+quality level
+. Should something like this be added:
+def
+get_supported_styles
+(
+self
+):
+yield
+(
+'text/plain'
+,
+'sms'
+,
+'ticket'
+,
+8
+)

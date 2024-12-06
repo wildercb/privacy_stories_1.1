@@ -1,0 +1,346 @@
+Contents
+Custom Trac Exceptions
+Database Exceptions
+Exceptions
+In programming
+exceptions
+are conditions of the program that require special processing. Handling exceptions is important, because to the user the program should function as if it were in a normal state whereby any exceptions that are encountered are handled in the background. See also
+​
+Exception_handling
+.
+This page lists the most common exceptions in Trac core and database communication.
+Custom Trac Exceptions
+Trac defines a set of custom exception types:
+Exception
+TracBaseError
+(
+trac.core
+​
+): Exception base class for errors in Trac.
+(since 1.1.2)
+TracError
+(
+trac.core
+​
+): Standard Exception for errors in Trac.
+AdminCommandError
+(
+trac.admin.api
+​
+): Exception raised when an admin command cannot be executed.
+ConfigurationError
+(
+trac.config
+​
+): Exception raised when a value in the configuration file is not valid.
+InvalidAttachment
+(
+trac.attachment
+​
+): Exception raised when attachment validation fails
+(Deprecated since 1.3.2, removed in 1.5.1)
+.
+InvalidRepository
+(
+trac.versioncontrol.api
+​
+): Exception raised when initializing a repository fails.
+InvalidTicket
+(
+trac.ticket.web_ui
+​
+): Exception raised when a ticket fails validation
+(Deprecated since 1.3.2, removed in 1.5.1)
+.
+InvalidWikiPage
+(
+trac.wiki.web_ui
+​
+): Exception raised when a Wiki page fails validation
+(Deprecated since Trac 0.11 and removed in Trac 1.1.2)
+.
+MacroError
+(
+trac.wiki.formatter
+​
+) Exception raised in macro when an argument is invalid
+(Since Trac 1.0.11)
+.
+ProcessorError
+(
+trac.wiki.formatter
+​
+)
+QuerySyntaxError
+(
+trac.ticket.query
+​
+): Exception raised when a ticket query cannot be parsed from a string.
+QueryValueError
+(
+trac.ticket.query
+​
+): Exception raised when a ticket query has bad constraint values.
+ResourceExistsError
+(
+trac.resource
+​
+): Thrown when attempting to insert an existing resource
+ResourceNotFound
+(
+trac.resource
+​
+): Thrown when a non-existent resource is requested
+TimeoutError
+(
+trac.db.pool
+​
+): Exception raised by the connection pool when no connection has become available after a given timeout (Prior to 1.0.2dev-
+r12305
+, inherited directly from
+Exception
+).
+TracNotImplementedError
+(
+trac.web.api
+​
+) Exception raised when a
+NotImplementedError
+is trapped. This exception is for internal use only and should not be raised by plugins. Plugin should use
+NotImplementedError
+.
+(Since 1.0.11)
+TracValueError
+(
+trac.core
+​
+) Exception raised when a function or operator receives an argument that is the correct type, but inappropriate value.
+(Since 1.2.1)
+HTTPException
+(
+trac.web.api
+​
+): Representing a HTTP status code
+HTTPBadRequest
+(
+trac.web.api
+​
+): 400 Bad Request
+HTTPUnauthorized
+(
+trac.web.api
+​
+): 401 Unauthorized
+HTTPPaymentRequired
+(
+trac.web.api
+​
+): 402 Payment Required
+HTTPForbidden
+(
+trac.web.api
+​
+): 403 Forbidden
+HTTPNotFound
+(
+trac.web.api
+​
+): 404 Not Found
+HTTPMethodNotAllowed
+(
+trac.web.api
+​
+): 405 Method Not Allowed
+HTTPNotAcceptable
+(
+trac.web.api
+​
+): 406 Not Acceptable
+HTTPProxyAuthenticationRequired
+(
+trac.web.api
+​
+): 407 Proxy Authentication Required
+HTTPRequestTimeout
+(
+trac.web.api
+​
+): 408 Request Timeout
+HTTPConflict
+(
+trac.web.api
+​
+): 409 Conflict
+HTTPGone
+(
+trac.web.api
+​
+): 410 Gone
+HTTPLengthRequired
+(
+trac.web.api
+​
+): 411 Length Required
+HTTPPreconditionFailed
+(
+trac.web.api
+​
+): 412 Precondition Failed
+HTTPRequestEntityTooLarge
+(
+trac.web.api
+​
+): 413 Request Entity Too Large
+HTTPRequestUriTooLong
+(
+trac.web.api
+​
+): 414 Request-Uri Too Long
+HTTPUnsupportedMediaType
+(
+trac.web.api
+​
+): 415 Unsupported Media Type
+HTTPRequestedRangeNotSatisfiable
+(
+trac.web.api
+​
+): 416 Requested Range Not Satisfiable
+HTTPExpectationFailed
+(
+trac.web.api
+​
+): 417 Expectation Failed
+HTTPInternalError
+(
+trac.web.api
+​
+): 500 Internal Server Error
+(removed in 1.3.1)
+HTTPServerInternalError
+(
+trac.web.api
+​
+): 500 Internal Server Error
+(since 1.3.1)
+HTTPNotImplemented
+(
+trac.web.api
+​
+): 501 Not Implemented
+HTTPBadGateway
+(
+trac.web.api
+​
+): 502 Bad Gateway
+HTTPServiceUnavailable
+(
+trac.web.api
+​
+): 503 Service Unavailable
+HTTPGatewayTimeout
+(
+trac.web.api
+​
+): 504 Gateway Timeout
+HTTPVersionNotSupported
+(
+trac.web.api
+​
+): 505 Http Version Not Supported
+RequestDone
+(
+trac.web.api
+​
+): Marker exception that indicates whether request processing has completed and a response was sent.
+ParseError
+(
+trac.versioncontrol.svn_authz
+​
+): Exception thrown for parse errors in authz files
+GitError
+(
+tracopt.versioncontrol.git.PyGIT
+​
+)
+GitErrorSha
+(
+tracopt.versioncontrol.git.PyGIT
+​
+)
+Error
+(
+trac.db.tests.api
+​
+)
+StandardError
+(Removed in 1.3.3)
+,
+TracBaseError
+PermissionError
+(
+trac.perm
+​
+): Insufficient permissions to complete the operation
+StandardError
+RuntimeError
+,
+TracBaseError
+BackupError
+(
+trac.env
+​
+): Exception raised during an upgrade when the DB backup fails
+Hierarchy is inconsistent, even after addition of
+TracBaseError
+class (
+#11568
+). There doesn't seem to be any consistent pattern in inheriting from
+TracError
+. Some exceptions also inherit from built-in exception classes other than
+Exception
+.
+There also seem to be multiple naming conventions. Consider following
+​
+PEP:0008#exception-names
+.
+But changing the existing hierarchy might be difficult without breaking backward compatibility.
+Database Exceptions
+We can catch
+​
+Python DB API exceptions
+in a database neutral way. (Since Trac 1.0, see
+#6348
+.)
+try
+:
+with
+env
+.
+db_transaction
+as
+db
+:
+...
+except
+env
+.
+db_exc
+.
+IntegrityError
+,
+e
+:
+...
+The above example catches
+sqlite.IntegrityError
+,
+MySQLdb.IntegrityError
+or
+psycopg.IntegrityError
+, 
+depending on the selected
+DatabaseBackend
+.
+See
+tickets

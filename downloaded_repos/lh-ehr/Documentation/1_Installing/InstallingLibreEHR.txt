@@ -1,0 +1,88 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=windows-1252"/>
+</head>
+<body>
+<p align="center"  background: transparent">
+<font size="5" style="font-size: 20pt"><b>Installing LibreHealth<font color="#ff420e">EHR</font></b></font></p>
+<p align="center" style="margin-left: -0.75in; margin-right: -0.81in; margin-bottom: 0in; line-height: 100%; background: transparent">
+<font color="#280099"><font size="3" style="font-size: 12pt"><u><b>Quick
+Start Guide</b></u>
+<BR>
+<TABLE>
+
+<TR>
+<TD>
+<BR>
+<font color="#000000"><font size="4" style="font-size: 14pt">After
+you have run the installer, please follow these steps:
+<BR></TD></TR>
+
+<TR>
+<TD>
+<img src="images/1_install/installer1.png" name="Image1" align="left"  border="0"/>
+</TR>
+</TD>
+
+
+<TR><TD><HR>
+<p align="center"><font color="#280099"><font size="4" style="font-size: 16pt"><b>NEXT</b></p>
+<BR><HR></TD></TR>
+
+
+<TR><TD>
+<img src="images/1_install/installer3.png" name="Image3" align="left"  border="0"/>
+<BR></TD></TR>
+
+<TR><TD><HR>
+<p align="center"><font color="#280099"><font size="4" style="font-size: 16pt"><b>AND</b></p>
+<BR><HR></TD></TR>
+
+<TR><TD>
+<img src="images/1_install/installer4.png" name="Image4" align="left"  border="0"/>
+<BR></TD></TR>
+
+<TR><TD><HR>
+<p align="center"><font color="#280099"><font size="4" style="font-size: 16pt"><b>Now
+Step 4 of 8</b></p>
+<BR><HR></TD></TR>
+
+<TR><TD>
+<img src="images/1_install/installer5.png" name="Image5" align="left"  border="0"/>
+<BR></TD></TR>
+
+<TR><TD><HR>
+<p align="center"><font color="#280099"><font size="4" style="font-size: 16pt"><b>Step5</b></p>
+<BR><HR></TD></TR>
+
+<TR><TD>
+<img src="images/1_install/installer6.png" name="Image6" align="left"  border="0"/>
+<BR></TD></TR>
+
+<TR><TD><HR>
+<p align="center"><font color="#280099"><font size="4" style="font-size: 16pt"><b>On to Step 6</b></p>
+<BR><HR></TD></TR>
+
+<TR><TD>
+<img src="images/1_install/installer7.png" name="Image7" align="left"  border="0"/>
+<BR></TD></TR>
+
+<TR><TD><HR>
+<p align="center"><font color="#280099"><font size="4" style="font-size: 16pt"><b>Then Step 7 of 8...Getting Close...</b></p>
+<BR><HR></TD></TR>
+
+<TR><TD>
+<img src="images/1_install/installer8.png" name="Image8" align="left"  border="0"/>
+<BR></TD></TR>
+
+<TR><TD><HR>
+<p align="center"><font color="#280099"><font size="4" style="font-size: 16pt"><b>And Last of All...</b></p>
+<BR><HR></TD></TR>
+
+<TR><TD>
+<img src="images/1_install/installer9.png" name="Image9" align="left"  border="0"/>
+<HR></TD></TR>
+
+</body>
+</html>

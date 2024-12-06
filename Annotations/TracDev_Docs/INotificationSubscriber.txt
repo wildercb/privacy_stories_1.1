@@ -1,0 +1,278 @@
+This page was a draft. See
+TracDev/PluginDevelopment/ExtensionPoints/trac.notification.api.INotificationSubscriber
+page now.
+{#s (A: Collect, Use) (DT: messages, username) (P: Functionality, Customization, Security)
+The
+Open questions
+section might still contain unimplemented ideas.
+Extension Point :
+INotificationSubscriber
+Interface
+INotificationSubscriber
+Since
+1.1.3
+Module
+trac.notification
+Source
+api.py
+​
+The
+INotificationSubscriber
+subscribes users to
+notification
+events.
+Purpose
+Trac provides an extendible and flexible notification system. Different people are interested in different kinds of notifications. Notification subscriptions allow administrators and / or users to configure the exact rules used that trigger sending of notifications.
+Usage
+Implementing the interface follows the standard guidelines found in
+TracDev/ComponentArchitecture
+and of course
+TracDev/PluginDevelopment
+.
+The main part of this interface is the
+match()
+function. It returns a list of subscriptions, in the form of tuples consisting of:
+class
+: The name of the Python class. (This could probably be removed.)
+distributor
+: Also known as
+transport
+. E.g. the string
+email
+. See
+INotificationDistributor
+.
+sid
+: The session ID of the subscriber. (Can be
+None
+if
+address
+is provided.)
+authenticated
+:
+1
+for authenticated session IDs,
+0
+for anonymous session IDs.
+address
+: The (email) address to use. (Can be
+None
+if
+sid
+is provided.)
+format
+: The MIME type to be used (e.g.
+text/plain
+or
+text/html
+.)
+priority
+: An integer priority. Smaller numbers have higher priority than bigger numbers.
+1
+is the highest priority.
+adverb
+: Either the string
+always
+or
+never
+.
+Since more than one component can handle the same realms and categories, the priorities and adverbs are used to resolve conflicting subscriptions.
+The implementation can use any means to determine if a user is interested in hearing about a given event.
+Most check that the appropriate conditions apply and then retrieve the required information from the
+subscription
+DB table.
+The subscriptions in that table are configured in a shared preferences panel that uses two other methods of this interface:
+The simple
+description()
+method returns a description string shown to the user in the preferences panel (or
+None
+if the plugin does use the
+subscriptions
+DB table.)
+The
+requires_authentication()
+method allows hiding the rule from unauthenticated users. (E.g. because only authenticated users can be ticket owners.)
+The
+default_subscriptions()
+method describes any  default subscriptions that automatically exist without the user configuring
+subscription
+DB entries in the preferences.
+These are also displayed on the preferences panel, but can not be directly modified there. (They usually can be overriden by non-default subscriptions.)
+The plugin still has to return the respective subscriptions from the
+matches()
+method.
+Default descriptions should be used when users can be determined by the event itself.
+For instance, ticket author has a default subscription that is controlled via trac.ini.
+Default subscriptions should be low priority (i.e. have a priority number much larger than
+1
+, like 100) so that the user can easily override them.
+Examples
+The following example implements a simple subscriber that can trigger notifications when a new ticket is created with a high priority level.
+from
+trac.core
+import
+*
+from
+trac.notification.api
+import
+INotificationSubscriber
+from
+trac.notification.model
+import
+Subscription
+class
+HighPriorityTicketNotificationSubscriber
+(
+Component
+):
+implements
+(
+INotificationSubscriber
+)
+# INotificationSubscriber methods
+def
+matches
+(
+self
+,
+event
+):
+if
+event
+.
+realm
+!=
+'ticket'
+:
+return
+if
+event
+.
+category
+!=
+'created'
+:
+return
+ticket
+=
+event
+.
+target
+if
+ticket
+[
+'priority'
+]
+not
+in
+(
+'blocker'
+,
+'critical'
+,
+'major'
+):
+return
+klass
+=
+self
+.
+__class__
+.
+__name__
+for
+i
+in
+Subscription
+.
+find_by_class
+(
+self
+.
+env
+,
+klass
+):
+yield
+i
+.
+subscription_tuple
+()
+def
+description
+(
+self
+):
+return
+"notify me when new high priority tickets are created"
+def
+requires_authentication
+(
+self
+):
+return
+False
+Available Implementations
+Several implementations are part of core Trac:
+trac.ticket.notification.AllTicketSubscriber
+Allows anyone to subscribe to all ticket change notifications.
+trac.ticket.notification.TicketOwnerSubscriber
+Allows ticket owners to subscribe to (or unsubscribe from) change notifications for owned tickets.
+trac.ticket.notification.TicketComponentOwnerSubscriber
+Allows component owners to subscribe to (or unsubscribe from) change notifications for tickets assigned to owned component.
+trac.ticket.notification.TicketUpdaterSubscriber
+Allows anyone to subscribe to (or unsubscribe from) change notifications for their own ticket changes.
+trac.ticket.notification.TicketReporterSubscriber
+Allows ticket reporters to subscribe to (or unsubscribe from) change notifications for tickets they created.
+trac.ticket.notification.CarbonCopySubscriber
+Allows anyone to subscribe to (or unsubscribe from) change notifications for tickets where they are listed in CC.
+Additional Information and References
+​
+epydoc
+​
+API Reference
+The precursor of this interface was
+IAnnouncementSubscriber
+from the
+​
+th:AnnouncerPlugin
+.
+DONE
+The
+IAnnouncementDefaultSubscriber
+from the
+​
+th:AnnouncerPlugin
+was also folded into this interface.
+Open Questions
+Merge
+description()
+and
+requires_authentication()
+These methods are both only used in the preferences panel.
+Merging them could be easier to understand and more flexible, allowing different requirement checks:
+def get_subscription_preference_description(self, req):
+        if req.is_authenticated and 'TICKET_ADMIN' in req.perm:
+            return "notify me when an admin is needed"
+Remove
+class
+name
+The
+class
+item could be removed from the tuple returned by
+matches()
+. It's not really needed and clutters up each plugin with ugly
+klass = self.__class__.__name__
+lines.
+Counter-arguments:
+It helps debugging and can be logged.
+But if that's needed the
+NotificationSystem
+should do so, to avoid mistakes and simplify plugins.
+The
+subscription
+DB table requires that anyway.
+But it should be replaced there as well, e.g. by a freely chosen
+rule
+string.
+/}

@@ -1,0 +1,139 @@
+Status: Proposed in
+#12156
+Extension Point :
+ITicketQueryRenderer
+Interface
+ITicketQueryRenderer
+Since
+1.2
+Module
+trac.ticket
+Source
+api.py
+​
+The
+ITicketQueryRenderer
+visualizes
+query
+results in various ways.
+Purpose
+Trac provides an extensive
+TracQuery
+system with an interactive UI, a special
+query language
+, a
+wiki macro
+and more. Typically the results of a query would be displayed as a table of tickets in the interactive UI. The wiki macro already supported various hardcoded formats including a similar table view, a simple ticket list or count and roadmap-style progress bars.
+With this interface plugins can extend the list of available visualization formats to for example display the queried tickets in pie diagrams, burndown charts, Kanban boards etc.
+These renderers could be available wherever ticket queries are visualized, like in the interactive query UI or the roadmap view.
+Usage
+Implementing the interface follows the standard guidelines found in
+TracDev/ComponentArchitecture
+and of course
+TracDev/PluginDevelopment
+.
+A simple
+get_ticket_query_formats()
+method lists the internal and display names of the supported formats. The
+render_ticket_query()
+is called to render a given ticket query to HTML.
+Examples
+The following minimal example renders a warning sign if a query finds any tickets:
+from
+genshi
+import
+tag
+from
+trac.core
+import
+implements
+,
+Component
+from
+trac.ticket.api
+import
+ITicketQueryRenderer
+class
+WarningTicketQueryRenderer
+(
+Component
+):
+implements
+(
+ITicketQueryRenderer
+)
+def
+get_ticket_query_formats
+(
+self
+):
+yield
+(
+'warning'
+,
+_
+(
+"Warning Sign"
+))
+def
+render_ticket_query
+(
+self
+,
+context
+,
+query
+,
+query_string
+,
+tickets
+,
+format
+):
+if
+tickets
+:
+return
+tag
+.
+span
+(
+u
+"
+\u26A0
+"
+)
+# Warning sign
+else
+:
+return
+tag
+.
+span
+(
+u
+"
+\u2713
+"
+)
+# Check mark
+Available Implementations
+trac.ticket.query.QueryModule
+​
+implements the table format.
+trac.ticket.roadmap.RoadmapModule
+​
+implements the progress format.
+Additional Information and References
+​
+epydoc
+​
+API Reference
+Related to the
+TracDev/PluginDevelopment/ExtensionPoints/trac.ticket.roadmap.ITicketGroupStatsProvider
+interface.
+History
+1.2
+: Introduced (
+#12156
+)

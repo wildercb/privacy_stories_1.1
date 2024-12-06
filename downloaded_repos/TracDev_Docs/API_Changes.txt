@@ -1,0 +1,53 @@
+Evolution of the Trac API
+Detailed changes per version
+TracDev/ApiChanges/
+0.10
+,
+0.11
+,
+0.12
+,
+0.13
+,
+1.0
+,
+1.1
+,
+1.2
+,
+1.4
+,
+1.6
+See also the
+ApiDocs
+themselves.
+Guidelines for API changes
+Always try to maintain API compatibility.
+If an interface
+must
+be changed:
+try to maintain the old interface for at
+least one minor version change (e.g.
+0.10
+→
+0.11
+)
+log deprecation warnings if the old method is used
+document the API change:
+in
+TracDev/ApiChanges/<version>
+or in the
+API changes
+field of the corresponding ticket if any.
+in the docstring, make use of the
+​
+.. versionmodified::
+and
+.. deprecated::
+directives.
+If the old interface can't be maintained, document it as such in the appropriate TracDev/ApiChanges/
+<version>
+page.
+Notable changesets modifying the API prior to 1.0 have been recorded in
+a previous version
+of this page.

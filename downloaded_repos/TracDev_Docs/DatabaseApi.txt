@@ -1,0 +1,964 @@
+Contents
+Accessing the Database
+API before Trac 0.12
+Trac 0.12 API
+Nested Transactions
+API after Trac 1.0
+Configuration
+Pooled Connections
+Rules for DB API Usage
+Parameter passing
+Retrieving results
+Guidelines for SQL Statements
+Trac SQL Database API
+Trac uses a thin layer on top of the standard
+​
+Python Database API 2.0
+to interface with supported relational database systems such as
+​
+SQLite
+,
+​
+PostgreSQL
+and
+MySqlDb
+systems.
+You can find the specifics of the database API in the
+trac.db
+package. This package provides:
+Simple pooling of database connections
+Iterable cursors
+Selection of database modules based on connection URIs.
+Accessing the Database
+The Database API has evolved in the various versions of Trac, and its usage differs substantially across Trac 0.11, 0.12 and 1.x. The following subsections explain these differences chronologically. You can skip to the
+last section
+if you don't care about the history and only need to write code that works in Trac 1.0 and later.
+API before Trac 0.12
+This is the style for Trac 0.5 - 0.11 and supported until
+1.1.2
+. Its use is discouraged for new code.
+Code accessing the database in Trac go through this layer simply by using the
+Environment
+method
+get_db_cnx()
+to get a pooled database connection. A database cursor can be obtained from the pooled database connection, and the code uses the cursor in conjunction with SQL statements to implement the behavior:
+from
+trac.env
+import
+Environment
+def
+myFunc
+():
+env
+=
+Environment
+(
+'/path/to/projenv'
+)
+db
+=
+env
+.
+get_db_cnx
+()
+cursor
+=
+db
+.
+cursor
+()
+# Execute some SQL statements
+db
+.
+commit
+()
+Note that you should always make sure that
+db
+won't get garbage collected while
+cursor
+is still used, as the collection will do a rollback and close the cursors.
+Avoid statements like
+cursor = env.get_db_cnx().cursor()
+, see
+r8878
+.
+Trac 0.12 API
+This is the style for Trac 0.12 and deprecated in
+1.3.1
+. Its use is discouraged for new code.
+As support for Python 2.3 has been dropped, we could make use of decorators to get rid of some of the boilerplate code:
+from
+trac.env
+import
+Environment
+from
+trac.db
+import
+with_transaction
+def
+myFunc
+():
+env
+=
+Environment
+(
+'/path/to/projenv'
+)
+@with_transaction
+(
+env
+)
+def
+do_something
+(
+db
+):
+cursor
+=
+db
+.
+cursor
+()
+# Execute some SQL statements
+This is slightly simpler and
+more robust
+than the previous API, as not only the
+commit()
+is performed in any successful case (i.e. the
+Execute some SQL statements
+code can
+return
+at any place), but a
+rollback
+will be performed should an exception be triggered in that block.
+See more details in the
+ApiChanges/0.12
+paragraph.
+The use of
+env.get_db_cnx()
+is still possible, but
+deprecated
+.
+An alternative
+env.get_read_db()
+method can be used to get a "read" only access to the database (for performing
+SELECT
+queries).
+Nested Transactions
+With the API described above (since
+0.12
+) it is possible to have nested transactions, as in the following example:
+from
+trac.env
+import
+Environment
+from
+trac.db
+import
+with_transaction
+def
+myFunc1
+():
+env
+=
+Environment
+(
+'/path/to/projenv'
+)
+@with_transaction
+(
+env
+)
+def
+do_outer_transaction
+(
+db
+):
+cursor
+=
+db
+.
+cursor
+()
+# Execute some SQL statements
+myFunc2
+(
+env
+)
+# do nested transaction
+# <=== commit or rollback
+def
+myFunc2
+(
+env
+):
+@with_transaction
+(
+env
+)
+def
+do_nested_transaction
+(
+db
+):
+cursor
+=
+db
+.
+cursor
+()
+# Execute some SQL statements
+In this example, when
+myFunc1()
+is called, it first executes the outer transaction (
+do_outer_transaction()
+) and then executes a nested transaction (
+myFunc2()
+) from within the outer transaction. The key observation is that
+nested transactions are atomic
+.
+This means that the
+whole
+(outer) transaction is either committed or aborted. So even if the nested transaction succeeded but the outer transaction fails (an exception is raised at the line with the "commit or rollback" comment), the
+whole
+transaction will be rolled back, i.e. including the changes made by the nested transaction.
+Notes:
+Do
+not
+call
+commit()
+yourself in a transaction, even though this is still possible in the API for backward compatibility reasons. Not only is a commit performed automatically at the proper time (as explained above), but if you call it yourself you risk to commit from within a nested transaction, possibly leading to an inconsistent state of the database.
+Using
+env.get_read_db()
+within a transaction reuses the same connection. So uncommitted changes made by the transaction will already be visible to the caller of
+get_read_db()
+(but not outside of the transaction - that is in another thread).
+Uncommited changes of a transaction are only visible to nested transactions in the same thread. Different threads use different database connections and therefore different transactions. To be more precise, the exact detail of what is visible to other threads is database specific and depends on the
+isolation level
+used.
+API after Trac 1.0
+This style is supported for Trac version 1.0 and later. Starting with
+1.3.1
+, this is actually the only way, as the deprecated APIs were removed.
+As we dropped support for Python 2.4, we simplified the code by using the
+with
+keyword and context managers:
+from
+trac.env
+import
+Environment
+def
+myFunc
+():
+env
+=
+Environment
+(
+'/path/to/projenv'
+)
+with
+env
+.
+db_transaction
+as
+db
+:
+cursor
+=
+db
+.
+cursor
+()
+# Execute some SQL statements
+It does essentially the same thing as the 0.12 version above in a terser way. Nested transactions work the way you would expect: only the outermost one will actually do the
+commit()
+, upon normal exit. So, again, don't call
+commit()
+by yourself.
+The use of
+env.get_db_cnx()
+is now deprecated.
+Symmetrically, a second context manager is provided for performing read-only accesses:
+from
+trac.env
+import
+Environment
+def
+myFunc
+():
+env
+=
+Environment
+(
+'/path/to/projenv'
+)
+with
+env
+.
+db_query
+as
+db
+:
+cursor
+=
+db
+.
+cursor
+()
+cursor
+.
+execute
+(
+"""
+SELECT a, b, c FROM ...
+"""
+,
+(
+param1
+,
+param2
+))
+# Execute some SQL "SELECT" statements
+# (continue)
+This one enforces the notion of read-access, because the
+db
+connection bound to the context doesn't support the
+commit()
+or
+rollback()
+methods. As there's no
+commit()
+upon exit, one could question the usefulness of this syntactic construct. The main interest is in better locality of the connection: to improve concurrency, the lifetime of a connection wrapper has to be as short as possible (see
+#3446
+). Therefore, we close the connection on exit, making it available to other threads. So even if Python gives you access to the
+db
+variable after the
+with
+block (at the
+# (continue)
+line in the above example), you should not (and can't) use it at that point.
+Actually, if you don't need to do anything fancy with the cursor like calling
+db.get_last_id(cursor, ...)
+, then you can use a shorter form:
+from
+trac.env
+import
+Environment
+def
+myFunc
+():
+env
+=
+Environment
+(
+'/path/to/projenv'
+)
+with
+env
+.
+db_query
+as
+db
+:
+for
+a
+,
+b
+,
+c
+in
+db
+(
+"""
+SELECT a, b, c
+FROM ...
+"""
+,
+(
+param1
+,
+param2
+)):
+# do something with a, b, c
+All the results are returned at once in a list, by calling
+fetchall()
+on the underlying cursor. This is fine most of the time, if you need to limit the number of returned results, you can still use "LIMIT" or "OFFSET" in the SQL query.
+In the same spirit, if you don't even need to use
+db
+itself for things like
+db.cast()
+or
+db.like()
+, you can simply do:
+from
+trac.env
+import
+Environment
+def
+myFunc
+():
+env
+=
+Environment
+(
+'/path/to/projenv'
+)
+for
+a
+,
+b
+,
+c
+in
+env
+.
+db_query
+(
+"""
+SELECT a, b, c
+FROM ...
+"""
+,
+(
+param1
+,
+param2
+)):
+# do something with a, b, c
+You can use a list comprehension or dict comprehension to generate a sequence from a query:
+from
+trac.env
+import
+Environment
+env
+=
+Environment
+(
+'/path/to/projenv'
+)
+def
+myFunc1
+():
+"""Returns a list of tuples."""
+return
+[
+a
+,
+b
+,
+c
+for
+a
+,
+b
+,
+c
+in
+env
+.
+db_query
+(
+"""
+SELECT a, b, c
+FROM ...
+"""
+,
+(
+param1
+,
+param2
+))]
+env
+=
+Environment
+(
+'/path/to/projenv'
+)
+def
+myFunc1
+():
+"""Equivalent to myFunc1, without tuple unpacking."""
+return
+[
+row
+for
+row
+in
+env
+.
+db_query
+(
+"""
+SELECT a, b, c
+FROM ...
+"""
+,
+(
+param1
+,
+param2
+))]
+def
+myFunc3
+():
+"""Equivalent to myFunc1."""
+# Or even more simply, if the data is returned
+# directly from the database without modification.
+return
+env
+.
+db_query
+(
+"""
+SELECT a, b, c
+FROM ...
+"""
+,
+(
+param1
+,
+param2
+))
+def
+myFunc4
+():
+"""Returns a dict."""
+# This form of dict creation should be used in Python < 2.7
+return
+[
+dict
+(
+a
+,
+b
+)
+for
+a
+,
+b
+in
+env
+.
+db_query
+(
+"""
+SELECT a, b
+FROM ...
+"""
+,
+(
+param1
+,
+param2
+))]
+def
+myFunc5
+():
+"""Returns a dict."""
+# Dict comprehensions are available in Python 2.7
+return
+{
+a
+:
+b
+for
+a
+,
+b
+in
+env
+.
+db_query
+(
+"""
+SELECT a, b
+FROM ...
+"""
+,
+(
+param1
+,
+param2
+))}
+Note that dict comprehensions are only available in Python 2.7 and Trac < 1.3.1 supports Python 2.6.
+These short forms also present an additional safety measure as they're only allowing a "SELECT" query to be executed by a read-only connection. Indeed, the same short forms are possible on both
+env.db_transaction
+and
+env.db_query
+.
+Configuration
+Trac connects to a database using the database connection URI contained in the
+[trac] database
+option of trac.ini. The default value for this option tells Trac to use an SQLite database inside the environment directory:
+[trac]
+database
+=
+sqlite:db/trac.db
+The connection URI syntax has been designed to be compatible with that provided by
+​
+SQLObject
+. See also the section on SQLObject
+​
+connections
+. The supported URI schemes are
+sqlite
+,
+postgres
+and
+mysql
+, though additional schemes can be provided by plugins.
+Pooled Connections
+Prior to version 1.0, Trac used to operate the following way:
+The
+Environment
+method
+get_db_cnx()
+returns a connection from the pool of connections. This connection needs to be returned, and Trac is written so that the return will happen automatically by the garbage collector if the code is written to follow a simple rule. When the garbage collector determines the pooled database connection is no longer being used, its
+__del__
+method will return the pooled connection to the pool for reuse. If you have set a lexical variable in the function's body to the pooled connection, this typically occurs when the function is returning. In the example above of
+myFunc
+it occurs at the return statement since
+db
+is a variable local to
+myFunc
+.
+With the context managers introduced in Trac 1.0, we're able to return this Connection to the pool in a much more robust and direct way:
+When the control flow exits a context manager (either
+Environment.db_query
+or
+Environment.db_transaction
+), and if that context manager is the "outermost" one in case multiple contexts where nested, then the
+Connection
+is immediately returned to the pool, regardless of the behavior of the garbage collector.
+This means that even if a variable still contains a reference to the
+Connection
+, it won't be possible to use it outside of the context:
+>>>
+from
+trac.env
+import
+open_environment
+>>>
+env
+=
+open_environment
+(
+'...-trac'
+)
+>>>
+with
+env
+.
+db_query
+as
+db
+:
+...
+print
+db
+(
+"SELECT count(*) FROM wiki"
+)
+...
+[(563,)]
+>>>
+db
+<trac.db.util.ConnectionWrapper object at 0x026146E8>
+>>>
+print
+db
+(
+"SELECT count(*) FROM wiki"
+)
+Traceback (most recent call last):
+File
+"<stdin>"
+, line
+1
+, in
+<module>
+File
+"trac\db\util.py"
+, line
+123
+, in
+__call__
+cursor
+=
+self
+.
+cnx
+.
+cursor
+()
+File
+"trac\db\util.py"
+, line
+108
+, in
+__getattr__
+return
+getattr
+(
+self
+.
+cnx
+,
+name
+)
+AttributeError
+:
+'NoneType' object has no attribute 'cursor'
+… which is a good thing!
+Rules for DB API Usage
+Different DB API modules have different ways to pass parameters to the cursors'
+execute
+method, and different ways to access query results. To keep the database API as thin as possible, Trac uses a relatively common subset in all database code.
+Parameter passing
+Always use the "format" parameter style, and always with
+%s
+. Statement parameters always need to be passed into execute as an actual sequence (list or tuple).
+So the following statements are okay:
+cursor
+.
+execute
+(
+"SELECT author, ipnr, comment FROM wiki WHERE name =
+%s
+"
+,
+[
+thename
+])
+cursor
+.
+execute
+(
+"SELECT id FROM ticket WHERE time >=
+%s
+AND time <=
+%s
+"
+,
+(
+start
+,
+stop
+))
+The following uses are
+not
+okay:
+cursor
+.
+execute
+(
+"SELECT author, ipnr, comment FROM wiki WHERE name = ?"
+,
+thename
+)
+cursor
+.
+execute
+(
+"SELECT id FROM ticket WHERE time >=
+%i
+AND time <=
+%i
+"
+,
+start
+,
+stop
+)
+At any cost, avoid
+​
+string formatting
+to get values into the SQL statement. The database automatically escapes values you pass using
+execute()
+arguments, but the same is not true if you use string formatting, opening your code up to
+​
+SQL injection
+attacks.
+On the other hand, you
+must
+use string formatting to dynamically specify names of tables or columns, i.e. anything that is not a value as such:
+cursor
+.
+execute
+(
+"SELECT time FROM
+%s
+WHERE name =
+%%
+s"
+%
+db
+.
+quote
+(
+table
+),
+(
+thename
+,))
+Retrieving results
+For convenience, cursors returned by the database connection object are iterable after having executed an SQL query. Individual fields in result rows may only be accessed using integer indices:
+cursor
+.
+execute
+(
+"SELECT author, ipnr, comment FROM wiki WHERE name =
+%s
+"
+,
+(
+thename
+,))
+for
+row
+in
+cursor
+:
+print
+'Author:
+%s
+(
+%s
+)'
+%
+(
+row
+[
+0
+],
+row
+[
+1
+])
+print
+row
+[
+2
+]
+Accessing fields using the column names is not supported by all database modules, so it should not be used. Automatically unpacking rows into tuples of named variables often provides better readability:
+cursor
+.
+execute
+(
+"SELECT author, ipnr, comment FROM wiki WHERE name =
+%s
+"
+,
+(
+thename
+,))
+for
+author
+,
+ipnr
+,
+comment
+in
+cursor
+:
+print
+'Author:
+%s
+(
+%s
+)'
+%
+(
+author
+,
+ipnr
+)
+print
+comment
+Guidelines for SQL Statements
+As you may know, support for the SQL syntax varies among database systems. Trac adheres to a common subset that is supported by the majority of databases:
+no native
+date
+or
+time
+database types; store date and time information in seconds as
+int
+fields (before 0.12) or better, in microseconds and
+int64
+fields (since 0.12, mapped by each
+trac.db.IDatabaseConnector
+to a suitable database specific type)
+no triggers
+you may use views if you feel you need them, but this not used within Trac core
+For anything not portable (and you really fall quickly in there), you need to use some methods from the connection when building your SQL query, such as
+db.cast(column, type)
+,
+db.concat(*params)
+,
+db.like()
+,
+db.like_escape()
+,
+db.quote(param)
+,
+db.get_last_id(cursor, table, col)
+.
+For example:
+cursor
+.
+execute
+(
+"""
+SELECT DISTINCT rev FROM node_change
+WHERE repos =
+%%
+s AND rev >=
+%%
+s AND rev <=
+%%
+s
+AND (path =
+%%
+s OR path
+%s
+)"""
+%
+db
+.
+like
+(),
+(
+self
+.
+id
+,
+sfirst
+,
+slast
+,
+path
+,
+db
+.
+like_escape
+(
+path
++
+'/'
+)
++
+'%'
+))
+Source:
+cache.py
+​
+.
+As you can see, the legibility of long SQL statements can be improved by using Python's multiline string syntax.
+See also:
+TracDev
+,
+TracDev/DatabaseSchema
+,
+TracDev/DatabaseUpgrades
+,
+TracDev/CodingStyle

@@ -1,0 +1,160 @@
+This page was a draft. See
+TracDev/NotificationApi
+page now.
+The
+Open questions
+section might still contain unimplemented ideas.
+Old API
+New API
+Open Questions
+Trac Notification API
+Old API
+(since Trac 0.7, deprecated since Trac 1.1.3)
+The original notification API consisted mainly of a class hierarchy:
+Notify
+(abstract base class for notifications based on a plain text template)
+NotifyEmail
+(abstract base class for notifications via plain text email)
+TicketNotifyEmail
+(concrete class for ticket notification emails)
+BatchTicketNotifyEmail
+(concrete class for ticket batch modification notification emails)
+In any situation that required sending notifications, a new instance of such a class was created, invoked once, and discarded. When invoked the object was responsible for finding the recipients, formatting the message and sending the email, all according to various configuration options.
+This API turned out to be too inflexible. There are too few extension points that would allow plugins to hook into this process. New subclasses could be defined to handle new situations, but existing code would still explicitly use the original
+TicketNotifyEmail
+. Strong inter-dependencies between the multiple levels of inheritance also make overriding certain things unexpectedly difficult.
+The only extension point was
+IEmailSender
+, a low-level backend for sending an already finalized email.
+(Since Trac 0.12)
+There was also a
+NotificationSystem
+component, mainly containing the various configuration option definitions.
+New API
+(since Trac 1.1.3)
+The new API keeps the
+IEmailSender
+extension point entirely and the
+NotificationSystem
+component almost unchanged, but deprecates the entire
+Notify
+hierarchy.
+It is replaced by a new class hierarchy. An instance of such a class contains all known data about an event that requires sending notifications:
+#NotificationEvent
+(common properties shared among all events)
+#TicketChangeEvent
+(properties specific to ticket change events)
+#BatchTicketChangeEvent
+(properties specific to ticket batch modification events)
+The
+NotificationSystem
+gains some simple methods to process such events. Also several new extension points are introduced that allow plugins to hook into that processing.
+NotificationEvent
+Contains the following properties:
+realm
+: a string of the affected resource realm (e.g.
+'ticket'
+or
+'wiki'
+)
+category
+: a string to identify the category of event (e.g.
+'created'
+,
+'changed'
+or
+'deleted'
+)
+target
+: the resource
+model
+(e.g. an instance of
+Ticket
+or
+WikiPage
+) or
+None
+time
+: the
+datetime
+when the event happened
+author
+: the
+session id
+of the user responsible for the event
+TicketChangeEvent
+realm
+is 'ticket'.
+Known values for
+category
+are
+'created'
+,
+'changed'
+,
+'attachment added'
+and
+'attachment deleted'
+.
+target
+is an instance of
+Ticket
+.
+Additional properties:
+comment
+: a string containing the user's comment (or
+None
+)
+changes
+: an empty dictionary for now
+attachment
+:
+None
+for now
+BatchTicketChangeEvent
+realm
+is 'ticket'.
+category
+is 'batchmodify'.
+target
+is a list of ticket ids(!)
+Additional properties:
+comment
+: a string containing the user's comment
+new_values
+: a dictionary with property names as keys and new property values as values.
+action
+: a ticket action controller action
+Open Questions
+Config options?
+Should new config options be defined on the
+NotificationSystem
+component as before? Or should they be defined locally in the components where they are used?
+Should the values be accessed using e.g.
+config.getbool()
+or using
+NotificationSystem(env).option_name
+?
+How conservative should we be in adding new options, and in breaking backward compatibility?
+Event?
+Should the event classes just be "dumb" data records? Or should the new
+NotificationSystem
+methods be moved there?
+Is the new class hierarchy useful? Or not needed? Would a simple dictionary be sufficient?
+Which properties exactly should be defined? Which ones should be removed or tweaked?
+Should the
+RenderingContext
+system be considered here? Should a NotificationEvent be (similar to) a RenderingContext?
+Batch events?
+How should batch events be modeled? Announcer does not implement this feature so no precedent exists.
+Should the
+event.target
+be:
+A list of ticket id's?
+A list of
+Ticket
+model instances?
+A list of
+TicketChangeEvent
+instances?
+None

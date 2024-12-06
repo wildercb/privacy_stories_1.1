@@ -1,0 +1,39 @@
+←
+1.6
+|
+1.10
+→
+Release Notes for for Trac 1.8
+This page documents changes in the 1.7.x releases
+leading up to 1.8. This page will eventually
+document the final status of 1.8.
+1.7.x releases are "stable" and tested snapshots of
+trunk
+​
+.
+They can be seen as sub-milestones on the road towards
+1.8
+.
+As opposed to maintenance releases, we offer
+no guarantees on feature and API compatibility from one 1.7.x release to the next
+.
+However, by following 1.7.x you get a chance to use new features earlier, and therefore be able to contribute feedback when things are still in flux. It's also less risky than just getting the latest trunk, as we won't cut a 1.7.x release in the middle of a series of changes, though we had and still intend to have a good record of keeping things always working on trunk.
+If you are a plugin developer, also check the
+ApiChanges/1.8
+page.
+Highlights
+Development Releases
+Overview
+next-dev-1.7.x
+0 / 51
+1.7.1
+0 / 11
+Tickets with release notes
+Ticket
+Release Notes
+No tickets found
+Developer-visible changes
+A detailed view of the API changes since 1.6.x can be found in
+TracDev/ApiChanges/1.8
+.
+Code Name

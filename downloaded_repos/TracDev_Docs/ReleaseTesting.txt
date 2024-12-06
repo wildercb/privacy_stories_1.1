@@ -1,0 +1,121 @@
+Contents
+What's expected of me?
+Current target releases
+Systems
+Testing Scenarios
+prod
+dev
+devlite
+Release Testing
+To ensure that our releases are well tested and with as few bugs as possible, we need your help.
+If you have a Trac installation with a combination of OS, database or frontend not represented in the list below, please consider adding yourself to the list.
+What's expected of me?
+At the beginning of the release testing period you will be added to the CC-list of the release ticket, where you will find details on where to download the release candidate. The ticket might also mention additional information on specific areas/features to test. But in most cases it is enough to verify that the release works as expected on your system. Running the
+unit tests
+and
+functional tests
+and getting a green light would be a plus. 
+See
+Testing Scenarios
+below for some suggestions.
+Once you have upgraded your server to the release candidate, please let us know by updating the release ticket. If you detect an issue, report it on that ticket as well.
+Current target releases
+No results
+Systems
+Contact
+Python
+Database Backend + Bindings
+Genshi
+Web Frontend
+OS
+Subversion, Git
+Testing
+JonasBorgstrom
+ChristianBoos
+*.edgewall.org
+2.7.3
+PostgreSQL 9.1 + psycopg2 2.4.5
+pysqlite 2.6.0 / SQLite 3.7.13
+0.6.1 / 0.7dev-r1134
+Apache 2.2.22 + mod_wsgi 3.3
+Debian 7.6 X86_64
+svn 1.6.17
+prod
+[demo-0.12:], [Babel:] → 0.12.6dev-
+r12590
+demo-1.0
+→ 1.0.2dev-
+r12804
+[demo-1.1:], t.e.o → 1.1.2dev-
+r12592
+ChristianBoos
+2.7.1
+SQLite 3.7.5 (
+PySqlite
+2.6.0)
+0.6
+Apache 2.0.59 + mod_wsgi 3.3
+SuSE SLES 9.3 x86_64, xfs
+svn 1.7.5
+prod
+1.1.2dev
+JunOmae
+2.4.6
+2.5.6
+2.6.9
+2.7.3
+SQLite 3.7.9
+MySQL 5.5.35
+PostgreSQL 9.1.12
+0.6
+tracd
+Ubuntu 12.04 LTS x86_64, ext4
+svn 1.6.17
+git 1.7.9.5
+devlite
+2.4.3
+2.5.6
+2.6.8
+2.7.2
+SQLite 3.3.6
+MySQL 5.0.77
+PostgreSQL 8.1.23
+0.6
+tracd
+CentOS 5.10 i386, ext3
+svn 1.7.6
+git 1.8.2.1
+devlite
+2.6.6
+2.7.5
+SQLite
+0.6
+tracd
+Windows XP (32bit)
+svn 1.7.13
+devlite
+2.4.4
+2.5.4
+SQLite
+0.6
+tracd
+Windows XP (32bit)
+no svn
+devlite
+When adding yourself and your test configuration to the list, please also indicate your e-mail address under "Contact".
+Testing Scenarios
+The above configurations are used in the following test conditions, along with corresponding expectations.
+prod
+Version is used in "production", on a heavily used site, either public or private.
+No regression or new defect should be reported by the users.
+dev
+Full test suite pass, both unit tests and functional tests.
+Testing creation of a new environment, using a Trac mirror for the repository.
+Interactive testing of that new environment.
+Memory usage should stay steady and performance should be adequate.
+devlite
+Full test suite pass, both unit tests and functional tests.
+Interactive testing of existing environment.
+Memory usage should stay steady and performance should be adequate.
+Note
+: expand as needed.

@@ -1,0 +1,15 @@
+A module is a type of plugin that runs in ProcessWire, and they come in many flavors. At its core, ProcessWire is a platform for executing modules, and much ProcessWire is built upon these modules. Hooks enable you to intercept and modify events in ProcessWire and can be used both inside and outside of modules.
+Introduction to modules
+Learn about what modules are, what different flavors of modules are available, how to install them, and where to get them.
+Module development
+It is easy to develop a module in ProcessWire, though some PHP experience is helpful. This section introduces module development and guides you through a simple example to get you started.
+Module types
+This page looks at the different predefined types of modules in ProcessWire and what they do. It also provides the recommended naming prefixes for modules so that ProcessWire can recognize your module type without actually loading it.
+Using hooks
+ProcessWire contains many methods that you may easily hook in order to modify the behavior of the method. Hooks can also be used to add new methods to existing classes.
+Pro modules
+Pro modules are commercial modules developed by Ryan Cramer (lead developer of ProcessWire) that support the development of the ProcessWire core.
+About the /site/modules/ directory
+This directory /site/modules/ is where you may install additional 3rd party plugin modules, or create your own. Read on for more details.
+Third-party modules
+The ProcessWire modules directory contains hundreds of useful third-party modules that you can download and/or directly install into ProcessWire.
