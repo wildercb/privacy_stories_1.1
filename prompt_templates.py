@@ -32,6 +32,7 @@ def format_data_types(data_types: Union[Dict, List], level: int = 0) -> str:
             formatted_text += format_data_types(subcategories, level + 1)
     return formatted_text
 
+'''
 # Create the annotation prompt using the ontology
 def create_annotation_prompt(example_file: Dict, target_text: str, ontology: Dict[str, Union[List[str], Dict]]) -> str:
     # Start building the prompt with an instructional message
@@ -75,6 +76,54 @@ def create_annotation_prompt(example_file: Dict, target_text: str, ontology: Dic
     )
 
     return prompt
+'''
+
+# Updated function to create the annotation prompt
+def create_annotation_prompt(
+    processed_file: Dict, target_text: str, ontology: Dict[str, Union[List[str], Dict]]
+) -> str:
+    """Creates an annotation prompt for the new file format."""
+    prompt = (
+        "You are a privacy expert annotator tasked with annotating text files with metadata about privacy behaviors and stories. "
+        "For the given text, annotate the following:\n\n"
+        "1. Actions: Actions performed or expected in the text.\n"
+        "2. Data Types: Types of data referenced in the text. Data types may include specific subcategories.\n"
+        "3. Purposes: Intentions or purposes related to the actions and data types.\n"
+        "4. Stories: Concise stories that describe how actions, data types, and purposes interact in context.\n\n"
+        "After providing your annotations, explain your rationale for these annotations. "
+        "Place <R> tag between your annotations and your rationale.\n\n"
+    )
+
+    # Add ontology guidance
+    prompt += "Use only the categories listed below when annotating:\n\n"
+    prompt += "Actions:\n" + ", ".join(ontology.get("Actions", [])) + "\n\n"
+    prompt += "Data Types:\n" + format_data_types(ontology.get("Data Types", {})) + "\n"
+    prompt += "Purposes:\n" + ", ".join(ontology.get("Purpose", [])) + "\n\n"
+    
+    # Example text
+    prompt += "Here is the text:\n\n"
+    prompt += f"Full Cleaned Text:\n{processed_file['full_cleaned_text']}\n\n"
+    
+    # Example metadata
+    prompt += "Here are the behaviors and the privacy requirements in the form of privacy stories we build from them:\n"
+    prompt += "Privacy stories are built explicitly from our labelled privacy behaviors in the format of we (action) (data type) for (purpose)"
+    if processed_file["metadata"]:
+        metadata = processed_file["metadata"]
+        prompt += f"Actions: {', '.join(metadata['actions'] or [])}\n"
+        prompt += f"Data Types: {', '.join(metadata['data_types'] or [])}\n"
+        prompt += f"Purposes: {', '.join(metadata['purposes'] or [])}\n"
+        if metadata.get("stories"):
+            prompt += "Stories:\n" + "\n".join([f"{i+1}. {story}." for i, story in enumerate(metadata["stories"])]) + "\n\n"
+
+    prompt += f"{target_text}\n\n"
+    prompt += (
+        "Annotate the text with actions, data types, purposes, and stories as demonstrated, "
+        "using only the categories from the list provided. For each annotation, provide your rationale "
+        "and place <R> tag between your annotations and rationales.\n"
+    )
+
+    return prompt
+
 
 
 # Create the annotation prompt using the ontology
