@@ -276,3 +276,5 @@ But it should be replaced there as well, e.g. by a freely chosen
 rule
 string.
 /}
+(A: Collect, Use) (DT: messages, username) (P: Functionality, Customization, Security)
+(S: we collect messages, username for security. We use messages, username for customization.)
