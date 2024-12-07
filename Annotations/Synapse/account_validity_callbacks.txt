@@ -1,6 +1,3 @@
-<PI>
-
-{#s (a: collect, use) (dt: Account data, User id ) (p: Account Update)
 # Account validity callbacks
 
 Account validity callbacks allow module developers to add extra steps to verify the
@@ -59,4 +56,6 @@ represented by their Matrix user ID.
 
 If multiple modules implement this callback, Synapse runs them all in order.
 
-\}
+(A: Process) (DT: account information) (P: Security,account management, functionality)
+
+(S: We process account information for security. We process account information for functionality. We process account information for account management.)

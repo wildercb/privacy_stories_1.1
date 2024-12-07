@@ -1,5 +1,4 @@
-<PI>
-{#s (a: collect, use) (dt: Account data, User id ) (p: Account Update)
+
 # Account data callbacks
 
 Account data callbacks allow module developers to react to changes of the account data
@@ -106,4 +105,7 @@ class CustomAccountDataModule:
             }
         )
 ```
- \}
+ 
+(A: Process, Share) (DT: account information) (P: Functionality, account management)
+
+(S: We process account information for functionality. We process account information for account management. We share account information for functionality. We share account information for account management.)
