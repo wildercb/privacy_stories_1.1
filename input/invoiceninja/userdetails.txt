@@ -1,0 +1,11 @@
+User Details
+The User Details section covers account settings for the currently logged in user. A user's details help identify them among your team, help your teammates contact each other, and is relevant in Invoice Ninja if you are assigning users to tasks, projects, clients, or etc as a practice for organization and accountability.
+
+Details
+First Name
+Last Name
+Email - Used to send password reset links to when requested.
+Phone - For your reference only.
+Password - You would use this field to change your user account password, it doesn't reveal your existing account password.
+Enable Two Factor - Enable two factor authentication using TOTP codes with any TOTP supported 2FA app or device. The pop-up will present a random secret code, and a matching QR code for it. It will require you test the TOTP with a one time password to verify the 2FA setup works, then save the change to your account.
+Accent Color - Accent colors are used mostly as selection highlighter, and button colors in the admin portal UI. Accent Color is a mix of user-associated, and company associated. Each user may pick all of their own accent colors, and for each company.

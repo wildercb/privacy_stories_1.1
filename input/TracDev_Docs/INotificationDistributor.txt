@@ -1,0 +1,256 @@
+This page was a draft. See
+TracDev/PluginDevelopment/ExtensionPoints/trac.notification.api.INotificationDistributor
+page now.
+
+Extension Point :
+INotificationDistributor
+Interface
+INotificationDistributor
+Since
+1.1.3
+Module
+trac.notification
+Source
+api.py
+​
+The
+INotificationDistributor
+sends
+notification
+events over some distribution channel, like email.
+Purpose
+Trac provides an extendible and flexible notification system, that historically has sent notifications by email. Notifications could however also be distributed by XMPP, SMS or any other messaging protocol.
+Usage
+Implementing the interface follows the standard guidelines found in
+TracDev/ComponentArchitecture
+and of course
+TracDev/PluginDevelopment
+.
+A simple
+transports()
+method lists the names of the supported transports (protocols / distribution channels). The
+distribute()
+method distributes a message to one or more recipients. It receives the following parameters:
+transport
+: The name of the transports that should be used. One of those returned by
+transports()
+.
+recipients
+: A list of
+(sid, authenticated, address, format)
+tuples.
+sid
+: The Trac session ID of the recipient (or
+None
+).
+authenticated
+:
+1
+if the Trac session ID is authenticated,
+0
+otherwise.
+address
+: A protocol specific address to send the notification to. If it is
+None
+the implementation might still be able to send the message to the recipient using the
+sid
+/
+authenticated
+information somehow. (E.g. the
+EmailDistributor
+falls back to
+IEmailAddressResolver
+implementations.)
+format
+: MIME type of the message format to be used.
+event
+: A
+trac.notification.api.NotificationEvent
+instance describing the event about which the recipients should be notified.
+The
+event
+is supposed to be formatted into a message in the given
+format
+using a
+INotificationFormatter
+.
+Examples
+The following example distributes notifications by SMS. (The
+sms
+library does not exist. Several commercial SMS services provide real APIs.)
+from
+itertools
+import
+groupby
+from
+operator
+import
+itemgetter
+from
+trac.core
+import
+*
+from
+trac.notification.api
+import
+INotificationDistributor
+,
+\
+INotificationFormatter
+import
+sms
+class
+SmsNotificationDistributor
+(
+Component
+):
+implements
+(
+INotificationDistributor
+)
+formatters
+=
+ExtensionPoint
+(
+INotificationFormatter
+)
+# INotificationDistributor methods
+def
+transports
+(
+self
+):
+return
+[
+'sms'
+]
+def
+distribute
+(
+self
+,
+transport
+,
+recipients
+,
+event
+):
+if
+transport
+!=
+'sms'
+:
+return
+# Group by message format:
+for
+format
+,
+group
+in
+groupby
+(
+recipients
+,
+itemgetter
+(
+3
+)):
+formatter
+=
+None
+for
+f
+in
+self
+.
+formatters
+:
+for
+style
+in
+f
+.
+styles
+(
+transport
+,
+event
+.
+realm
+):
+if
+style
+==
+format
+:
+formatter
+=
+f
+if
+formatter
+:
+message
+=
+formatter
+.
+format
+(
+transport
+,
+format
+,
+event
+)
+for
+sid
+,
+authenticated
+,
+address
+,
+format
+in
+group
+:
+if
+address
+:
+sms
+.
+send
+(
+message
+,
+address
+)
+Available Implementations
+Only
+trac.notification.mail.EmailDistributor
+is part of core Trac.
+XmppDistributor
+will be part of
+​
+th:AnnouncerPlugin
+.
+Additional Information and References
+​
+epydoc
+​
+API Reference
+Related to the
+INotificationFormatter
+This interface originated in
+​
+th:AnnouncerPlugin
+as
+IAnnouncementDistributor
+.
+DONE
+IAnnouncerDistributor
+had no
+format
+in the
+recipients
+parameter to
+distribute()
+.
