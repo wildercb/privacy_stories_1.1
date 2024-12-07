@@ -1,4 +1,3 @@
-<PI>
 
 Architecture
 This chapter contains an in-depth view of the architecture of the system. If you don't understand everything on the first reading, don't fret! Understanding how the basic system fits together is the most important thing you need for now.
@@ -60,9 +59,8 @@ Furthermore, not all files served by the webapp are run through Spring. The /web
 There are no jsp pages that are accessed directly. If a page's url is /admin/patients/index.htm, the jsp will actually reside in /web/WEB-INF/view/admin/patients/index.jsp. This is necessary so that we can do the redirect with the SpringController. Because the file being accessed ends with .htm, the SpringController is invoked by the web server. When the SpringController sees the url, it simply replaces .htm with .jsp and looks for the file in /web/WEB-INF/view/ according to the jspViewResolver bean in openmrs-servlet.xml. If the page being accessed was patient.form, the mapping in the urlMapping bean would have told spring to use the PatientFormController and the patientForm.jsp file.
 
 #Authentication and Authorization
-{#s (A: Collect, Use, Manage) (DT: account information) (P: Security)
+
 OpenMRS has a very granulated permissions system. Every action is associated with a Privilege, which in turn can be grouped into Roles. Examples of such privileges are "Add Patient", "Update Patient", "Delete Patient", "Add Concept", "Update Concept", and more. A Role can also point to a list of inherited roles. The role inherits all privileges from that inherited role. In this way, hierarchies of roles are possible. A User contains only a collection of Roles, not Privileges. These privileges are enforced in the service layer using AOP annotations. In a way, this also enssures Confidentiality of patients' Data by putting restrictions on the data Access.
-/}
 
 
 #Build Management
@@ -97,3 +95,7 @@ There are three main layers to the system: User Interface (Presentation), Servic
 OpenMRS makes extensive use of a number of frameworks including Spring and Hibernate.
 We use Apache Maven for build management, JIRA for issue management and Github for version control.
 Authentication/Authorisation is ensured by grouping different priviledges into roles which then are assigned to defined users and in turn it ensures the confidentiality of patients data and security of the system.
+
+(A: Process, Collect) (DT: health data, account information) (P: functionality, compliance, security)
+
+(S: We process health data and account information for functionality. We process health data and account information for compliance. We process health data and account information for security. We collect health data and account information for functionality. We collect health data and account information for security. We collect health data and account information for compliance.)
