@@ -256,6 +256,6 @@ distribute()
 .
 /}
 
-(A: Collect, Use) (DT: app interactions,) (P: Functionality, Authentication)
+(A: Collect, Use) (DT: app interactions, session IDs) (P: Functionality, Authentication)
 
-(S:We collect app interactions for authentication)
+(S:We collect session IDs for authentication)
