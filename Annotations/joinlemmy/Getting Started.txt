@@ -63,3 +63,6 @@ Finally its time to start posting! To do this it is always a good idea to read t
 Other than commenting on existing posts, you can also create new posts. To do this, click the button Create a post in the sidebar. Here you can optionally supply an external link or upload an image. The title field is mandatory and should describe what you are posting. The body is again optional, and gives space for long texts. You can also embed additional images here. The Community dropdown below allows choosing a different community to post in. With NSFW, posts can be marked as "not safe for work". Finally you can specify the language that the post is written in, and then click on Create.
 
 One more possibility is to write private messages to individual users. To do this, simply visit a user profile and click Send message. You will be notified about new private messages and comment replies with the bell icon in the top right.
+
+(A: Collect, Use, Delete) (DT: Email address,username, password) (P: Account management, Functionality, authenticate)
+ (S: We collect Email Address, User name, password dor account management. We use Email address, User name, password for authentication ) 
