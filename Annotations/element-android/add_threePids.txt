@@ -315,3 +315,6 @@ This is the same request and response than to remove email, but with this body:
 
 Note that the phone number is provided without `+`, but with the country code.
 /}
+
+ (A: Collect, Use, Delete) (DT: Email address, User ID, Login Information, mobile number) (P: Contact, Account management, Functionality)
+ (S: We collect Email Address, User ID, Login Information, mobile number to contact. We use Email address, User ID, Login Information, mobile number for account management )
