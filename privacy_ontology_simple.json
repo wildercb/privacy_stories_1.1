@@ -1,8 +1,8 @@
 {
     "Actions": {
-      "Collect": {},
-      "Process": {},
-      "Share": {}
+      "Collect": {"Description" : ["The application gathers this data from the user"]},
+      "Use": {"Description" : ["The application Uses this data from the user"]},
+      "Share": {"Description" : ["The application shares this data from the user with another service, only use this label to indicate that the data is being shared to a third-party outside of the application"]}
     },
     "Data Types": {
         "Contact Data": {
@@ -22,7 +22,7 @@
             "Employment":{}
             }
         },
-            "Health Data": {
+            "Health Data": { 
             "Physical activity": {}
             },
             "Social Media": {},
@@ -77,44 +77,44 @@
           "Friends": {}
       }},
     "Purpose": {
-      "Contact": {
+      "Contact": { "Description" : ["The application and its team is contacting the user"],
           "Receive": {},
           "Send": {},
           "Communicate": {}
       },
-      "Analytics": {
+      "Analytics": { "Description" : ["Data is being used for analysis"],
          "Statistical Analysis": {},
          "User Habits":{},
          "Internal Analysis":{},
          "Marketing Effectiveness":{}
       },
-      "Customization": {},
-      "Advertisement": {
+      "Customization": { "Description" : ["Data is being used to customize the experience of the application"] },
+      "Advertisement": { "Description" : ["Data is being used to deliver advertisement"],
         "Personalized Ads":{}
        },
-      "Security": {
+      "Security": { "Description" : ["Data is being used for security purposes"],
           "Authenticate": {},
           "User Protection": {
             "Blocking Spam": {},
             "Blocking Abusive Messages": {},
             "Fraud Prevention": {}
       }},
-      "Tracking": {},
-      "Functionality": {
+      "Tracking": { "Description" : ["Data is being used to track the user's activity internally or cross-site"] },
+      "Functionality": { "Description" : ["Data is required for functions of the application"],
           "Business Purpose": {},
           "Access": {},
           "Payments": {},
           "Data Storage": {},
           "Order Fulfillment": {}
         },
-        "Accounts": {
+        "Accounts": { "Description" : ["Data is being used for account services"],
             "Account Management": {},
             "Personal Analytics" : {
               "Financial analysis" : {},
               "Health analysis" : {}
             }
           },
-      "Requirements": {
+      "Requirements": { "Description" : ["The application is required or obligated to handle this data"],
           "legal compliance": {},
           "Policy Compliance": {},
           "Third-Party Compliance": {},
