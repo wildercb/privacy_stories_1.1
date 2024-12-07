@@ -1,5 +1,5 @@
- <PI>
-{#s (A: Collect, Use, Delete) (DT: Medical Information, Email address, Messages) (P: Contact, Functionality, Compliance)}
+
+ 
 Direct Messaging with LibreEHR and EMR Direct phiMail(R)
 Version 1.3, 19 Jul 2014
 
@@ -216,4 +216,7 @@ Documents interface.
 Trademark Notice: phiMail is a registered trademark of EMR Direct.
 
 Copyright (c) 2013-2014 EMR Direct.
-/}
+
+(A: Share, Collect, Process) (DT: Health data, address, usage data) (P: compliance, Functionality, security)
+
+(S: We share health data and address for compliance. We share health data and address for Functionality. We collect health data and address for complaince. We collect health data and address for functionality. We process health data, address and usage data for compliance. We process health data, address and usage data for functionality. We process health data, address and usage data for security.)
