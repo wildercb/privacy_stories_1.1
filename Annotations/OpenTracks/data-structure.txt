@@ -1,5 +1,4 @@
-{#s (A: Collect, Use, Share, Delete) (DT: Location, Physical Activity, Timestamps) (P: Functionality, Health analysis, Customization)}
-<PI>
+
 @startuml
 class Track {
     -id
@@ -99,6 +98,6 @@ Trackpoints of Type.SEGMENT_START_MANUAL or Type.SEGMENT_END_MANUAL do not conta
 Tracks recorded prior to OpenTracks version 3.15.0, do neither begin with a Type.SEGMENT_START_MANUAL nor end with a Type.SEGMENT_END_MANUAL.
 end note
 @enduml
-/}
- (A: Collect, Use, Share, Delete) (DT: Location, Physical Activity, Timestamps) (P: Functionality, Health analysis, Customization)
- (S: we collect Location, Physical Activity, Timestamps for Customization. We use  Location, Physical Activity, Timestamps for health analysis )
+
+ (A: Collect, Use, Share) (DT: Location, Physical Activity, Timestamps) (P: Health analysis, Customization)
+ (S: we collect Location, Physical Activity, Timestamps for Customization. We use  Location, Physical Activity, Timestamps for health analysis.)

@@ -217,6 +217,6 @@ Trademark Notice: phiMail is a registered trademark of EMR Direct.
 
 Copyright (c) 2013-2014 EMR Direct.
 
-(A: Share, Collect, Process) (DT: Health data, address, usage data) (P: compliance, Functionality, security)
+(A: Share, Collect, Use) (DT: Health data, address, usage data) (P: requirements, Functionality, security)
 
-(S: We share health data and address for compliance. We share health data and address for Functionality. We collect health data and address for complaince. We collect health data and address for functionality. We process health data, address and usage data for compliance. We process health data, address and usage data for functionality. We process health data, address and usage data for security.)
+(S: We share health data and address for requirements. We share health data and address for Functionality. We collect health data and address for complaince. We collect health data and address for functionality. We use health data, address and usage data for requirements. We use health data, address and usage data for functionality. We use health data, address and usage data for security.)

@@ -132,6 +132,6 @@ While the current window is in the custom login flow, all links that emit the
 will-navigate
 event will be allowed. Anything that opens a new window will still be restricted based on the rules for new windows. We leave the custom login flow once the app has navigated back to an URL internal to the application
 
-(A: Process) (DT: usage data) (P: Functionality, security)
+(A: use) (DT: usage data) (P: Functionality, security)
 
-(S: We process usage data for Functionality. We process usage data for security.)
+(S: We use usage data for Functionality. We use usage data for security.)

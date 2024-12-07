@@ -59,6 +59,6 @@ Controls the percentage of automatic feedback shown to participants when callsta
 
 feedbackPercentage: 100
 
-(A: Share, Collect, Process)  (DT: email address, account information, device information, usage data) (P: analytics, functionality)
+(A: Share, Collect, use)  (DT: email address, account information, device information, usage data) (P: analytics, functionality)
 
-(S: We share email address, account information for analytics. We collect email address, account information, device information and usage data for functionality. We collect email address, account information, device information and usage data for analytics. We Process email address, account information, device information and usage data for functionality. We Process email address, account information, device information and usage data for analytics.)
+(S: We share email address, account information for analytics. We collect email address, account information, device information and usage data for functionality. We collect email address, account information, device information and usage data for analytics. We use email address, account information, device information and usage data for functionality. We use email address, account information, device information and usage data for analytics.)

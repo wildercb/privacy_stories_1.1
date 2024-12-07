@@ -64,5 +64,6 @@ Other than commenting on existing posts, you can also create new posts. To do th
 
 One more possibility is to write private messages to individual users. To do this, simply visit a user profile and click Send message. You will be notified about new private messages and comment replies with the bell icon in the top right.
 
-(A: Collect, Use, Delete) (DT: Email address,username, password) (P: Account management, Functionality, authenticate)
- (S: We collect Email Address, User name, password dor account management. We use Email address, User name, password for authentication ) 
+(A: Collect, Use) (DT: Email address, account information) (P: Account management, Functionality, authenticate)
+ (S: We collect Email Addres and account information  For account management. We use Email address and account information for authenticate. We use email address and account information for functionality.)
+ 

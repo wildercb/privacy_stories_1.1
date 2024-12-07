@@ -25,4 +25,4 @@ Browser based QR code scanner for door management
 Elegant dashboard for easy management.
 
 (A: collect,use)(DT: Financial)(P: tracking, Customization,)
-(S: we collect Fiancial for customization. we use financial data for tracking user payment history)
+(S: we collect Fiancial for customization. we use financial data for tracking. )

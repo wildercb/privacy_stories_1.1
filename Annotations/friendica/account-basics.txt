@@ -94,6 +94,6 @@ You can export a copy of your personal data in JSON format from the "Export pers
 You need this file to relocate your Friendica account to another node.
 This might be necessary, e.g. if your node suffers a severe hardware problem and is not recoverable.
 
-(A: Collect, Share, Process) (DT: email address, account information) (P: account management, functionality)
+(A: Collect, Use) (DT: email address, account information) (P: account management, functionality)
 
-(S: We collect email address and account information for account management. We collect email address and account information for functionality. We share account information for functionality. We process email address and personal information for functionality. We process email address and account information for contact.)
+(S: We collect email address and account information for account management. We collect email address and account information for functionality.  We use email address and personal information for functionality. We use email address and account information for contact.)
