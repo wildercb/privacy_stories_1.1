@@ -1,0 +1,21 @@
+Cash and Bank Transfer are the default accounts on Akaunting. Every Invoice, Bill, or Transaction is recorded in Cash or Bank Transfer.
+
+Creating New Account:
+
+Go to Banking on the Navigation Menu.
+Creating New Payment Account
+Select Accounts from the dropdown options.
+On the Accounts page, Click on New Account at the top right corner.
+Define the Account type – Bank or Credit Card (Use the credit card option for a negative opening balance)
+Creating New Payment Account: Define Account type when adding a payment account
+For Bank account type:
+
+Enter the required details – General (Name, Account Number, Currency, and Starting Balance) and Bank (Name, Phone, and Address).
+Adding a bank account for payment account
+Decide whether you want the account to be your default.
+Then, Save.
+Please note that when creating a Credit Card account, you cannot set it as Default Account.
+
+(A:Collect) (DT: Account Number,Name, Card Data, Phone Number, Address) (P: Account management, Functionality)
+
+(S: We collect account Number, name, card data, Phone Number, Address for account management. We save account Number, name, card data, Phone Number, Address for Functionality. We collect account Number, name, card data, Phone Number, Address for account management.)

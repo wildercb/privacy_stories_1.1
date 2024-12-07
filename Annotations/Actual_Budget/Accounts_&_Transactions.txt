@@ -87,4 +87,6 @@ Renaming an existing account
 
 (A: Collect, Use) (DT: Account Data, Account Balance, Bank Account, Assets) (P: Personal analytics, Provide Service, )
 
-(S: We collect account data, account balance, bank account, and assets for personal analytics. We collect account data, account balance, bank account, and assets for account management. We collect account data, account balance, bank account, and assets for Functionality. )
+(S: 
+We collect account data, account balance, bank account, and assets for personal analytics.We collect account data, account balance, bank account, and assets for account management. We collect account data, account balance, bank account, and assets for Functionality. We use account data, account balance, bank account, and assets for personal analytics. We use account data, account balance, bank account, and assets for account management. We use account data, account balance, bank account, and assets for Functionality.
+)

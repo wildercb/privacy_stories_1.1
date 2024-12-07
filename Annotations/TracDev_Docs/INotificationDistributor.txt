@@ -1,7 +1,7 @@
 This page was a draft. See
 TracDev/PluginDevelopment/ExtensionPoints/trac.notification.api.INotificationDistributor
 page now.
-{#s (A: Collect, Use) (DT: Messages, username) (P: Functionality, Security)
+{#s (A: Collect, Use) (DT: Email Address, username) (P: Functionality, Security)
 Extension Point :
 INotificationDistributor
 Interface
@@ -255,3 +255,7 @@ parameter to
 distribute()
 .
 /}
+
+(A: Collect, Use) (DT: app interactions,) (P: Functionality, Authentication)
+
+(S:We collect app interactions for authentication)
