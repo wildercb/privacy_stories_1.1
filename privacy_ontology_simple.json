@@ -5,45 +5,45 @@
       "Share": {"Description" : ["The application shares this data from the user with another service, only use this label to indicate that the data is being shared to a third-party outside of the application"]}
     },
     "Data Types": {
-        "Contact Data": {
-            "Phone Number": {},
-            "Email address": {},
-            "User ID": {},
-            "Job Title": {},
-            "Company": {},
-            "Address": {},
-            "Name": {},
-            "Date of Birth": {},
-            "Image": {},
-            "Government ID": {},
-            "Biographical Data": {
-            "CV": {},
-            "Education": {},
-            "Employment":{}
-            }
-        },
-            "Health Data": { 
-            "Physical activity": {}
-            },
-            "Social Media": {},
-            "Location": {
-            "Approximate location": {},
-            "Precise location": {}
-            },
-        "Financial": {
-          "Orders": {},
-          "Payment History": {},
-          "Purchase History": {},
-          "Order": {},
-          "Card Data": {},
-          "Bank Account": {},
-          "Credit Score": {},
-          "Income Information": {},
-          "assets": {
-              "vehicle": {},
-              "Insurance": {}
+      "Contact Data": {
+          "Phone Number": {},
+          "Email address": {},
+          "User ID": {},
+          "Job Title": {},
+          "Company": {},
+          "Address": {},
+          "Name": {},
+          "Date of Birth": {},
+          "Image": {},
+          "Government ID": {},
+          "Biographical Data": {
+          "CV": {},
+          "Education": {},
+          "Employment":{}
           }
       },
+      "Health Data": { 
+          "Physical activity": {}
+          },
+          "Social Media": {},
+          "Location": {
+          "Approximate location": {},
+          "Precise location": {}
+          },
+      "Financial": {
+        "Orders": {},
+        "Payment History": {},
+        "Purchase History": {},
+        "Order": {},
+        "Card Data": {},
+        "Bank Account": {},
+        "Credit Score": {},
+        "Income Information": {},
+        "assets": {
+            "vehicle": {},
+            "Insurance": {}
+        }
+    },
       "Usage Data": {
           "App Interactions": {
             "Pages Visited": {},
@@ -52,16 +52,16 @@
             "User Engagement": {},
             "Session ID": {}
           },
-      "Device Information": {
-          "IP Address": {},
-          "Device ID": {},
-          "Advertisement ID": {},
-          "Browser": {},
-          "Operating System": {},
-          "Diagnostics": {},
-          "Sensor Data": {},
-          "Audio": {},
-          "Browsing history": {}
+    "Device Information": {
+        "IP Address": {},
+        "Device ID": {},
+        "Advertisement ID": {},
+        "Browser": {},
+        "Operating System": {},
+        "Diagnostics": {},
+        "Sensor Data": {},
+        "Audio": {},
+        "Browsing history": {}
       }},
       "Tracking": {
           "Cookies": {},
