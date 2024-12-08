@@ -65,9 +65,14 @@ def run_multi_model_prompts(
                 # Write the row for this model and prompt
                 csv_writer.writerow(row)
 '''
+from transformers import AutoModelForCausalLM, AutoTokenizer
 import aisuite as ai
 import csv
+import torch
 from typing import List, Union, Optional
+import csv
+import os
+
 
 def run_multi_model_prompts(
     models: List[str], 
@@ -131,6 +136,139 @@ def run_multi_model_prompts(
     
     return model_responses
         
+def run_hf_prompts(
+    models: List[str], 
+    prompts: Union[str, List[str]], 
+    num_runs: int = 3, 
+    temperature: float = 0.7,
+    max_tokens: int = 1500,
+    output_dir: Optional[str] = None
+):
+    """
+    Run prompts through multiple Hugging Face models and capture responses
+
+    Args:
+        models (List[str]): List of Hugging Face model identifiers
+        prompts (Union[str, List[str]]): Single prompt or list of prompts to send
+        num_runs (int): Number of times to run each model (default: 3)
+        temperature (float): Sampling temperature for model responses (default: 0.7)
+        max_tokens (int): Maximum number of tokens in response (default: 1500)
+        output_dir (Optional[str]): Directory to save model responses (default: None)
+    
+    Returns:
+        dict: A dictionary of model responses.
+    """
+    # Ensure output directory exists if specified
+    if output_dir:
+        os.makedirs(output_dir, exist_ok=True)
+
+    # Convert single prompt to list if needed
+    if isinstance(prompts, str):
+        prompts = [prompts]
+    
+    # Store responses for all models
+    model_responses = {model: [] for model in models}
+    
+    # Iterate through prompts
+    for prompt in prompts:
+        # Iterate through models
+        for model_name in models:
+            model_responses[model_name].append([])
+            
+            try:
+                # Load tokenizer and model
+                tokenizer = AutoTokenizer.from_pretrained(model_name)
+                model = AutoModelForCausalLM.from_pretrained(model_name, torch_dtype=torch.float16)
+                
+                # Move model to GPU if available
+                device = "cuda" if torch.cuda.is_available() else "cpu"
+                model = model.to(device)
+                
+                # Perform multiple runs for each model
+                for run in range(num_runs):
+                    try:
+                        # Prepare input
+                        input_ids = tokenizer.encode(prompt, return_tensors="pt").to(device)
+                        
+                        # Generate response
+                        output = model.generate(
+                            input_ids, 
+                            max_length=input_ids.shape[1] + max_tokens,
+                            num_return_sequences=1,
+                            temperature=temperature,
+                            do_sample=True
+                        )
+                        
+                        # Decode and clean response
+                        response_text = tokenizer.decode(output[0], skip_special_tokens=True)
+                        
+                        # Remove the original prompt from the response
+                        response_text = response_text[len(prompt):].strip()
+                        
+                        model_responses[model_name][-1].append(response_text)
+                        
+                        print(f"Model: {model_name} - Run {run + 1} completed")
+                    
+                    except Exception as run_error:
+                        error_msg = f"ERROR in run {run + 1}: {str(run_error)}"
+                        print(error_msg)
+                        model_responses[model_name][-1].append(error_msg)
+                
+                # Optional: Save responses to CSV
+                if output_dir:
+                    save_responses_to_csv(model_responses, output_dir)
+            
+            except Exception as model_error:
+                print(f"Error loading model {model_name}: {model_error}")
+                model_responses[model_name][-1].append(f"ERROR LOADING MODEL: {str(model_error)}")
+    
+    return model_responses
+
+def save_responses_to_csv(model_responses: dict, output_dir: str):
+    """
+    Save model responses to CSV files in the specified output directory
+
+    Args:
+        model_responses (dict): Dictionary of model responses
+        output_dir (str): Directory to save CSV files
+    """
+    for model_name, prompt_responses in model_responses.items():
+        # Create a safe filename by replacing invalid characters
+        safe_model_name = "".join(c if c.isalnum() or c in ('-', '_') else '_' for c in model_name)
+        csv_filename = os.path.join(output_dir, f"{safe_model_name}_responses.csv")
+        
+        # Write responses to CSV
+        with open(csv_filename, 'w', newline='', encoding='utf-8') as csvfile:
+            csv_writer = csv.writer(csvfile)
+            csv_writer.writerow(['Prompt', 'Run', 'Response'])
+            
+            for prompt_idx, runs in enumerate(prompt_responses):
+                for run_idx, response in enumerate(runs):
+                    csv_writer.writerow([f"Prompt {prompt_idx + 1}", f"Run {run_idx + 1}", response])
+        
+        print(f"Responses for {model_name} saved to {csv_filename}")
+
+# Example usage
+if __name__ == "__main__":
+    # Example list of models (replace with actual Hugging Face model names)
+    model_list = [
+        "gpt2",  # Small GPT-2 model
+        "distilgpt2",  # Distilled version of GPT-2
+        "EleutherAI/gpt-neo-125M"  # GPT-Neo 125M model
+    ]
+    
+    prompts = [
+        "Tell me a short story about a brave adventurer.",
+        "Explain the basics of quantum computing in simple terms."
+    ]
+    
+    # Run models with responses saved to 'model_outputs' directory
+    responses = run_multi_model_prompts(
+        models=model_list, 
+        prompts=prompts, 
+        num_runs=2, 
+        output_dir="model_outputs"
+    )
 '''
 import openai
 import json
