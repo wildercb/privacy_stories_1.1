@@ -136,6 +136,6 @@ Copyright © 2016–2023
 Licensed under the AGPL License.
 
 (A: Collect, Use) 
-(DT: Date of Birth, Email, Image, Friends) 
-(P: Contact, customization, access) 
-(S: We collect and use date of birth and email for contact. We collect and use Images and Friends for customization and access. We collect and use Images and Friends for access)
+(DT: Date of Birth, Email address , Image, Friends) 
+(P: Contact, customization, functionality) 
+(S: We collect date of birth, email address, image and friends for contact. We collect date of birth, email address, image and friends for customization. We collect date of birth, email address, image and friends for functionality. We use date of birth, email address, image and friends for functionality. We use date of birth, email address, image and friends for contact. We use date of birth, email address, image and friends for customization.)

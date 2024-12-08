@@ -132,6 +132,6 @@ Daily Video Quota represents the max quota a user is allowed to upload by day. Y
 
 Once you are satisfied with your user, you can click on the "Update User" button to save modifications.
 
-(A: Collect, Process, Delete) (DT: Email address, account information, video) (P: account management, user protection)
+(A: Collect, use) (DT: Email address, account information) (P: account management, user protection)
 
-(S: We collect email address, account information for account management. We Process email addres, account information and video for account management. We delete account information and video for user protection.)
+(S: We collect email address, account information for account management. We  use email address, account information  for user protection.)

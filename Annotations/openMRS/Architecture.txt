@@ -96,6 +96,6 @@ OpenMRS makes extensive use of a number of frameworks including Spring and Hiber
 We use Apache Maven for build management, JIRA for issue management and Github for version control.
 Authentication/Authorisation is ensured by grouping different priviledges into roles which then are assigned to defined users and in turn it ensures the confidentiality of patients data and security of the system.
 
-(A: Process, Collect) (DT: health data, account information) (P: functionality, compliance, security)
+(A: Use, Collect) (DT: health data, account information) (P: functionality, Requirements, security)
 
-(S: We process health data and account information for functionality. We process health data and account information for compliance. We process health data and account information for security. We collect health data and account information for functionality. We collect health data and account information for security. We collect health data and account information for compliance.)
+(S: We use health data and account information for functionality. We use health data and account information for requirements. We use health data and account information for security. We collect health data and account information for functionality. We collect health data and account information for security. We collect health data and account information for requirements.)

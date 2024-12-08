@@ -58,6 +58,6 @@ To combat spam accounts, GoToSocial account sign-ups **always** require manual a
 
 NOT IMPLEMENTED YET: in a future update, admins and moderators will be able to create and send invites that allow accounts to be created even when public sign-up is closed, and to pre-approve accounts created via invitation, and/or allow them to override the sign-up limits described above.
 
-(A: Collect, Process) (DT: email address, account information ) (P: account management, user protection, functionality)
+(A: Collect, Use) (DT: email address, account information ) (P: account management, user protection, functionality)
 
-(S: We collect email address and account information for account management. We collect email address and account information for functionality. We process email address and account information for account management. We process email address and account information for user protection. We process email address and account information for functionality.)
+(S: We collect email address and account information for account management. We collect email address and account information for functionality. We use email address and account information for account management. We use email address and account information for user protection. We use email address and account information for functionality.)

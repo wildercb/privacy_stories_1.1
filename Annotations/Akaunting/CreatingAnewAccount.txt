@@ -16,6 +16,6 @@ Decide whether you want the account to be your default.
 Then, Save.
 Please note that when creating a Credit Card account, you cannot set it as Default Account.
 
-(A:Collect) (DT: Account Number,Name, Card Data, Phone Number, Address) (P: Account management, Functionality)
+(A:Collect) (DT:Name, Card Data, Phone Number, Address) (P: Account management, Functionality)
 
-(S: We collect account Number, name, card data, Phone Number, Address for account management. We save account Number, name, card data, Phone Number, Address for Functionality. We collect account Number, name, card data, Phone Number, Address for account management.)
+(S: We collect  name, card data, Phone Number, Address for account management. We save name, card data, Phone Number, Address for Functionality. We collect  name, card data, Phone Number, Address for account management.)

@@ -106,6 +106,6 @@ class CustomAccountDataModule:
         )
 ```
  
-(A: Process, Share) (DT: account information) (P: Functionality, account management)
+(A: use, Share) (DT: account information) (P: Functionality, account management)
 
-(S: We process account information for functionality. We process account information for account management. We share account information for functionality. We share account information for account management.)
+(S: We use account information for functionality. We use account information for account management. We share account information for functionality. We share account information for account management.)

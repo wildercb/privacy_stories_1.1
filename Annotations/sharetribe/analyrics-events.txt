@@ -105,6 +105,6 @@ Sample handle for Google Analytics:
     }
   });
 
-(A: Collect, share, Process) (DT: usage Data, financial, account information, identifiers) (P: analytics)
+(A: Collect, share, use) (DT: usage Data, financial, account information, identifiers) (P: analytics)
 
-(S: We collect usage data, account information, financial and account information for analytics. We Share usage data, account information, financial and account information for analytics. We Process usage data, account information, financial and account information for analytics.)
+(S: We collect usage data, account information, financial and account information for analytics. We Share usage data, account information, financial and account information for analytics. We use usage data, account information, financial and account information for analytics.)

@@ -36,5 +36,5 @@ Click
 Backup Now
 
 Manually creating a backup from the desktop app 
-(A: Save, Share, Process) (DT: Files, Your data, account information) (P: Data Storage, access, Login)
-(S: We save Files for data storage. We share your data for access. We Process your account information for Login)
+(A: Collect Process) (DT: account information) (P: account management, functionality)
+(S: We collect account information for account management. We process account information for account management. We collect account information for functionality. We process account information for functionality.)

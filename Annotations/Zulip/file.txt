@@ -119,4 +119,10 @@ If using APNs token-based authentication, set APNS_TOKEN_KEY_FILE to the path of
 
 Restart the Zulip server.
 
+<<<<<<< HEAD
 (A: collect,use ) (DT: usage data)(P:tracking, security) (S: We collect and use usage data for tracking and security)
+=======
+(A: collect,use ) (DT: usage data)(P:tracking, security)
+
+(S: We collect usage data for security. We use usage data for tracking.)
+>>>>>>> 1fb6e403a0661573c989bacdd4d97d2aeca26219

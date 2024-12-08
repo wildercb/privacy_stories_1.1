@@ -37,5 +37,5 @@ This tab displays a QR code that you can scan to log in to Koel Player on your p
 
 <script lang="ts" setup> import uploadIcon from '../assets/icons/upload.svg' import timesIcon from '../assets/icons/times.svg' </script>
 
-(A: Collect, Process) (DT: name, email address, Account information) (P: Functionality, identification, customization)
-(S: We collect name, email address, account information for Functionality. We collect name, email address, account information for identification. We collect name, email address, account information for customization. We Process name, email address, account information for Functionality. We Process name, email address, account information for identification. We Process name, email address, account information for customization. )
+(A: Collect, Use) (DT: name, email address, Account information) (P: Functionality, customization)
+(S: We collect name, email address, account information for Functionality.We collect name, email address, account information for customization. We use name, email address, account information for Functionality.We use name, email address, account information for customization.)

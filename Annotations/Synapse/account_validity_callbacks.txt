@@ -56,6 +56,6 @@ represented by their Matrix user ID.
 
 If multiple modules implement this callback, Synapse runs them all in order.
 
-(A: Process) (DT: account information) (P: Security,account management, functionality)
+(A: use) (DT: account information) (P: Security,account management, functionality)
 
-(S: We process account information for security. We process account information for functionality. We process account information for account management.)
+(S: We use account information for security. We use account information for functionality. We use account information for account management.)

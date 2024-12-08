@@ -171,4 +171,4 @@ These are not really needed.
 
  (A: Collect, Use) (DT: Email, Usage Data) (P: Functionality, Authentication)
 
-(S: We collect Email and Usage Data for functionality. We collect Email and usage data for authentication.)
+(S: We collect email address and Usage Data for functionality. We collect email addressand usage data for authentication. We use email address and usage data for functionality.)
