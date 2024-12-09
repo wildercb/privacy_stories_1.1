@@ -148,7 +148,7 @@ def train_rlhf_model(
 
 def main():
     train_rlhf_model(
-        csv_path='LLMAnnotation_gpt4o-latest.csv',
+        csv_path='LLMAnnotation-gpt40-shashank.csv',
         model_name='meta-llama/Llama-3-8b',
         output_dir='wildercb/llama-rlhf-privacy-analyst',
         max_samples=5000
@@ -156,3 +156,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

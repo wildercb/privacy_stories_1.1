@@ -1,49 +1,49 @@
-File,Model,Response,Actions_ground_truth_labels,Actions_predicted_labels,Actions_precision,Actions_recall,Actions_f1_score,Data Types_ground_truth_labels,Data Types_predicted_labels,Data Types_precision,Data Types_recall,Data Types_f1_score,Purposes_ground_truth_labels,Purposes_predicted_labels,Purposes_precision,Purposes_recall,Purposes_f1_score
-Actual_Budget\Accounts_&_Transactions.txt,openai:gpt-4o-2024-11-20,Model Response 1,[],"['share', 'collect', 'use']",0.0,0.0,0.0,[],"['accountinformation', 'account information', 'tracking', 'financial']",0.0,0.0,0.0,[],[],0.0,0.0,0.0
-Actual_Budget\Accounts_&_Transactions.txt,openai:gpt-4o-2024-11-20,Model Response 2,[],"['collect', 'use']",0.0,0.0,0.0,[],"['tracking', 'financial']",0.0,0.0,0.0,[],[],0.0,0.0,0.0
-Akaunting\CreatingAnewAccount.txt,openai:gpt-4o-2024-11-20,Model Response 1,[],"['collect', 'use']",0.0,0.0,0.0,[],"['accountinformation', 'account information', 'tracking', 'financial']",0.0,0.0,0.0,[],[],0.0,0.0,0.0
-Akaunting\CreatingAnewAccount.txt,openai:gpt-4o-2024-11-20,Model Response 2,[],"['share', 'collect', 'use']",0.0,0.0,0.0,[],"['accountinformation', 'account information', 'tracking', 'financial']",0.0,0.0,0.0,[],[],0.0,0.0,0.0
-Attendize\features.txt,openai:gpt-4o-2024-11-20,Model Response 1,[],"['collect', 'use']",0.0,0.0,0.0,[],"['tracking', 'contact data', 'contactdata', 'accountinformation', 'usage data', 'account information', 'usagedata']",0.0,0.0,0.0,[],[],0.0,0.0,0.0
-Attendize\features.txt,openai:gpt-4o-2024-11-20,Model Response 2,[],"['collect', 'use']",0.0,0.0,0.0,[],"['healthdata', 'tracking', 'contact data', 'contactdata', 'accountinformation', 'usage data', 'health data', 'account information', 'usagedata']",0.0,0.0,0.0,[],[],0.0,0.0,0.0
-element-android\add_threePids.txt,openai:gpt-4o-2024-11-20,Model Response 1,[],"['collect', 'use']",0.0,0.0,0.0,[],"['accountinformation', 'account information']",0.0,0.0,0.0,[],[],0.0,0.0,0.0
-element-android\add_threePids.txt,openai:gpt-4o-2024-11-20,Model Response 2,[],"['collect', 'use']",0.0,0.0,0.0,[],"['tracking', 'contact data', 'contactdata', 'accountinformation', 'account information']",0.0,0.0,0.0,[],[],0.0,0.0,0.0
-friendica\account-basics.txt,openai:gpt-4o-2024-11-20,Model Response 1,[],"['collect', 'use']",0.0,0.0,0.0,[],[],0.0,0.0,0.0,[],[],0.0,0.0,0.0
-friendica\account-basics.txt,openai:gpt-4o-2024-11-20,Model Response 2,[],"['share', 'collect', 'use']",0.0,0.0,0.0,[],"['socialmedia', 'tracking', 'social media', 'contact data', 'contactdata', 'accountinformation', 'usage data', 'account information', 'usagedata']",0.0,0.0,0.0,[],[],0.0,0.0,0.0
-gotosocial\signups.txt,openai:gpt-4o-2024-11-20,Model Response 1,[],"['collect', 'use']",0.0,0.0,0.0,[],[],0.0,0.0,0.0,[],[],0.0,0.0,0.0
-gotosocial\signups.txt,openai:gpt-4o-2024-11-20,Model Response 2,[],"['share', 'collect', 'use']",0.0,0.0,0.0,[],[],0.0,0.0,0.0,[],[],0.0,0.0,0.0
-invoiceninja\userdetails.txt,openai:gpt-4o-2024-11-20,Model Response 1,[],"['collect', 'use']",0.0,0.0,0.0,[],"['contact data', 'contactdata', 'financial', 'accountinformation', 'usage data', 'account information', 'usagedata']",0.0,0.0,0.0,[],[],0.0,0.0,0.0
-invoiceninja\userdetails.txt,openai:gpt-4o-2024-11-20,Model Response 2,[],"['share', 'collect', 'use']",0.0,0.0,0.0,[],"['socialmedia', 'healthdata', 'social media', 'contact data', 'contactdata', 'accountinformation', 'usage data', 'health data', 'account information', 'usagedata']",0.0,0.0,0.0,[],[],0.0,0.0,0.0
-jitsi-meet\configurations.txt,openai:gpt-4o-2024-11-20,Model Response 1,[],"['share', 'collect', 'use']",0.0,0.0,0.0,[],"['contact data', 'contactdata', 'accountinformation', 'usage data', 'account information', 'usagedata']",0.0,0.0,0.0,[],[],0.0,0.0,0.0
-jitsi-meet\configurations.txt,openai:gpt-4o-2024-11-20,Model Response 2,[],"['collect', 'use']",0.0,0.0,0.0,[],"['tracking', 'contact data', 'contactdata', 'accountinformation', 'usage data', 'account information', 'usagedata']",0.0,0.0,0.0,[],[],0.0,0.0,0.0
-joinlemmy\Getting Started.txt,openai:gpt-4o-2024-11-20,Model Response 1,[],"['share', 'collect', 'use']",0.0,0.0,0.0,[],"['contact data', 'contactdata', 'accountinformation', 'usage data', 'account information', 'usagedata']",0.0,0.0,0.0,[],[],0.0,0.0,0.0
-joinlemmy\Getting Started.txt,openai:gpt-4o-2024-11-20,Model Response 2,[],"['share', 'collect', 'use']",0.0,0.0,0.0,[],"['contact data', 'contactdata', 'accountinformation', 'usage data', 'account information', 'usagedata']",0.0,0.0,0.0,[],[],0.0,0.0,0.0
-koel\profile-preferences.txt,openai:gpt-4o-2024-11-20,Model Response 1,[],"['share', 'collect', 'use']",0.0,0.0,0.0,[],[],0.0,0.0,0.0,[],[],0.0,0.0,0.0
-koel\profile-preferences.txt,openai:gpt-4o-2024-11-20,Model Response 2,[],"['collect', 'use']",0.0,0.0,0.0,[],[],0.0,0.0,0.0,[],[],0.0,0.0,0.0
-lh-ehr\Direct_Messaging_README.txt,openai:gpt-4o-2024-11-20,Model Response 1,[],"['share', 'collect', 'use']",0.0,0.0,0.0,[],"['healthdata', 'tracking', 'contact data', 'contactdata', 'usage data', 'health data', 'usagedata']",0.0,0.0,0.0,[],[],0.0,0.0,0.0
-lh-ehr\Direct_Messaging_README.txt,openai:gpt-4o-2024-11-20,Model Response 2,[],"['collect', 'use']",0.0,0.0,0.0,[],"['health data', 'healthdata']",0.0,0.0,0.0,[],[],0.0,0.0,0.0
-Mattermost_Architecture\Navigation.txt,openai:gpt-4o-2024-11-20,Model Response 1,[],"['share', 'collect', 'use']",0.0,0.0,0.0,[],"['healthdata', 'tracking', 'contact data', 'contactdata', 'accountinformation', 'usage data', 'health data', 'account information', 'usagedata']",0.0,0.0,0.0,[],[],0.0,0.0,0.0
-Mattermost_Architecture\Navigation.txt,openai:gpt-4o-2024-11-20,Model Response 2,[],"['share', 'collect', 'use']",0.0,0.0,0.0,[],"['healthdata', 'contact data', 'contactdata', 'usage data', 'health data', 'usagedata']",0.0,0.0,0.0,[],[],0.0,0.0,0.0
-Monica\README.txt,openai:gpt-4o-2024-11-20,Model Response 1,[],"['collect', 'use']",0.0,0.0,0.0,[],"['accountinformation', 'contact data', 'account information', 'contactdata']",0.0,0.0,0.0,[],[],0.0,0.0,0.0
-Monica\README.txt,openai:gpt-4o-2024-11-20,Model Response 2,[],"['collect', 'use']",0.0,0.0,0.0,[],"['contact data', 'contactdata', 'accountinformation', 'usage data', 'account information', 'usagedata']",0.0,0.0,0.0,[],[],0.0,0.0,0.0
-openMRS\Architecture.txt,openai:gpt-4o-2024-11-20,Model Response 1,[],['use'],0.0,0.0,0.0,[],"['usage data', 'usagedata']",0.0,0.0,0.0,[],[],0.0,0.0,0.0
-openMRS\Architecture.txt,openai:gpt-4o-2024-11-20,Model Response 2,[],"['collect', 'use']",0.0,0.0,0.0,[],"['accountinformation', 'usage data', 'account information', 'usagedata']",0.0,0.0,0.0,[],[],0.0,0.0,0.0
-OpenTracks\data-structure.txt,openai:gpt-4o-2024-11-20,Model Response 1,[],"['collect', 'use']",0.0,0.0,0.0,[],"['usage data', 'usagedata']",0.0,0.0,0.0,[],[],0.0,0.0,0.0
-OpenTracks\data-structure.txt,openai:gpt-4o-2024-11-20,Model Response 2,[],"['collect', 'use']",0.0,0.0,0.0,[],"['usage data', 'tracking', 'usagedata']",0.0,0.0,0.0,[],[],0.0,0.0,0.0
-peertube\managing-users.txt,openai:gpt-4o-2024-11-20,Model Response 1,[],"['share', 'collect', 'use']",0.0,0.0,0.0,[],['location'],0.0,0.0,0.0,[],[],0.0,0.0,0.0
-peertube\managing-users.txt,openai:gpt-4o-2024-11-20,Model Response 2,[],"['share', 'collect', 'use']",0.0,0.0,0.0,[],"['tracking', 'contact data', 'contactdata', 'accountinformation', 'usage data', 'account information', 'usagedata']",0.0,0.0,0.0,[],[],0.0,0.0,0.0
-sharetribe\analyrics-events.txt,openai:gpt-4o-2024-11-20,Model Response 1,[],"['share', 'collect', 'use']",0.0,0.0,0.0,[],"['tracking', 'contact data', 'contactdata', 'financial', 'accountinformation', 'usage data', 'account information', 'usagedata']",0.0,0.0,0.0,[],[],0.0,0.0,0.0
-sharetribe\analyrics-events.txt,openai:gpt-4o-2024-11-20,Model Response 2,[],"['collect', 'use']",0.0,0.0,0.0,[],"['tracking', 'contact data', 'contactdata', 'accountinformation', 'usage data', 'account information', 'usagedata']",0.0,0.0,0.0,[],[],0.0,0.0,0.0
-Synapse\account_data_callbacks.txt,openai:gpt-4o-2024-11-20,Model Response 1,[],"['collect', 'use']",0.0,0.0,0.0,[],"['accountinformation', 'contact data', 'account information', 'contactdata']",0.0,0.0,0.0,[],[],0.0,0.0,0.0
-Synapse\account_data_callbacks.txt,openai:gpt-4o-2024-11-20,Model Response 2,[],"['collect', 'use']",0.0,0.0,0.0,[],"['accountinformation', 'account information']",0.0,0.0,0.0,[],[],0.0,0.0,0.0
-Synapse\account_validity_callbacks.txt,openai:gpt-4o-2024-11-20,Model Response 1,[],"['collect', 'use']",0.0,0.0,0.0,[],"['accountinformation', 'account information']",0.0,0.0,0.0,[],[],0.0,0.0,0.0
-Synapse\account_validity_callbacks.txt,openai:gpt-4o-2024-11-20,Model Response 2,[],"['collect', 'use']",0.0,0.0,0.0,[],"['accountinformation', 'account information']",0.0,0.0,0.0,[],[],0.0,0.0,0.0
-Synapse\password_auth_provider_callbacks.txt,openai:gpt-4o-2024-11-20,Model Response 1,[],"['collect', 'use']",0.0,0.0,0.0,[],"['accountinformation', 'account information']",0.0,0.0,0.0,[],[],0.0,0.0,0.0
-Synapse\password_auth_provider_callbacks.txt,openai:gpt-4o-2024-11-20,Model Response 2,[],"['collect', 'use']",0.0,0.0,0.0,[],"['accountinformation', 'account information']",0.0,0.0,0.0,[],[],0.0,0.0,0.0
-TracDev_Docs\DatabaseSchema.txt,openai:gpt-4o-2024-11-20,Model Response 1,[],"['collect', 'use']",0.0,0.0,0.0,[],"['accountinformation', 'account information']",0.0,0.0,0.0,[],[],0.0,0.0,0.0
-TracDev_Docs\DatabaseSchema.txt,openai:gpt-4o-2024-11-20,Model Response 2,[],"['collect', 'use']",0.0,0.0,0.0,[],"['accountinformation', 'contact data', 'account information', 'contactdata']",0.0,0.0,0.0,[],[],0.0,0.0,0.0
-TracDev_Docs\INotificationDistributor.txt,openai:gpt-4o-2024-11-20,Model Response 1,[],"['collect', 'use']",0.0,0.0,0.0,[],"['accountinformation', 'contact data', 'account information', 'contactdata']",0.0,0.0,0.0,[],[],0.0,0.0,0.0
-TracDev_Docs\INotificationDistributor.txt,openai:gpt-4o-2024-11-20,Model Response 2,[],"['share', 'collect', 'use']",0.0,0.0,0.0,[],"['contact data', 'contactdata', 'accountinformation', 'usage data', 'account information', 'usagedata']",0.0,0.0,0.0,[],[],0.0,0.0,0.0
-TracDev_Docs\INotificationSubscriber.txt,openai:gpt-4o-2024-11-20,Model Response 1,[],"['collect', 'use']",0.0,0.0,0.0,[],"['contact data', 'contactdata', 'accountinformation', 'usage data', 'account information', 'usagedata']",0.0,0.0,0.0,[],[],0.0,0.0,0.0
-TracDev_Docs\INotificationSubscriber.txt,openai:gpt-4o-2024-11-20,Model Response 2,[],"['collect', 'use']",0.0,0.0,0.0,[],[],0.0,0.0,0.0,[],[],0.0,0.0,0.0
-Zulip\file.txt,openai:gpt-4o-2024-11-20,Model Response 1,[],"['share', 'collect', 'use']",0.0,0.0,0.0,[],"['healthdata', 'contact data', 'contactdata', 'financial', 'accountinformation', 'usage data', 'health data', 'account information', 'usagedata']",0.0,0.0,0.0,[],[],0.0,0.0,0.0
-Zulip\file.txt,openai:gpt-4o-2024-11-20,Model Response 2,[],"['share', 'collect', 'use']",0.0,0.0,0.0,[],"['healthdata', 'tracking', 'contact data', 'contactdata', 'accountinformation', 'usage data', 'health data', 'account information', 'usagedata']",0.0,0.0,0.0,[],[],0.0,0.0,0.0
+File,Model,Response,Actions F1,Actions Precision,Actions Recall,Data Types F1,Data Types Precision,Data Types Recall,Purposes F1,Purposes Precision,Purposes Recall,Overall F1,Overall Precision,Overall Recall
+Accounts_&_Transactions.txt,groq:gemma2-9b-it,Model Response 1,1.0,1.0,1.0,0.4,1.0,0.25,0.8,1.0,0.6666666666666666,0.7333333333333334,1.0,0.6388888888888888
+Accounts_&_Transactions.txt,groq:gemma2-9b-it,Model Response 2,1.0,1.0,1.0,0.6666666666666666,1.0,0.5,0.8,1.0,0.6666666666666666,0.8222222222222223,1.0,0.7222222222222222
+CreatingAnewAccount.txt,groq:gemma2-9b-it,Model Response 1,1.0,1.0,1.0,0.8888888888888888,1.0,0.8,1.0,1.0,1.0,0.9629629629629629,1.0,0.9333333333333332
+CreatingAnewAccount.txt,groq:gemma2-9b-it,Model Response 2,1.0,1.0,1.0,0.8888888888888888,1.0,0.8,1.0,1.0,1.0,0.9629629629629629,1.0,0.9333333333333332
+features.txt,groq:gemma2-9b-it,Model Response 1,1.0,1.0,1.0,1.0,1.0,1.0,0.6666666666666666,1.0,0.5,0.8888888888888888,1.0,0.8333333333333334
+features.txt,groq:gemma2-9b-it,Model Response 2,1.0,1.0,1.0,0.0,0.0,0.0,1.0,1.0,1.0,0.6666666666666666,0.6666666666666666,0.6666666666666666
+add_threePids.txt,groq:gemma2-9b-it,Model Response 1,0.8,1.0,0.6666666666666666,0.0,0.0,0.0,0.5,1.0,0.3333333333333333,0.43333333333333335,0.6666666666666666,0.3333333333333333
+add_threePids.txt,groq:gemma2-9b-it,Model Response 2,0.5,1.0,0.3333333333333333,0.4,1.0,0.25,0.5,1.0,0.3333333333333333,0.4666666666666666,1.0,0.3055555555555555
+account-basics.txt,groq:gemma2-9b-it,Model Response 1,0.5,1.0,0.3333333333333333,1.0,1.0,1.0,1.0,1.0,1.0,0.8333333333333334,1.0,0.7777777777777777
+account-basics.txt,groq:gemma2-9b-it,Model Response 2,0.8,1.0,0.6666666666666666,1.0,1.0,1.0,1.0,1.0,1.0,0.9333333333333332,1.0,0.8888888888888888
+signups.txt,groq:gemma2-9b-it,Model Response 1,0.6666666666666666,1.0,0.5,1.0,1.0,1.0,0.8,1.0,0.6666666666666666,0.8222222222222223,1.0,0.7222222222222222
+signups.txt,groq:gemma2-9b-it,Model Response 2,0.6666666666666666,1.0,0.5,0.6666666666666666,1.0,0.5,0.8,1.0,0.6666666666666666,0.7111111111111111,1.0,0.5555555555555555
+userdetails.txt,groq:gemma2-9b-it,Model Response 1,0.6666666666666666,1.0,0.5,1.0,1.0,1.0,0.8,1.0,0.6666666666666666,0.8222222222222223,1.0,0.7222222222222222
+userdetails.txt,groq:gemma2-9b-it,Model Response 2,0.6666666666666666,1.0,0.5,1.0,1.0,1.0,0.8,1.0,0.6666666666666666,0.8222222222222223,1.0,0.7222222222222222
+configurations.txt,groq:gemma2-9b-it,Model Response 1,0.8,1.0,0.6666666666666666,1.0,1.0,1.0,1.0,1.0,1.0,0.9333333333333332,1.0,0.8888888888888888
+configurations.txt,groq:gemma2-9b-it,Model Response 2,0.5,1.0,0.3333333333333333,0.6666666666666666,1.0,0.5,0.6666666666666666,1.0,0.5,0.611111111111111,1.0,0.4444444444444444
+Getting Started.txt,groq:gemma2-9b-it,Model Response 1,0.8,1.0,0.6666666666666666,1.0,1.0,1.0,0.8,1.0,0.6666666666666666,0.8666666666666667,1.0,0.7777777777777777
+Getting Started.txt,groq:gemma2-9b-it,Model Response 2,0.8,1.0,0.6666666666666666,1.0,1.0,1.0,0.8,1.0,0.6666666666666666,0.8666666666666667,1.0,0.7777777777777777
+profile-preferences.txt,groq:gemma2-9b-it,Model Response 1,0.6666666666666666,1.0,0.5,1.0,1.0,1.0,1.0,1.0,1.0,0.8888888888888888,1.0,0.8333333333333334
+profile-preferences.txt,groq:gemma2-9b-it,Model Response 2,0.6666666666666666,1.0,0.5,1.0,1.0,1.0,0.8,1.0,0.6666666666666666,0.8222222222222223,1.0,0.7222222222222222
+Direct_Messaging_README.txt,groq:gemma2-9b-it,Model Response 1,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+Direct_Messaging_README.txt,groq:gemma2-9b-it,Model Response 2,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+Navigation.txt,groq:gemma2-9b-it,Model Response 1,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+Navigation.txt,groq:gemma2-9b-it,Model Response 2,0.0,0.0,0.0,0.0,0.0,0.0,1.0,1.0,1.0,0.3333333333333333,0.3333333333333333,0.3333333333333333
+README.txt,groq:gemma2-9b-it,Model Response 1,1.0,1.0,1.0,0.4,1.0,0.25,0.5,1.0,0.3333333333333333,0.6333333333333333,1.0,0.5277777777777778
+README.txt,groq:gemma2-9b-it,Model Response 2,1.0,1.0,1.0,0.4,1.0,0.25,0.5,1.0,0.3333333333333333,0.6333333333333333,1.0,0.5277777777777778
+Architecture.txt,groq:gemma2-9b-it,Model Response 1,1.0,1.0,1.0,0.0,0.0,0.0,0.8,1.0,0.6666666666666666,0.6,0.6666666666666666,0.5555555555555555
+Architecture.txt,groq:gemma2-9b-it,Model Response 2,0.6666666666666666,1.0,0.5,0.0,0.0,0.0,0.8,1.0,0.6666666666666666,0.48888888888888893,0.6666666666666666,0.38888888888888884
+data-structure.txt,groq:gemma2-9b-it,Model Response 1,0.6666666666666666,1.0,0.5,0.0,0.0,0.0,0.5,1.0,0.3333333333333333,0.38888888888888884,0.6666666666666666,0.27777777777777773
+data-structure.txt,groq:gemma2-9b-it,Model Response 2,0.4,1.0,0.25,0.0,0.0,0.0,0.5,1.0,0.3333333333333333,0.3,0.6666666666666666,0.19444444444444442
+managing-users.txt,groq:gemma2-9b-it,Model Response 1,0.5,1.0,0.3333333333333333,0.8,1.0,0.6666666666666666,0.6666666666666666,1.0,0.5,0.6555555555555556,1.0,0.5
+managing-users.txt,groq:gemma2-9b-it,Model Response 2,0.5,1.0,0.3333333333333333,0.8,1.0,0.6666666666666666,0.6666666666666666,1.0,0.5,0.6555555555555556,1.0,0.5
+analyrics-events.txt,groq:gemma2-9b-it,Model Response 1,1.0,1.0,1.0,0.6666666666666666,1.0,0.5,1.0,1.0,1.0,0.8888888888888888,1.0,0.8333333333333334
+analyrics-events.txt,groq:gemma2-9b-it,Model Response 2,0.8,1.0,0.6666666666666666,0.6666666666666666,1.0,0.5,1.0,1.0,1.0,0.8222222222222223,1.0,0.7222222222222222
+account_data_callbacks.txt,groq:gemma2-9b-it,Model Response 1,0.6666666666666666,1.0,0.5,0.0,0.0,0.0,0.0,0.0,0.0,0.2222222222222222,0.3333333333333333,0.16666666666666666
+account_data_callbacks.txt,groq:gemma2-9b-it,Model Response 2,1.0,1.0,1.0,0.0,0.0,0.0,0.6666666666666666,1.0,0.5,0.5555555555555555,0.6666666666666666,0.5
+account_validity_callbacks.txt,groq:gemma2-9b-it,Model Response 1,0.0,0.0,0.0,1.0,1.0,1.0,0.0,0.0,0.0,0.3333333333333333,0.3333333333333333,0.3333333333333333
+account_validity_callbacks.txt,groq:gemma2-9b-it,Model Response 2,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+password_auth_provider_callbacks.txt,groq:gemma2-9b-it,Model Response 1,1.0,1.0,1.0,0.5,1.0,0.3333333333333333,1.0,1.0,1.0,0.8333333333333334,1.0,0.7777777777777777
+password_auth_provider_callbacks.txt,groq:gemma2-9b-it,Model Response 2,0.6666666666666666,1.0,0.5,0.5,1.0,0.3333333333333333,0.0,0.0,0.0,0.38888888888888884,0.6666666666666666,0.27777777777777773
+DatabaseSchema.txt,groq:gemma2-9b-it,Model Response 1,1.0,1.0,1.0,1.0,1.0,1.0,0.6666666666666666,1.0,0.5,0.8888888888888888,1.0,0.8333333333333334
+DatabaseSchema.txt,groq:gemma2-9b-it,Model Response 2,1.0,1.0,1.0,1.0,1.0,1.0,0.6666666666666666,1.0,0.5,0.8888888888888888,1.0,0.8333333333333334
+INotificationDistributor.txt,groq:gemma2-9b-it,Model Response 1,1.0,1.0,1.0,0.4,1.0,0.25,0.8571428571428571,1.0,0.75,0.7523809523809524,1.0,0.6666666666666666
+INotificationDistributor.txt,groq:gemma2-9b-it,Model Response 2,1.0,1.0,1.0,0.6666666666666666,1.0,0.5,0.8571428571428571,1.0,0.75,0.8412698412698413,1.0,0.75
+INotificationSubscriber.txt,groq:gemma2-9b-it,Model Response 1,1.0,1.0,1.0,0.6666666666666666,1.0,0.5,1.0,1.0,1.0,0.8888888888888888,1.0,0.8333333333333334
+INotificationSubscriber.txt,groq:gemma2-9b-it,Model Response 2,1.0,1.0,1.0,0.6666666666666666,1.0,0.5,0.8,1.0,0.6666666666666666,0.8222222222222223,1.0,0.7222222222222222
+file.txt,groq:gemma2-9b-it,Model Response 1,1.0,1.0,1.0,1.0,1.0,1.0,0.6666666666666666,1.0,0.5,0.8888888888888888,1.0,0.8333333333333334
+file.txt,groq:gemma2-9b-it,Model Response 2,1.0,1.0,1.0,1.0,1.0,1.0,0.6666666666666666,1.0,0.5,0.8888888888888888,1.0,0.8333333333333334

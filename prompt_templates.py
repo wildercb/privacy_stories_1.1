@@ -168,13 +168,6 @@ def create_judge_prompt(original_prompt: str, response_1: str, response_2: str, 
         "4. Depth: Does the response demonstrate a deeper understanding of the topic?\n\n"
         "Explicitly output \"1\" if Response 1 is better, and \"2\" if Response 2 is better."
     )
-
-    if annotations:
-        prompt += "\n\nExpected annotations based on the provided information:\n"
-        prompt += f"Actions: {', '.join(annotations.get('actions', []))}\n"
-        prompt += f"Data Types: {', '.join(annotations.get('data_types', []))}\n"
-        prompt += f"Purposes: {', '.join(annotations.get('purposes', []))}\n"
-
     prompt += "\n\nHere is the original prompt:\n\n"
     prompt += f"{original_prompt}\n\n"
 

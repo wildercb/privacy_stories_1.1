@@ -1,0 +1,54 @@
+/home/wbaldwin/Desktop/privacy_stories_1
+node-g105
+Mon Dec  9 09:01:53 EST 2024
+Initializing conda
+Mon Dec  9 09:01:54 EST 2024
+runnning pretraining script
+🦥 Unsloth: Will patch your computer to enable 2x faster free finetuning.
+🦥 Unsloth Zoo will now patch everything to make training faster!
+
+First few rows of training dataset:
+                                            Question  ...                                           rejected
+0  You are a privacy expert annotator tasked with...  ...  "### Annotations\n\nActions:  \n- Use  \n- Pro...
+1  You are a privacy expert annotator tasked with...  ...  "### Annotations:\n\n**Actions:**\n- Collect\n...
+2  You are a privacy expert annotator tasked with...  ...  "### Annotations:\n\n#### Actions:\n- Collect\...
+3  You are a privacy expert annotator tasked with...  ...  "### Annotations:\n\n**Actions:**  \n1. Collec...
+4  You are a privacy expert annotator tasked with...  ...  "### Annotations:\n\n#### Actions:\n- Collect\...
+
+[5 rows x 4 columns]
+
+First few rows of test dataset:
+                                            Question  ...                                           rejected
+0  You are a privacy expert annotator tasked with...  ...  "**Annotations:**\n\n**Actions:**\n- Collect\n...
+1  You are a privacy expert annotator tasked with...  ...  "### Annotations:\n\n#### Actions:\n- Collect\...
+2  You are a privacy expert annotator tasked with...  ...  "### Annotations:\n\n**Actions:**  \n- Collect...
+3  You are a privacy expert annotator tasked with...  ...  "### Annotations:\n\n**Actions**:  \n- Collect...
+4  You are a privacy expert annotator tasked with...  ...  "### Annotations:\n\n**Actions:**  \n- Collect...
+
+[5 rows x 4 columns]
+==((====))==  Unsloth 2024.12.4: Fast Llama patching. Transformers:4.47.0.
+   \\   /|    GPU: NVIDIA A100-SXM4-40GB. Max memory: 39.496 GB. Platform: Linux.
+O^O/ \_/ \    Torch: 2.5.1+cu124. CUDA: 8.0. CUDA Toolkit: 12.4. Triton: 3.1.0
+\        /    Bfloat16 = TRUE. FA [Xformers = 0.0.28.post3. FA2 = False]
+ "-____-"     Free Apache license: http://github.com/unslothai/unsloth
+Unsloth: Fast downloading is enabled - ignore downloading bars which are red colored!
+Traceback (most recent call last):
+  File "/home/wbaldwin/Desktop/privacy_stories_1/trainllama.py", line 44, in <module>
+    model, tokenizer = FastLanguageModel.from_pretrained(
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/wbaldwin/.conda/envs/prillm/lib/python3.12/site-packages/unsloth/models/loader.py", line 256, in from_pretrained
+    model, tokenizer = dispatch_model.from_pretrained(
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/wbaldwin/.conda/envs/prillm/lib/python3.12/site-packages/unsloth/models/llama.py", line 1663, in from_pretrained
+    model = AutoModelForCausalLM.from_pretrained(
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/wbaldwin/.conda/envs/prillm/lib/python3.12/site-packages/transformers/models/auto/auto_factory.py", line 564, in from_pretrained
+    return model_class.from_pretrained(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/wbaldwin/.conda/envs/prillm/lib/python3.12/site-packages/transformers/modeling_utils.py", line 4342, in from_pretrained
+    dispatch_model(model, **device_map_kwargs)
+  File "/home/wbaldwin/.conda/envs/prillm/lib/python3.12/site-packages/accelerate/big_modeling.py", line 498, in dispatch_model
+    model.to(device)
+  File "/home/wbaldwin/.conda/envs/prillm/lib/python3.12/site-packages/transformers/modeling_utils.py", line 3154, in to
+    raise ValueError(
+ValueError: Calling `to()` is not supported for `4-bit` quantized models with the installed version of bitsandbytes. The current device is `cuda:0`. If you intended to move the model, please install bitsandbytes >= 0.43.2.
