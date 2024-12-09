@@ -223,52 +223,6 @@ def run_hf_prompts(
                 model_responses[model_name][-1].append(f"ERROR LOADING MODEL: {str(model_error)}")
     
     return model_responses
-
-def save_responses_to_csv(model_responses: dict, output_dir: str):
-    """
-    Save model responses to CSV files in the specified output directory
-
-    Args:
-        model_responses (dict): Dictionary of model responses
-        output_dir (str): Directory to save CSV files
-    """
-    for model_name, prompt_responses in model_responses.items():
-        # Create a safe filename by replacing invalid characters
-        safe_model_name = "".join(c if c.isalnum() or c in ('-', '_') else '_' for c in model_name)
-        csv_filename = os.path.join(output_dir, f"{safe_model_name}_responses.csv")
-        
-        # Write responses to CSV
-        with open(csv_filename, 'w', newline='', encoding='utf-8') as csvfile:
-            csv_writer = csv.writer(csvfile)
-            csv_writer.writerow(['Prompt', 'Run', 'Response'])
-            
-            for prompt_idx, runs in enumerate(prompt_responses):
-                for run_idx, response in enumerate(runs):
-                    csv_writer.writerow([f"Prompt {prompt_idx + 1}", f"Run {run_idx + 1}", response])
-        
-        print(f"Responses for {model_name} saved to {csv_filename}")
-
-# Example usage
-if __name__ == "__main__":
-    # Example list of models (replace with actual Hugging Face model names)
-    model_list = [
-        "gpt2",  # Small GPT-2 model
-        "distilgpt2",  # Distilled version of GPT-2
-        "EleutherAI/gpt-neo-125M"  # GPT-Neo 125M model
-    ]
-    
-    prompts = [
-        "Tell me a short story about a brave adventurer.",
-        "Explain the basics of quantum computing in simple terms."
-    ]
-    
-    # Run models with responses saved to 'model_outputs' directory
-    responses = run_multi_model_prompts(
-        models=model_list, 
-        prompts=prompts, 
-        num_runs=2, 
-        output_dir="model_outputs"
-    )
 '''
 import openai
 import json
