@@ -1,0 +1,135 @@
+{
+    "User and Developer Guides": [
+        {
+            "filename": "profile-preferences.txt",
+            "filepath": "/Users/shreyash/Downloads/privacy_stories_1.1/Annotations/koel/profile-preferences.txt",
+            "classification": "User and Developer Guides"
+        },
+        {
+            "filename": "signups.txt",
+            "filepath": "/Users/shreyash/Downloads/privacy_stories_1.1/Annotations/gotosocial/signups.txt",
+            "classification": "User and Developer Guides"
+        },
+        {
+            "filename": "Getting Started.txt",
+            "filepath": "/Users/shreyash/Downloads/privacy_stories_1.1/Annotations/joinlemmy/Getting Started.txt",
+            "classification": "User and Developer Guides"
+        },
+        {
+            "filename": "features.txt",
+            "filepath": "/Users/shreyash/Downloads/privacy_stories_1.1/Annotations/Attendize/features.txt",
+            "classification": "User and Developer Guides"
+        },
+        {
+            "filename": "userdetails.txt",
+            "filepath": "/Users/shreyash/Downloads/privacy_stories_1.1/Annotations/invoiceninja/userdetails.txt",
+            "classification": "User and Developer Guides"
+        },
+        {
+            "filename": "managing-users.txt",
+            "filepath": "/Users/shreyash/Downloads/privacy_stories_1.1/Annotations/peertube/managing-users.txt",
+            "classification": "User and Developer Guides"
+        },
+        {
+            "filename": "file.txt",
+            "filepath": "/Users/shreyash/Downloads/privacy_stories_1.1/Annotations/Zulip/file.txt",
+            "classification": "User and Developer Guides"
+        },
+        {
+            "filename": "Navigation.txt",
+            "filepath": "/Users/shreyash/Downloads/privacy_stories_1.1/Annotations/Mattermost_Architecture/Navigation.txt",
+            "classification": "User and Developer Guides"
+        },
+        {
+            "filename": "Backup_&_Restore.txt",
+            "filepath": "/Users/shreyash/Downloads/privacy_stories_1.1/Annotations/Actual_Budget/Backup_&_Restore.txt",
+            "classification": "User and Developer Guides"
+        },
+        {
+            "filename": "analyrics-events.txt",
+            "filepath": "/Users/shreyash/Downloads/privacy_stories_1.1/Annotations/sharetribe/analyrics-events.txt",
+            "classification": "User and Developer Guides"
+        }
+    ],
+    "Architecture and Database Design Documents": [
+        {
+            "filename": "Architecture.txt",
+            "filepath": "/Users/shreyash/Downloads/privacy_stories_1.1/Annotations/openMRS/Architecture.txt",
+            "classification": "Architecture and Database Design Documents"
+        },
+        {
+            "filename": "DatabaseSchema.txt",
+            "filepath": "/Users/shreyash/Downloads/privacy_stories_1.1/Annotations/TracDev_Docs/DatabaseSchema.txt",
+            "classification": "Architecture and Database Design Documents"
+        },
+        {
+            "filename": "INotificationDistributor.txt",
+            "filepath": "/Users/shreyash/Downloads/privacy_stories_1.1/Annotations/TracDev_Docs/INotificationDistributor.txt",
+            "classification": "Architecture and Database Design Documents"
+        },
+        {
+            "filename": "INotificationSubscriber.txt",
+            "filepath": "/Users/shreyash/Downloads/privacy_stories_1.1/Annotations/TracDev_Docs/INotificationSubscriber.txt",
+            "classification": "Architecture and Database Design Documents"
+        },
+        {
+            "filename": "data-structure.txt",
+            "filepath": "/Users/shreyash/Downloads/privacy_stories_1.1/Annotations/OpenTracks/data-structure.txt",
+            "classification": "Architecture and Database Design Documents"
+        }
+    ],
+    "Code Specification Documents": [
+        {
+            "filename": "add_threePids.txt",
+            "filepath": "/Users/shreyash/Downloads/privacy_stories_1.1/Annotations/element-android/add_threePids.txt",
+            "classification": "Code Specification Documents"
+        },
+        {
+            "filename": "CreatingAnewAccount.txt",
+            "filepath": "/Users/shreyash/Downloads/privacy_stories_1.1/Annotations/Akaunting/CreatingAnewAccount.txt",
+            "classification": "Code Specification Documents"
+        },
+        {
+            "filename": "configurations.txt",
+            "filepath": "/Users/shreyash/Downloads/privacy_stories_1.1/Annotations/jitsi-meet/configurations.txt",
+            "classification": "Code Specification Documents"
+        },
+        {
+            "filename": "Accounts_&_Transactions.txt",
+            "filepath": "/Users/shreyash/Downloads/privacy_stories_1.1/Annotations/Actual_Budget/Accounts_&_Transactions.txt",
+            "classification": "Code Specification Documents"
+        },
+        {
+            "filename": "account-basics.txt",
+            "filepath": "/Users/shreyash/Downloads/privacy_stories_1.1/Annotations/friendica/account-basics.txt",
+            "classification": "Code Specification Documents"
+        },
+        {
+            "filename": "password_auth_provider_callbacks.txt",
+            "filepath": "/Users/shreyash/Downloads/privacy_stories_1.1/Annotations/Synapse/password_auth_provider_callbacks.txt",
+            "classification": "Code Specification Documents"
+        },
+        {
+            "filename": "account_data_callbacks.txt",
+            "filepath": "/Users/shreyash/Downloads/privacy_stories_1.1/Annotations/Synapse/account_data_callbacks.txt",
+            "classification": "Code Specification Documents"
+        },
+        {
+            "filename": "account_validity_callbacks.txt",
+            "filepath": "/Users/shreyash/Downloads/privacy_stories_1.1/Annotations/Synapse/account_validity_callbacks.txt",
+            "classification": "Code Specification Documents"
+        }
+    ],
+    "README Files": [
+        {
+            "filename": "README.txt",
+            "filepath": "/Users/shreyash/Downloads/privacy_stories_1.1/Annotations/Monica/README.txt",
+            "classification": "README Files"
+        },
+        {
+            "filename": "Direct_Messaging_README.txt",
+            "filepath": "/Users/shreyash/Downloads/privacy_stories_1.1/Annotations/lh-ehr/Direct_Messaging_README.txt",
+            "classification": "README Files"
+        }
+    ]
+}
