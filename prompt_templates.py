@@ -158,14 +158,12 @@ def create_0_shot_annotation_prompt(example_file: Dict, target_text: str, ontolo
 
 # Create the judge prompt template
 def create_judge_prompt(original_prompt: str, response_1: str, response_2: str, annotations: dict = None) -> str:
-    """Creates a judge prompt that compares two model responses and explicitly selects the better one."""
     prompt = (
         "You are an impartial judge evaluating responses to a given prompt. Your task is to assess the quality of two responses and select the better one.\n\n"
         "Consider the following criteria when making your decision:\n"
-        "1. Completeness: Does the response fully address the original prompt?\n"
-        "2. Clarity: Is the response easy to understand and well-organized?\n"
-        "3. Accuracy: Is the information provided correct and relevant?\n"
-        "4. Depth: Does the response demonstrate a deeper understanding of the topic?\n\n"
+        "1. Completeness: Does the response fully address the original prompt? Do they hallucinate behaviors if so mark down, the biggest flaw of models at this task is over completeness.\n"
+        "2. Clarity: Is the response easy to understand and well-organized in a way that clearly displays privacy behaviors and stories?\n"
+        "3. Accuracy: Is the information provided correct and relevant in accordance to the original file.\n"
         "Explicitly output \"1\" if Response 1 is better, and \"2\" if Response 2 is better."
     )
     prompt += "\n\nHere is the original prompt:\n\n"
