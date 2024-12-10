@@ -25,7 +25,7 @@ utils.ipynb walks through the evaluation of models for F1 score and ELO rating.
 ```python annotate.py``` can be used to open our annotation file allowing for preference choices.
 
 #### Training
-trainllama.py walks through our fine-tuning approach. utils.ipynb walks through the creation of training data from prefference data. 
+trainllama.py walks through our fine-tuning approach. utils.ipynb walks through the creation of training data from prefference data. llamainf.py will inference the model created from this training script with our task. 
 
 
 ### Requirements 
