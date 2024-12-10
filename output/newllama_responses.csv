@@ -1,0 +1,2373 @@
+Original Prompt,Model Response 1,Target Annotations,Model
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+"You are a privacy expert annotator tasked with annotating text files with metadata about privacy behaviors and stories. For the given text, annotate the following:
+
+1. Actions: Actions performed or expected in the text.
+2. Data Types: Types of data referenced in the text. Data types may include specific subcategories.
+3. Purposes: Intentions or purposes related to the actions and data types.
+4. Stories: Concise stories that describe how actions, data types, and purposes interact in context.
+
+After providing your annotations, explain your rationale for these annotations. Place <R> tag between your annotations and your rationale.
+
+Use only the categories listed below when annotating:
+
+Actions:
+Collect, Use, Share
+
+Data Types:
+Contact Data:
+  Phone Number:
+  Email address:
+  User ID:
+  Job Title:
+  Company:
+  Address:
+  Name:
+  Date of Birth:
+  Image:
+  Government ID:
+  Biographical Data:
+    CV:
+    Education:
+    Employment:
+Health Data:
+  Physical activity:
+Social Media:
+Location:
+  Approximate location:
+  Precise location:
+Financial:
+  Orders:
+  Payment History:
+  Purchase History:
+  Order:
+  Card Data:
+  Bank Account:
+  Credit Score:
+  Income Information:
+  assets:
+    vehicle:
+    Insurance:
+Usage Data:
+  App Interactions:
+    Pages Visited:
+    Timestamps:
+    Interaction with Ads:
+    User Engagement:
+    Session ID:
+  Device Information:
+    IP Address:
+    Device ID:
+    Advertisement ID:
+    Browser:
+    Operating System:
+    Diagnostics:
+    Sensor Data:
+    Audio:
+    Browsing history:
+Tracking:
+  Cookies:
+  Web Beacons:
+  Tags:
+Account Information:
+  User id:
+  Username:
+  Password:
+  Account Balance:
+  Messages:
+  Friends:
+
+Purposes:
+Contact, Analytics, Customization, Advertisement, Security, Tracking, Functionality, Accounts, Requirements
+
+Here is the text:
+
+Full Cleaned Text:
+This page was a draft. See
+TracDev/PluginDevelopment/ExtensionPoints/trac.notification.api.INotificationSubscriber
+page now.
+{#s   
+The
+Open questions
+section might still contain unimplemented ideas.
+Extension Point :
+INotificationSubscriber
+Interface
+INotificationSubscriber
+Since
+1.1.3
+Module
+trac.notification
+Source
+api.py
+â€‹
+The
+INotificationSubscriber
+subscribes users to
+notification
+events.
+Purpose
+Trac provides an extendible and flexible notification system. Different people are interested in different kinds of notifications. Notification subscriptions allow administrators and / or users to configure the exact rules used that trigger sending of notifications.
+Usage
+Implementing the interface follows the standard guidelines found in
+TracDev/ComponentArchitecture
+and of course
+TracDev/PluginDevelopment
+.
+The main part of this interface is the
+match()
+function. It returns a list of subscriptions, in the form of tuples consisting of:
+class
+: The name of the Python class. (This could probably be removed.)
+distributor
+: Also known as
+transport
+. E.g. the string
+email
+. See
+INotificationDistributor
+.
+sid
+: The session ID of the subscriber. (Can be
+None
+if
+address
+is provided.)
+authenticated
+:
+1
+for authenticated session IDs,
+0
+for anonymous session IDs.
+address
+: The (email) address to use. (Can be
+None
+if
+sid
+is provided.)
+format
+: The MIME type to be used (e.g.
+text/plain
+or
+text/html
+.)
+priority
+: An integer priority. Smaller numbers have higher priority than bigger numbers.
+1
+is the highest priority.
+adverb
+: Either the string
+always
+or
+never
+.
+Since more than one component can handle the same realms and categories, the priorities and adverbs are used to resolve conflicting subscriptions.
+The implementation can use any means to determine if a user is interested in hearing about a given event.
+Most check that the appropriate conditions apply and then retrieve the required information from the
+subscription
+DB table.
+The subscriptions in that table are configured in a shared preferences panel that uses two other methods of this interface:
+The simple
+description()
+method returns a description string shown to the user in the preferences panel (or
+None
+if the plugin does use the
+subscriptions
+DB table.)
+The
+requires_authentication()
+method allows hiding the rule from unauthenticated users. (E.g. because only authenticated users can be ticket owners.)
+The
+default_subscriptions()
+method describes any  default subscriptions that automatically exist without the user configuring
+subscription
+DB entries in the preferences.
+These are also displayed on the preferences panel, but can not be directly modified there. (They usually can be overriden by non-default subscriptions.)
+The plugin still has to return the respective subscriptions from the
+matches()
+method.
+Default descriptions should be used when users can be determined by the event itself.
+For instance, ticket author has a default subscription that is controlled via trac.ini.
+Default subscriptions should be low priority (i.e. have a priority number much larger than
+1
+, like 100) so that the user can easily override them.
+Examples
+The following example implements a simple subscriber that can trigger notifications when a new ticket is created with a high priority level.
+from
+trac.core
+import
+*
+from
+trac.notification.api
+import
+INotificationSubscriber
+from
+trac.notification.model
+import
+Subscription
+class
+HighPriorityTicketNotificationSubscriber
+(
+Component
+):
+implements
+(
+INotificationSubscriber
+)
+# INotificationSubscriber methods
+def
+matches
+(
+self
+,
+event
+):
+if
+event
+.
+realm
+!=
+'ticket'
+:
+return
+if
+event
+.
+category
+!=
+'created'
+:
+return
+ticket
+=
+event
+.
+target
+if
+ticket
+[
+'priority'
+]
+not
+in
+(
+'blocker'
+,
+'critical'
+,
+'major'
+):
+return
+klass
+=
+self
+.
+__class__
+.
+__name__
+for
+i
+in
+Subscription
+.
+find_by_class
+(
+self
+.
+env
+,
+klass
+):
+yield
+i
+.
+subscription_tuple
+()
+def
+description
+(
+self
+):
+return
+""notify me when new high priority tickets are created""
+def
+requires_authentication
+(
+self
+):
+return
+False
+Available Implementations
+Several implementations are part of core Trac:
+trac.ticket.notification.AllTicketSubscriber
+Allows anyone to subscribe to all ticket change notifications.
+trac.ticket.notification.TicketOwnerSubscriber
+Allows ticket owners to subscribe to (or unsubscribe from) change notifications for owned tickets.
+trac.ticket.notification.TicketComponentOwnerSubscriber
+Allows component owners to subscribe to (or unsubscribe from) change notifications for tickets assigned to owned component.
+trac.ticket.notification.TicketUpdaterSubscriber
+Allows anyone to subscribe to (or unsubscribe from) change notifications for their own ticket changes.
+trac.ticket.notification.TicketReporterSubscriber
+Allows ticket reporters to subscribe to (or unsubscribe from) change notifications for tickets they created.
+trac.ticket.notification.CarbonCopySubscriber
+Allows anyone to subscribe to (or unsubscribe from) change notifications for tickets where they are listed in CC.
+Additional Information and References
+â€‹
+epydoc
+â€‹
+API Reference
+The precursor of this interface was
+IAnnouncementSubscriber
+from the
+â€‹
+th:AnnouncerPlugin
+.
+DONE
+The
+IAnnouncementDefaultSubscriber
+from the
+â€‹
+th:AnnouncerPlugin
+was also folded into this interface.
+Open Questions
+Merge
+description()
+and
+requires_authentication()
+These methods are both only used in the preferences panel.
+Merging them could be easier to understand and more flexible, allowing different requirement checks:
+def get_subscription_preference_description(self, req):
+        if req.is_authenticated and 'TICKET_ADMIN' in req.perm:
+            return ""notify me when an admin is needed""
+Remove
+class
+name
+The
+class
+item could be removed from the tuple returned by
+matches()
+. It's not really needed and clutters up each plugin with ugly
+klass = self.__class__.__name__
+lines.
+Counter-arguments:
+It helps debugging and can be logged.
+But if that's needed the
+NotificationSystem
+should do so, to avoid mistakes and simplify plugins.
+The
+subscription
+DB table requires that anyway.
+But it should be replaced there as well, e.g. by a freely chosen
+rule
+string.
+/}
+
+Here are the behaviors and the privacy requirements in the form of privacy stories we build from them:
+Privacy stories are built explicitly from our labelled privacy behaviors in the format of we (action) (data type) for (purpose)Actions: Collect, Use, Collect, Use
+Data Types: messages, username, messages, username
+Purposes: Functionality, Customization, Security, Functionality, Customization, Security
+Stories:
+1. we collect messages, username for security. We use messages, username for customization..
+
+This page was a draft. See
+
+TracDev/DatabaseSchema/NotificationSystem
+page now.
+The
+Open questions
+section might still contain unimplemented ideas.
+Table
+notify_subscription
+Table
+notify_watch
+Open Questions
+Trac Database Schema: Notification
+The
+TracNotification
+module stores notification event subscriptions in the database.
+Table
+notify_subscription
+Table
+Key
+notify_subscription
+id
+Columns
+Type
+Notes
+id
+auto_increment
+time
+int64
+changetime
+int64
+class
+The name of the Python class that stored this subscription.
+sid
+The
+session
+ID of the subscriber.
+authenticated
+int
+1
+for authenticated session IDs,
+0
+for anonymous session IDs
+distributor
+Identifies the distributor to used for this subscription (e.g.
+email
+)
+format
+Identifies the MIME type to be used for this subscription (e.g.
+text/plain
+or
+text/html
+)
+priority
+int
+Precedence level of this subscription. E.g.
+1
+overrules
+2
+.
+adverb
+always
+or
+never
+Indices
+sid
+,
+authenticated
+class
+Stores if a subscription rule always/never applies for a certain user, at what priority and using what distribution method/format.
+Use the
+trac.notification.model.Subscription
+model class to access this table.
+Note that this table does not store an (email) address, but the commonly used subscription tuple has an additional item
+addr
+. Usually such tuples that correspond to entries in this DB table contain a
+addr
+of
+None
+. Other tuples may contain an (email) address (e.g. retrieved from  a ticket CC field) but are missing the
+sid
+item instead.
+See
+trac.notification.model.Subscription
+​
+Table
+notify_watch
+Table
+Key
+notify_watch
+id
+Columns
+Type
+Notes
+id
+auto_increment
+sid
+The session ID of the subscriber.
+authenticated
+int
+1
+for authenticated session IDs,
+0
+for anonymous session IDs
+class
+The name of the Python class that stored this watch.
+realm
+The realm of this subscription (e.g.
+ticket
+).
+target
+The target of this subscription (e.g. a ticket id).
+Indices
+sid
+,
+authenticated
+,
+class
+class
+,
+realm
+,
+target
+Stores watches to identify the target resource(s) of a subscription (e.g. a watched ticket's id, wiki page filters, joined groups, etc.)
+Use the
+trac.notification.model.Watch
+model class to access this table.
+See
+trac.notification.model.Watch
+​
+Open Questions
+Rename
+class
+column?
+Something like
+rule
+might be more appropriate.
+See also
+INotificationSubscriber
+.
+Rename
+distributor
+column?
+transport
+might be more consistent.
+Rename tables?
+The current table names are taken from the
+​
+th:AnnouncerPlugin
+.
+Would this cause problems for users that already used that plugin?
+DONE
+Renamed
+subscription
+to
+notify_subscription
+.
+DONE
+Renamed
+subscription_attribute
+to
+notify_watch
+.
+Remove
+time
+and
+changetime
+columns?
+These are not really needed.
+
+
+Annotate the text with actions, data types, purposes, and stories as demonstrated, using only the categories from the list provided. For each annotation, provide your rationale and place <R> tag between your annotations and rationales.
+","**Actions:**
+
+* Collect: None
+* Use: None
+* Share: None
+
+**Data Types:**
+
+* Contact Data: None
+* Health Data: None
+* Social Media: None
+* Location: None
+* Financial: None
+* Usage Data: None
+* Tracking: None
+* Account Information: None
+
+**Purposes:**
+
+* Contact: None
+* Analytics: None
+* Customization: None
+* Advertisement: None
+* Security: None
+* Tracking: None
+* Functionality: None
+* Accounts: None
+* Requirements: None
+
+**Stories:**
+
+1. we collect messages, username for security. We use messages, username for customization. <R> The story highlights the collection of messages and username for security purposes, and the use of these data for customization.","{""file_name"": ""DatabaseSchema.txt"", ""full_cleaned_text"": ""This page was a draft. See\n{#s    \nTracDev/DatabaseSchema/NotificationSystem\npage now.\nThe\nOpen questions\nsection might still contain unimplemented ideas.\nTable\nnotify_subscription\nTable\nnotify_watch\nOpen Questions\nTrac Database Schema: Notification\nThe\nTracNotification\nmodule stores notification event subscriptions in the database.\nTable\nnotify_subscription\nTable\nKey\nnotify_subscription\nid\nColumns\nType\nNotes\nid\nauto_increment\ntime\nint64\nchangetime\nint64\nclass\nThe name of the Python class that stored this subscription.\nsid\nThe\nsession\nID of the subscriber.\nauthenticated\nint\n1\nfor authenticated session IDs,\n0\nfor anonymous session IDs\ndistributor\nIdentifies the distributor to used for this subscription (e.g.\nemail\n)\nformat\nIdentifies the MIME type to be used for this subscription (e.g.\ntext/plain\nor\ntext/html\n)\npriority\nint\nPrecedence level of this subscription. E.g.\n1\noverrules\n2\n.\nadverb\nalways\nor\nnever\nIndices\nsid\n,\nauthenticated\nclass\nStores if a subscription rule always/never applies for a certain user, at what priority and using what distribution method/format.\nUse the\ntrac.notification.model.Subscription\nmodel class to access this table.\nNote that this table does not store an (email) address, but the commonly used subscription tuple has an additional item\naddr\n. Usually such tuples that correspond to entries in this DB table contain a\naddr\nof\nNone\n. Other tuples may contain an (email) address (e.g. retrieved from  a ticket CC field) but are missing the\nsid\nitem instead.\nSee\ntrac.notification.model.Subscription\n\u00e2\u20ac\u2039\nTable\nnotify_watch\nTable\nKey\nnotify_watch\nid\nColumns\nType\nNotes\nid\nauto_increment\nsid\nThe session ID of the subscriber.\nauthenticated\nint\n1\nfor authenticated session IDs,\n0\nfor anonymous session IDs\nclass\nThe name of the Python class that stored this watch.\nrealm\nThe realm of this subscription (e.g.\nticket\n).\ntarget\nThe target of this subscription (e.g. a ticket id).\nIndices\nsid\n,\nauthenticated\n,\nclass\nclass\n,\nrealm\n,\ntarget\nStores watches to identify the target resource(s) of a subscription (e.g. a watched ticket's id, wiki page filters, joined groups, etc.)\nUse the\ntrac.notification.model.Watch\nmodel class to access this table.\nSee\ntrac.notification.model.Watch\n\u00e2\u20ac\u2039\nOpen Questions\nRename\nclass\ncolumn?\nSomething like\nrule\nmight be more appropriate.\nSee also\nINotificationSubscriber\n.\nRename\ndistributor\ncolumn?\ntransport\nmight be more consistent.\nRename tables?\nThe current table names are taken from the\n\u00e2\u20ac\u2039\nth:AnnouncerPlugin\n.\nWould this cause problems for users that already used that plugin?\nDONE\nRenamed\nsubscription\nto\nnotify_subscription\n.\nDONE\nRenamed\nsubscription_attribute\nto\nnotify_watch\n.\nRemove\ntime\nand\nchangetime\ncolumns?\nThese are not really needed.\n/}"", ""metadata"": {""actions"": [""Collect, Use"", ""Collect, Use""], ""data_types"": [""Email, Usage Data"", ""Email, Usage Data""], ""purposes"": [""Functionality, Authentication"", ""Functionality, Authentication""], ""stories"": [""We collect Email and Usage Data for functionality. We collect Email and usage data for authentication.""]}}",
+"You are a privacy expert annotator tasked with annotating text files with metadata about privacy behaviors and stories. For the given text, annotate the following:
+
+1. Actions: Actions performed or expected in the text.
+2. Data Types: Types of data referenced in the text. Data types may include specific subcategories.
+3. Purposes: Intentions or purposes related to the actions and data types.
+4. Stories: Concise stories that describe how actions, data types, and purposes interact in context.
+
+After providing your annotations, explain your rationale for these annotations. Place <R> tag between your annotations and your rationale.
+
+Use only the categories listed below when annotating:
+
+Actions:
+Collect, Use, Share
+
+Data Types:
+Contact Data:
+  Phone Number:
+  Email address:
+  User ID:
+  Job Title:
+  Company:
+  Address:
+  Name:
+  Date of Birth:
+  Image:
+  Government ID:
+  Biographical Data:
+    CV:
+    Education:
+    Employment:
+Health Data:
+  Physical activity:
+Social Media:
+Location:
+  Approximate location:
+  Precise location:
+Financial:
+  Orders:
+  Payment History:
+  Purchase History:
+  Order:
+  Card Data:
+  Bank Account:
+  Credit Score:
+  Income Information:
+  assets:
+    vehicle:
+    Insurance:
+Usage Data:
+  App Interactions:
+    Pages Visited:
+    Timestamps:
+    Interaction with Ads:
+    User Engagement:
+    Session ID:
+  Device Information:
+    IP Address:
+    Device ID:
+    Advertisement ID:
+    Browser:
+    Operating System:
+    Diagnostics:
+    Sensor Data:
+    Audio:
+    Browsing history:
+Tracking:
+  Cookies:
+  Web Beacons:
+  Tags:
+Account Information:
+  User id:
+  Username:
+  Password:
+  Account Balance:
+  Messages:
+  Friends:
+
+Purposes:
+Contact, Analytics, Customization, Advertisement, Security, Tracking, Functionality, Accounts, Requirements
+
+Here is the text:
+
+Full Cleaned Text:
+This page was a draft. See
+TracDev/PluginDevelopment/ExtensionPoints/trac.notification.api.INotificationSubscriber
+page now.
+{#s   
+The
+Open questions
+section might still contain unimplemented ideas.
+Extension Point :
+INotificationSubscriber
+Interface
+INotificationSubscriber
+Since
+1.1.3
+Module
+trac.notification
+Source
+api.py
+â€‹
+The
+INotificationSubscriber
+subscribes users to
+notification
+events.
+Purpose
+Trac provides an extendible and flexible notification system. Different people are interested in different kinds of notifications. Notification subscriptions allow administrators and / or users to configure the exact rules used that trigger sending of notifications.
+Usage
+Implementing the interface follows the standard guidelines found in
+TracDev/ComponentArchitecture
+and of course
+TracDev/PluginDevelopment
+.
+The main part of this interface is the
+match()
+function. It returns a list of subscriptions, in the form of tuples consisting of:
+class
+: The name of the Python class. (This could probably be removed.)
+distributor
+: Also known as
+transport
+. E.g. the string
+email
+. See
+INotificationDistributor
+.
+sid
+: The session ID of the subscriber. (Can be
+None
+if
+address
+is provided.)
+authenticated
+:
+1
+for authenticated session IDs,
+0
+for anonymous session IDs.
+address
+: The (email) address to use. (Can be
+None
+if
+sid
+is provided.)
+format
+: The MIME type to be used (e.g.
+text/plain
+or
+text/html
+.)
+priority
+: An integer priority. Smaller numbers have higher priority than bigger numbers.
+1
+is the highest priority.
+adverb
+: Either the string
+always
+or
+never
+.
+Since more than one component can handle the same realms and categories, the priorities and adverbs are used to resolve conflicting subscriptions.
+The implementation can use any means to determine if a user is interested in hearing about a given event.
+Most check that the appropriate conditions apply and then retrieve the required information from the
+subscription
+DB table.
+The subscriptions in that table are configured in a shared preferences panel that uses two other methods of this interface:
+The simple
+description()
+method returns a description string shown to the user in the preferences panel (or
+None
+if the plugin does use the
+subscriptions
+DB table.)
+The
+requires_authentication()
+method allows hiding the rule from unauthenticated users. (E.g. because only authenticated users can be ticket owners.)
+The
+default_subscriptions()
+method describes any  default subscriptions that automatically exist without the user configuring
+subscription
+DB entries in the preferences.
+These are also displayed on the preferences panel, but can not be directly modified there. (They usually can be overriden by non-default subscriptions.)
+The plugin still has to return the respective subscriptions from the
+matches()
+method.
+Default descriptions should be used when users can be determined by the event itself.
+For instance, ticket author has a default subscription that is controlled via trac.ini.
+Default subscriptions should be low priority (i.e. have a priority number much larger than
+1
+, like 100) so that the user can easily override them.
+Examples
+The following example implements a simple subscriber that can trigger notifications when a new ticket is created with a high priority level.
+from
+trac.core
+import
+*
+from
+trac.notification.api
+import
+INotificationSubscriber
+from
+trac.notification.model
+import
+Subscription
+class
+HighPriorityTicketNotificationSubscriber
+(
+Component
+):
+implements
+(
+INotificationSubscriber
+)
+# INotificationSubscriber methods
+def
+matches
+(
+self
+,
+event
+):
+if
+event
+.
+realm
+!=
+'ticket'
+:
+return
+if
+event
+.
+category
+!=
+'created'
+:
+return
+ticket
+=
+event
+.
+target
+if
+ticket
+[
+'priority'
+]
+not
+in
+(
+'blocker'
+,
+'critical'
+,
+'major'
+):
+return
+klass
+=
+self
+.
+__class__
+.
+__name__
+for
+i
+in
+Subscription
+.
+find_by_class
+(
+self
+.
+env
+,
+klass
+):
+yield
+i
+.
+subscription_tuple
+()
+def
+description
+(
+self
+):
+return
+""notify me when new high priority tickets are created""
+def
+requires_authentication
+(
+self
+):
+return
+False
+Available Implementations
+Several implementations are part of core Trac:
+trac.ticket.notification.AllTicketSubscriber
+Allows anyone to subscribe to all ticket change notifications.
+trac.ticket.notification.TicketOwnerSubscriber
+Allows ticket owners to subscribe to (or unsubscribe from) change notifications for owned tickets.
+trac.ticket.notification.TicketComponentOwnerSubscriber
+Allows component owners to subscribe to (or unsubscribe from) change notifications for tickets assigned to owned component.
+trac.ticket.notification.TicketUpdaterSubscriber
+Allows anyone to subscribe to (or unsubscribe from) change notifications for their own ticket changes.
+trac.ticket.notification.TicketReporterSubscriber
+Allows ticket reporters to subscribe to (or unsubscribe from) change notifications for tickets they created.
+trac.ticket.notification.CarbonCopySubscriber
+Allows anyone to subscribe to (or unsubscribe from) change notifications for tickets where they are listed in CC.
+Additional Information and References
+â€‹
+epydoc
+â€‹
+API Reference
+The precursor of this interface was
+IAnnouncementSubscriber
+from the
+â€‹
+th:AnnouncerPlugin
+.
+DONE
+The
+IAnnouncementDefaultSubscriber
+from the
+â€‹
+th:AnnouncerPlugin
+was also folded into this interface.
+Open Questions
+Merge
+description()
+and
+requires_authentication()
+These methods are both only used in the preferences panel.
+Merging them could be easier to understand and more flexible, allowing different requirement checks:
+def get_subscription_preference_description(self, req):
+        if req.is_authenticated and 'TICKET_ADMIN' in req.perm:
+            return ""notify me when an admin is needed""
+Remove
+class
+name
+The
+class
+item could be removed from the tuple returned by
+matches()
+. It's not really needed and clutters up each plugin with ugly
+klass = self.__class__.__name__
+lines.
+Counter-arguments:
+It helps debugging and can be logged.
+But if that's needed the
+NotificationSystem
+should do so, to avoid mistakes and simplify plugins.
+The
+subscription
+DB table requires that anyway.
+But it should be replaced there as well, e.g. by a freely chosen
+rule
+string.
+/}
+
+Here are the behaviors and the privacy requirements in the form of privacy stories we build from them:
+Privacy stories are built explicitly from our labelled privacy behaviors in the format of we (action) (data type) for (purpose)Actions: Collect, Use, Collect, Use
+Data Types: messages, username, messages, username
+Purposes: Functionality, Customization, Security, Functionality, Customization, Security
+Stories:
+1. we collect messages, username for security. We use messages, username for customization..
+
+This page was a draft. See
+TracDev/PluginDevelopment/ExtensionPoints/trac.notification.api.INotificationDistributor
+page now.
+
+Extension Point :
+INotificationDistributor
+Interface
+INotificationDistributor
+Since
+1.1.3
+Module
+trac.notification
+Source
+api.py
+​
+The
+INotificationDistributor
+sends
+notification
+events over some distribution channel, like email.
+Purpose
+Trac provides an extendible and flexible notification system, that historically has sent notifications by email. Notifications could however also be distributed by XMPP, SMS or any other messaging protocol.
+Usage
+Implementing the interface follows the standard guidelines found in
+TracDev/ComponentArchitecture
+and of course
+TracDev/PluginDevelopment
+.
+A simple
+transports()
+method lists the names of the supported transports (protocols / distribution channels). The
+distribute()
+method distributes a message to one or more recipients. It receives the following parameters:
+transport
+: The name of the transports that should be used. One of those returned by
+transports()
+.
+recipients
+: A list of
+(sid, authenticated, address, format)
+tuples.
+sid
+: The Trac session ID of the recipient (or
+None
+).
+authenticated
+:
+1
+if the Trac session ID is authenticated,
+0
+otherwise.
+address
+: A protocol specific address to send the notification to. If it is
+None
+the implementation might still be able to send the message to the recipient using the
+sid
+/
+authenticated
+information somehow. (E.g. the
+EmailDistributor
+falls back to
+IEmailAddressResolver
+implementations.)
+format
+: MIME type of the message format to be used.
+event
+: A
+trac.notification.api.NotificationEvent
+instance describing the event about which the recipients should be notified.
+The
+event
+is supposed to be formatted into a message in the given
+format
+using a
+INotificationFormatter
+.
+Examples
+The following example distributes notifications by SMS. (The
+sms
+library does not exist. Several commercial SMS services provide real APIs.)
+from
+itertools
+import
+groupby
+from
+operator
+import
+itemgetter
+from
+trac.core
+import
+*
+from
+trac.notification.api
+import
+INotificationDistributor
+,
+\
+INotificationFormatter
+import
+sms
+class
+SmsNotificationDistributor
+(
+Component
+):
+implements
+(
+INotificationDistributor
+)
+formatters
+=
+ExtensionPoint
+(
+INotificationFormatter
+)
+# INotificationDistributor methods
+def
+transports
+(
+self
+):
+return
+[
+'sms'
+]
+def
+distribute
+(
+self
+,
+transport
+,
+recipients
+,
+event
+):
+if
+transport
+!=
+'sms'
+:
+return
+# Group by message format:
+for
+format
+,
+group
+in
+groupby
+(
+recipients
+,
+itemgetter
+(
+3
+)):
+formatter
+=
+None
+for
+f
+in
+self
+.
+formatters
+:
+for
+style
+in
+f
+.
+styles
+(
+transport
+,
+event
+.
+realm
+):
+if
+style
+==
+format
+:
+formatter
+=
+f
+if
+formatter
+:
+message
+=
+formatter
+.
+format
+(
+transport
+,
+format
+,
+event
+)
+for
+sid
+,
+authenticated
+,
+address
+,
+format
+in
+group
+:
+if
+address
+:
+sms
+.
+send
+(
+message
+,
+address
+)
+Available Implementations
+Only
+trac.notification.mail.EmailDistributor
+is part of core Trac.
+XmppDistributor
+will be part of
+​
+th:AnnouncerPlugin
+.
+Additional Information and References
+​
+epydoc
+​
+API Reference
+Related to the
+INotificationFormatter
+This interface originated in
+​
+th:AnnouncerPlugin
+as
+IAnnouncementDistributor
+.
+DONE
+IAnnouncerDistributor
+had no
+format
+in the
+recipients
+parameter to
+distribute()
+.
+
+
+Annotate the text with actions, data types, purposes, and stories as demonstrated, using only the categories from the list provided. For each annotation, provide your rationale and place <R> tag between your annotations and rationales.
+","Actions: Collect, Use, Share
+
+Data Types: None
+
+Purposes: None
+
+Stories: None
+
+Actions: Collect, Use
+
+Data Types: messages, username
+
+Purposes: Functionality, Customization, Security
+
+Stories: we collect messages, username for security. We use messages, username for customization.
+
+Actions: Collect
+
+Data Types: messages, username
+
+Purposes: Functionality, Customization, Security
+
+Stories: we collect messages, username for functionality. We use messages, username for customization and security.
+
+Actions: Use
+
+Data Types: messages, username
+
+Purposes: Functionality, Customization, Security
+
+Stories: we use messages, username for functionality. We use messages, username for customization and security.
+
+Actions: Collect
+
+Data Types: messages, username
+
+Purposes: Functionality, Customization, Security
+
+Stories: we collect messages, username for functionality. We use messages, username for customization and security.
+
+Actions: Use
+
+Data","{""file_name"": ""INotificationDistributor.txt"", ""full_cleaned_text"": ""This page was a draft. See\nTracDev/PluginDevelopment/ExtensionPoints/trac.notification.api.INotificationDistributor\npage now.\n{#s   \nExtension Point :\nINotificationDistributor\nInterface\nINotificationDistributor\nSince\n1.1.3\nModule\ntrac.notification\nSource\napi.py\n\u00e2\u20ac\u2039\nThe\nINotificationDistributor\nsends\nnotification\nevents over some distribution channel, like email.\nPurpose\nTrac provides an extendible and flexible notification system, that historically has sent notifications by email. Notifications could however also be distributed by XMPP, SMS or any other messaging protocol.\nUsage\nImplementing the interface follows the standard guidelines found in\nTracDev/ComponentArchitecture\nand of course\nTracDev/PluginDevelopment\n.\nA simple\ntransports()\nmethod lists the names of the supported transports (protocols / distribution channels). The\ndistribute()\nmethod distributes a message to one or more recipients. It receives the following parameters:\ntransport\n: The name of the transports that should be used. One of those returned by\ntransports()\n.\nrecipients\n: A list of\n(sid, authenticated, address, format)\ntuples.\nsid\n: The Trac session ID of the recipient (or\nNone\n).\nauthenticated\n:\n1\nif the Trac session ID is authenticated,\n0\notherwise.\naddress\n: A protocol specific address to send the notification to. If it is\nNone\nthe implementation might still be able to send the message to the recipient using the\nsid\n/\nauthenticated\ninformation somehow. (E.g. the\nEmailDistributor\nfalls back to\nIEmailAddressResolver\nimplementations.)\nformat\n: MIME type of the message format to be used.\nevent\n: A\ntrac.notification.api.NotificationEvent\ninstance describing the event about which the recipients should be notified.\nThe\nevent\nis supposed to be formatted into a message in the given\nformat\nusing a\nINotificationFormatter\n.\nExamples\nThe following example distributes notifications by SMS. (The\nsms\nlibrary does not exist. Several commercial SMS services provide real APIs.)\nfrom\nitertools\nimport\ngroupby\nfrom\noperator\nimport\nitemgetter\nfrom\ntrac.core\nimport\n*\nfrom\ntrac.notification.api\nimport\nINotificationDistributor\n,\n\\\nINotificationFormatter\nimport\nsms\nclass\nSmsNotificationDistributor\n(\nComponent\n):\nimplements\n(\nINotificationDistributor\n)\nformatters\n=\nExtensionPoint\n(\nINotificationFormatter\n)\n# INotificationDistributor methods\ndef\ntransports\n(\nself\n):\nreturn\n[\n'sms'\n]\ndef\ndistribute\n(\nself\n,\ntransport\n,\nrecipients\n,\nevent\n):\nif\ntransport\n!=\n'sms'\n:\nreturn\n# Group by message format:\nfor\nformat\n,\ngroup\nin\ngroupby\n(\nrecipients\n,\nitemgetter\n(\n3\n)):\nformatter\n=\nNone\nfor\nf\nin\nself\n.\nformatters\n:\nfor\nstyle\nin\nf\n.\nstyles\n(\ntransport\n,\nevent\n.\nrealm\n):\nif\nstyle\n==\nformat\n:\nformatter\n=\nf\nif\nformatter\n:\nmessage\n=\nformatter\n.\nformat\n(\ntransport\n,\nformat\n,\nevent\n)\nfor\nsid\n,\nauthenticated\n,\naddress\n,\nformat\nin\ngroup\n:\nif\naddress\n:\nsms\n.\nsend\n(\nmessage\n,\naddress\n)\nAvailable Implementations\nOnly\ntrac.notification.mail.EmailDistributor\nis part of core Trac.\nXmppDistributor\nwill be part of\n\u00e2\u20ac\u2039\nth:AnnouncerPlugin\n.\nAdditional Information and References\n\u00e2\u20ac\u2039\nepydoc\n\u00e2\u20ac\u2039\nAPI Reference\nRelated to the\nINotificationFormatter\nThis interface originated in\n\u00e2\u20ac\u2039\nth:AnnouncerPlugin\nas\nIAnnouncementDistributor\n.\nDONE\nIAnnouncerDistributor\nhad no\nformat\nin the\nrecipients\nparameter to\ndistribute()\n.\n/}"", ""metadata"": {""actions"": [""Collect, Use"", ""Collect, Use""], ""data_types"": [""Email Address, username"", ""app interactions, session IDs""], ""purposes"": [""Functionality, Security"", ""Functionality, Authentication""], ""stories"": [""We collect session IDs for authentication""]}}",
+"You are a privacy expert annotator tasked with annotating text files with metadata about privacy behaviors and stories. For the given text, annotate the following:
+
+1. Actions: Actions performed or expected in the text.
+2. Data Types: Types of data referenced in the text. Data types may include specific subcategories.
+3. Purposes: Intentions or purposes related to the actions and data types.
+4. Stories: Concise stories that describe how actions, data types, and purposes interact in context.
+
+After providing your annotations, explain your rationale for these annotations. Place <R> tag between your annotations and your rationale.
+
+Use only the categories listed below when annotating:
+
+Actions:
+Collect, Use, Share
+
+Data Types:
+Contact Data:
+  Phone Number:
+  Email address:
+  User ID:
+  Job Title:
+  Company:
+  Address:
+  Name:
+  Date of Birth:
+  Image:
+  Government ID:
+  Biographical Data:
+    CV:
+    Education:
+    Employment:
+Health Data:
+  Physical activity:
+Social Media:
+Location:
+  Approximate location:
+  Precise location:
+Financial:
+  Orders:
+  Payment History:
+  Purchase History:
+  Order:
+  Card Data:
+  Bank Account:
+  Credit Score:
+  Income Information:
+  assets:
+    vehicle:
+    Insurance:
+Usage Data:
+  App Interactions:
+    Pages Visited:
+    Timestamps:
+    Interaction with Ads:
+    User Engagement:
+    Session ID:
+  Device Information:
+    IP Address:
+    Device ID:
+    Advertisement ID:
+    Browser:
+    Operating System:
+    Diagnostics:
+    Sensor Data:
+    Audio:
+    Browsing history:
+Tracking:
+  Cookies:
+  Web Beacons:
+  Tags:
+Account Information:
+  User id:
+  Username:
+  Password:
+  Account Balance:
+  Messages:
+  Friends:
+
+Purposes:
+Contact, Analytics, Customization, Advertisement, Security, Tracking, Functionality, Accounts, Requirements
+
+Here is the text:
+
+Full Cleaned Text:
+This page was a draft. See
+TracDev/PluginDevelopment/ExtensionPoints/trac.notification.api.INotificationDistributor
+page now.
+{#s   
+Extension Point :
+INotificationDistributor
+Interface
+INotificationDistributor
+Since
+1.1.3
+Module
+trac.notification
+Source
+api.py
+â€‹
+The
+INotificationDistributor
+sends
+notification
+events over some distribution channel, like email.
+Purpose
+Trac provides an extendible and flexible notification system, that historically has sent notifications by email. Notifications could however also be distributed by XMPP, SMS or any other messaging protocol.
+Usage
+Implementing the interface follows the standard guidelines found in
+TracDev/ComponentArchitecture
+and of course
+TracDev/PluginDevelopment
+.
+A simple
+transports()
+method lists the names of the supported transports (protocols / distribution channels). The
+distribute()
+method distributes a message to one or more recipients. It receives the following parameters:
+transport
+: The name of the transports that should be used. One of those returned by
+transports()
+.
+recipients
+: A list of
+(sid, authenticated, address, format)
+tuples.
+sid
+: The Trac session ID of the recipient (or
+None
+).
+authenticated
+:
+1
+if the Trac session ID is authenticated,
+0
+otherwise.
+address
+: A protocol specific address to send the notification to. If it is
+None
+the implementation might still be able to send the message to the recipient using the
+sid
+/
+authenticated
+information somehow. (E.g. the
+EmailDistributor
+falls back to
+IEmailAddressResolver
+implementations.)
+format
+: MIME type of the message format to be used.
+event
+: A
+trac.notification.api.NotificationEvent
+instance describing the event about which the recipients should be notified.
+The
+event
+is supposed to be formatted into a message in the given
+format
+using a
+INotificationFormatter
+.
+Examples
+The following example distributes notifications by SMS. (The
+sms
+library does not exist. Several commercial SMS services provide real APIs.)
+from
+itertools
+import
+groupby
+from
+operator
+import
+itemgetter
+from
+trac.core
+import
+*
+from
+trac.notification.api
+import
+INotificationDistributor
+,
+\
+INotificationFormatter
+import
+sms
+class
+SmsNotificationDistributor
+(
+Component
+):
+implements
+(
+INotificationDistributor
+)
+formatters
+=
+ExtensionPoint
+(
+INotificationFormatter
+)
+# INotificationDistributor methods
+def
+transports
+(
+self
+):
+return
+[
+'sms'
+]
+def
+distribute
+(
+self
+,
+transport
+,
+recipients
+,
+event
+):
+if
+transport
+!=
+'sms'
+:
+return
+# Group by message format:
+for
+format
+,
+group
+in
+groupby
+(
+recipients
+,
+itemgetter
+(
+3
+)):
+formatter
+=
+None
+for
+f
+in
+self
+.
+formatters
+:
+for
+style
+in
+f
+.
+styles
+(
+transport
+,
+event
+.
+realm
+):
+if
+style
+==
+format
+:
+formatter
+=
+f
+if
+formatter
+:
+message
+=
+formatter
+.
+format
+(
+transport
+,
+format
+,
+event
+)
+for
+sid
+,
+authenticated
+,
+address
+,
+format
+in
+group
+:
+if
+address
+:
+sms
+.
+send
+(
+message
+,
+address
+)
+Available Implementations
+Only
+trac.notification.mail.EmailDistributor
+is part of core Trac.
+XmppDistributor
+will be part of
+â€‹
+th:AnnouncerPlugin
+.
+Additional Information and References
+â€‹
+epydoc
+â€‹
+API Reference
+Related to the
+INotificationFormatter
+This interface originated in
+â€‹
+th:AnnouncerPlugin
+as
+IAnnouncementDistributor
+.
+DONE
+IAnnouncerDistributor
+had no
+format
+in the
+recipients
+parameter to
+distribute()
+.
+/}
+
+Here are the behaviors and the privacy requirements in the form of privacy stories we build from them:
+Privacy stories are built explicitly from our labelled privacy behaviors in the format of we (action) (data type) for (purpose)Actions: Collect, Use, Collect, Use
+Data Types: Email Address, username, app interactions, session IDs
+Purposes: Functionality, Security, Functionality, Authentication
+Stories:
+1. We collect session IDs for authentication.
+
+This page was a draft. See
+TracDev/PluginDevelopment/ExtensionPoints/trac.notification.api.INotificationSubscriber
+page now.
+
+The
+Open questions
+section might still contain unimplemented ideas.
+Extension Point :
+INotificationSubscriber
+Interface
+INotificationSubscriber
+Since
+1.1.3
+Module
+trac.notification
+Source
+api.py
+​
+The
+INotificationSubscriber
+subscribes users to
+notification
+events.
+Purpose
+Trac provides an extendible and flexible notification system. Different people are interested in different kinds of notifications. Notification subscriptions allow administrators and / or users to configure the exact rules used that trigger sending of notifications.
+Usage
+Implementing the interface follows the standard guidelines found in
+TracDev/ComponentArchitecture
+and of course
+TracDev/PluginDevelopment
+.
+The main part of this interface is the
+match()
+function. It returns a list of subscriptions, in the form of tuples consisting of:
+class
+: The name of the Python class. (This could probably be removed.)
+distributor
+: Also known as
+transport
+. E.g. the string
+email
+. See
+INotificationDistributor
+.
+sid
+: The session ID of the subscriber. (Can be
+None
+if
+address
+is provided.)
+authenticated
+:
+1
+for authenticated session IDs,
+0
+for anonymous session IDs.
+address
+: The (email) address to use. (Can be
+None
+if
+sid
+is provided.)
+format
+: The MIME type to be used (e.g.
+text/plain
+or
+text/html
+.)
+priority
+: An integer priority. Smaller numbers have higher priority than bigger numbers.
+1
+is the highest priority.
+adverb
+: Either the string
+always
+or
+never
+.
+Since more than one component can handle the same realms and categories, the priorities and adverbs are used to resolve conflicting subscriptions.
+The implementation can use any means to determine if a user is interested in hearing about a given event.
+Most check that the appropriate conditions apply and then retrieve the required information from the
+subscription
+DB table.
+The subscriptions in that table are configured in a shared preferences panel that uses two other methods of this interface:
+The simple
+description()
+method returns a description string shown to the user in the preferences panel (or
+None
+if the plugin does use the
+subscriptions
+DB table.)
+The
+requires_authentication()
+method allows hiding the rule from unauthenticated users. (E.g. because only authenticated users can be ticket owners.)
+The
+default_subscriptions()
+method describes any  default subscriptions that automatically exist without the user configuring
+subscription
+DB entries in the preferences.
+These are also displayed on the preferences panel, but can not be directly modified there. (They usually can be overriden by non-default subscriptions.)
+The plugin still has to return the respective subscriptions from the
+matches()
+method.
+Default descriptions should be used when users can be determined by the event itself.
+For instance, ticket author has a default subscription that is controlled via trac.ini.
+Default subscriptions should be low priority (i.e. have a priority number much larger than
+1
+, like 100) so that the user can easily override them.
+Examples
+The following example implements a simple subscriber that can trigger notifications when a new ticket is created with a high priority level.
+from
+trac.core
+import
+*
+from
+trac.notification.api
+import
+INotificationSubscriber
+from
+trac.notification.model
+import
+Subscription
+class
+HighPriorityTicketNotificationSubscriber
+(
+Component
+):
+implements
+(
+INotificationSubscriber
+)
+# INotificationSubscriber methods
+def
+matches
+(
+self
+,
+event
+):
+if
+event
+.
+realm
+!=
+'ticket'
+:
+return
+if
+event
+.
+category
+!=
+'created'
+:
+return
+ticket
+=
+event
+.
+target
+if
+ticket
+[
+'priority'
+]
+not
+in
+(
+'blocker'
+,
+'critical'
+,
+'major'
+):
+return
+klass
+=
+self
+.
+__class__
+.
+__name__
+for
+i
+in
+Subscription
+.
+find_by_class
+(
+self
+.
+env
+,
+klass
+):
+yield
+i
+.
+subscription_tuple
+()
+def
+description
+(
+self
+):
+return
+""notify me when new high priority tickets are created""
+def
+requires_authentication
+(
+self
+):
+return
+False
+Available Implementations
+Several implementations are part of core Trac:
+trac.ticket.notification.AllTicketSubscriber
+Allows anyone to subscribe to all ticket change notifications.
+trac.ticket.notification.TicketOwnerSubscriber
+Allows ticket owners to subscribe to (or unsubscribe from) change notifications for owned tickets.
+trac.ticket.notification.TicketComponentOwnerSubscriber
+Allows component owners to subscribe to (or unsubscribe from) change notifications for tickets assigned to owned component.
+trac.ticket.notification.TicketUpdaterSubscriber
+Allows anyone to subscribe to (or unsubscribe from) change notifications for their own ticket changes.
+trac.ticket.notification.TicketReporterSubscriber
+Allows ticket reporters to subscribe to (or unsubscribe from) change notifications for tickets they created.
+trac.ticket.notification.CarbonCopySubscriber
+Allows anyone to subscribe to (or unsubscribe from) change notifications for tickets where they are listed in CC.
+Additional Information and References
+​
+epydoc
+​
+API Reference
+The precursor of this interface was
+IAnnouncementSubscriber
+from the
+​
+th:AnnouncerPlugin
+.
+DONE
+The
+IAnnouncementDefaultSubscriber
+from the
+​
+th:AnnouncerPlugin
+was also folded into this interface.
+Open Questions
+Merge
+description()
+and
+requires_authentication()
+These methods are both only used in the preferences panel.
+Merging them could be easier to understand and more flexible, allowing different requirement checks:
+def get_subscription_preference_description(self, req):
+        if req.is_authenticated and 'TICKET_ADMIN' in req.perm:
+            return ""notify me when an admin is needed""
+Remove
+class
+name
+The
+class
+item could be removed from the tuple returned by
+matches()
+. It's not really needed and clutters up each plugin with ugly
+klass = self.__class__.__name__
+lines.
+Counter-arguments:
+It helps debugging and can be logged.
+But if that's needed the
+NotificationSystem
+should do so, to avoid mistakes and simplify plugins.
+The
+subscription
+DB table requires that anyway.
+But it should be replaced there as well, e.g. by a freely chosen
+rule
+string.
+
+
+Annotate the text with actions, data types, purposes, and stories as demonstrated, using only the categories from the list provided. For each annotation, provide your rationale and place <R> tag between your annotations and rationales.
+","Actions: Collect, Use, Share
+
+Data Types: Email Address, username, app interactions, session IDs
+
+Purposes: Functionality, Security, Functionality, Authentication
+
+Stories:
+
+1. We collect session IDs for authentication. <R> Rationale: The text states that the INotificationDistributor sends notification events over some distribution channel, like email. It also mentions that the distribute() method distributes a message to one or more recipients. This implies that session IDs are collected for authentication purposes.
+
+Actions: Collect, Use
+
+Data Types: Email Address
+
+Purposes: Functionality
+
+Story: We collect email addresses for notification distribution.
+
+Actions: Collect, Use
+
+Data Types: app interactions
+
+Purposes: Functionality
+
+Story: We collect app interactions for notification distribution.
+
+Actions: Collect, Use
+
+Data Types: session IDs
+
+Purposes: Functionality
+
+Story: We collect session IDs for notification distribution.
+
+Actions: Use
+
+Data Types: Email Address, username","{""file_name"": ""INotificationSubscriber.txt"", ""full_cleaned_text"": ""This page was a draft. See\nTracDev/PluginDevelopment/ExtensionPoints/trac.notification.api.INotificationSubscriber\npage now.\n{#s   \nThe\nOpen questions\nsection might still contain unimplemented ideas.\nExtension Point :\nINotificationSubscriber\nInterface\nINotificationSubscriber\nSince\n1.1.3\nModule\ntrac.notification\nSource\napi.py\n\u00e2\u20ac\u2039\nThe\nINotificationSubscriber\nsubscribes users to\nnotification\nevents.\nPurpose\nTrac provides an extendible and flexible notification system. Different people are interested in different kinds of notifications. Notification subscriptions allow administrators and / or users to configure the exact rules used that trigger sending of notifications.\nUsage\nImplementing the interface follows the standard guidelines found in\nTracDev/ComponentArchitecture\nand of course\nTracDev/PluginDevelopment\n.\nThe main part of this interface is the\nmatch()\nfunction. It returns a list of subscriptions, in the form of tuples consisting of:\nclass\n: The name of the Python class. (This could probably be removed.)\ndistributor\n: Also known as\ntransport\n. E.g. the string\nemail\n. See\nINotificationDistributor\n.\nsid\n: The session ID of the subscriber. (Can be\nNone\nif\naddress\nis provided.)\nauthenticated\n:\n1\nfor authenticated session IDs,\n0\nfor anonymous session IDs.\naddress\n: The (email) address to use. (Can be\nNone\nif\nsid\nis provided.)\nformat\n: The MIME type to be used (e.g.\ntext/plain\nor\ntext/html\n.)\npriority\n: An integer priority. Smaller numbers have higher priority than bigger numbers.\n1\nis the highest priority.\nadverb\n: Either the string\nalways\nor\nnever\n.\nSince more than one component can handle the same realms and categories, the priorities and adverbs are used to resolve conflicting subscriptions.\nThe implementation can use any means to determine if a user is interested in hearing about a given event.\nMost check that the appropriate conditions apply and then retrieve the required information from the\nsubscription\nDB table.\nThe subscriptions in that table are configured in a shared preferences panel that uses two other methods of this interface:\nThe simple\ndescription()\nmethod returns a description string shown to the user in the preferences panel (or\nNone\nif the plugin does use the\nsubscriptions\nDB table.)\nThe\nrequires_authentication()\nmethod allows hiding the rule from unauthenticated users. (E.g. because only authenticated users can be ticket owners.)\nThe\ndefault_subscriptions()\nmethod describes any  default subscriptions that automatically exist without the user configuring\nsubscription\nDB entries in the preferences.\nThese are also displayed on the preferences panel, but can not be directly modified there. (They usually can be overriden by non-default subscriptions.)\nThe plugin still has to return the respective subscriptions from the\nmatches()\nmethod.\nDefault descriptions should be used when users can be determined by the event itself.\nFor instance, ticket author has a default subscription that is controlled via trac.ini.\nDefault subscriptions should be low priority (i.e. have a priority number much larger than\n1\n, like 100) so that the user can easily override them.\nExamples\nThe following example implements a simple subscriber that can trigger notifications when a new ticket is created with a high priority level.\nfrom\ntrac.core\nimport\n*\nfrom\ntrac.notification.api\nimport\nINotificationSubscriber\nfrom\ntrac.notification.model\nimport\nSubscription\nclass\nHighPriorityTicketNotificationSubscriber\n(\nComponent\n):\nimplements\n(\nINotificationSubscriber\n)\n# INotificationSubscriber methods\ndef\nmatches\n(\nself\n,\nevent\n):\nif\nevent\n.\nrealm\n!=\n'ticket'\n:\nreturn\nif\nevent\n.\ncategory\n!=\n'created'\n:\nreturn\nticket\n=\nevent\n.\ntarget\nif\nticket\n[\n'priority'\n]\nnot\nin\n(\n'blocker'\n,\n'critical'\n,\n'major'\n):\nreturn\nklass\n=\nself\n.\n__class__\n.\n__name__\nfor\ni\nin\nSubscription\n.\nfind_by_class\n(\nself\n.\nenv\n,\nklass\n):\nyield\ni\n.\nsubscription_tuple\n()\ndef\ndescription\n(\nself\n):\nreturn\n\""notify me when new high priority tickets are created\""\ndef\nrequires_authentication\n(\nself\n):\nreturn\nFalse\nAvailable Implementations\nSeveral implementations are part of core Trac:\ntrac.ticket.notification.AllTicketSubscriber\nAllows anyone to subscribe to all ticket change notifications.\ntrac.ticket.notification.TicketOwnerSubscriber\nAllows ticket owners to subscribe to (or unsubscribe from) change notifications for owned tickets.\ntrac.ticket.notification.TicketComponentOwnerSubscriber\nAllows component owners to subscribe to (or unsubscribe from) change notifications for tickets assigned to owned component.\ntrac.ticket.notification.TicketUpdaterSubscriber\nAllows anyone to subscribe to (or unsubscribe from) change notifications for their own ticket changes.\ntrac.ticket.notification.TicketReporterSubscriber\nAllows ticket reporters to subscribe to (or unsubscribe from) change notifications for tickets they created.\ntrac.ticket.notification.CarbonCopySubscriber\nAllows anyone to subscribe to (or unsubscribe from) change notifications for tickets where they are listed in CC.\nAdditional Information and References\n\u00e2\u20ac\u2039\nepydoc\n\u00e2\u20ac\u2039\nAPI Reference\nThe precursor of this interface was\nIAnnouncementSubscriber\nfrom the\n\u00e2\u20ac\u2039\nth:AnnouncerPlugin\n.\nDONE\nThe\nIAnnouncementDefaultSubscriber\nfrom the\n\u00e2\u20ac\u2039\nth:AnnouncerPlugin\nwas also folded into this interface.\nOpen Questions\nMerge\ndescription()\nand\nrequires_authentication()\nThese methods are both only used in the preferences panel.\nMerging them could be easier to understand and more flexible, allowing different requirement checks:\ndef get_subscription_preference_description(self, req):\n        if req.is_authenticated and 'TICKET_ADMIN' in req.perm:\n            return \""notify me when an admin is needed\""\nRemove\nclass\nname\nThe\nclass\nitem could be removed from the tuple returned by\nmatches()\n. It's not really needed and clutters up each plugin with ugly\nklass = self.__class__.__name__\nlines.\nCounter-arguments:\nIt helps debugging and can be logged.\nBut if that's needed the\nNotificationSystem\nshould do so, to avoid mistakes and simplify plugins.\nThe\nsubscription\nDB table requires that anyway.\nBut it should be replaced there as well, e.g. by a freely chosen\nrule\nstring.\n/}"", ""metadata"": {""actions"": [""Collect, Use"", ""Collect, Use""], ""data_types"": [""messages, username"", ""messages, username""], ""purposes"": [""Functionality, Customization, Security"", ""Functionality, Customization, Security""], ""stories"": [""we collect messages, username for security. We use messages, username for customization.""]}}",
+"You are a privacy expert annotator tasked with annotating text files with metadata about privacy behaviors and stories. For the given text, annotate the following:
+
+1. Actions: Actions performed or expected in the text.
+2. Data Types: Types of data referenced in the text. Data types may include specific subcategories.
+3. Purposes: Intentions or purposes related to the actions and data types.
+4. Stories: Concise stories that describe how actions, data types, and purposes interact in context.
+
+After providing your annotations, explain your rationale for these annotations. Place <R> tag between your annotations and your rationale.
+
+Use only the categories listed below when annotating:
+
+Actions:
+Collect, Use, Share
+
+Data Types:
+Contact Data:
+  Phone Number:
+  Email address:
+  User ID:
+  Job Title:
+  Company:
+  Address:
+  Name:
+  Date of Birth:
+  Image:
+  Government ID:
+  Biographical Data:
+    CV:
+    Education:
+    Employment:
+Health Data:
+  Physical activity:
+Social Media:
+Location:
+  Approximate location:
+  Precise location:
+Financial:
+  Orders:
+  Payment History:
+  Purchase History:
+  Order:
+  Card Data:
+  Bank Account:
+  Credit Score:
+  Income Information:
+  assets:
+    vehicle:
+    Insurance:
+Usage Data:
+  App Interactions:
+    Pages Visited:
+    Timestamps:
+    Interaction with Ads:
+    User Engagement:
+    Session ID:
+  Device Information:
+    IP Address:
+    Device ID:
+    Advertisement ID:
+    Browser:
+    Operating System:
+    Diagnostics:
+    Sensor Data:
+    Audio:
+    Browsing history:
+Tracking:
+  Cookies:
+  Web Beacons:
+  Tags:
+Account Information:
+  User id:
+  Username:
+  Password:
+  Account Balance:
+  Messages:
+  Friends:
+
+Purposes:
+Contact, Analytics, Customization, Advertisement, Security, Tracking, Functionality, Accounts, Requirements
+
+Here is the text:
+
+Full Cleaned Text:
+Direct Messaging with LibreEHR and EMR Direct phiMail(R)
+Version 1.3, 19 Jul 2014
+
+A. Purpose: To provide a secure method from within LibreEHR for sending/receiving 
+protected health information to/from another Direct address using the Direct Project 
+messaging standard, as a step toward the goal of satisfying the three MU2 criteria 
+requiring the use of Direct messaging.  (For general information about Direct messaging, 
+see http://www.emrdirect.com/about-directed-exchange-and-secure-direct-messaging.html)
+
+B. IMPORTANT:  Please be aware of the following limitations when using the LibreEHR 
+Direct Messaging features with PHI in a production environment:
+
+1. the current code only supports a single shared ""group"" Direct Address for each LibreEHR 
+installation. Note that this model is fully compliant with the Direct Project 
+requirements for Direct messaging, but we may add additional models in the future 
+should we determine that doing so would provide a higher degree of interoperability for 
+LibreEHR users.
+
+2. the current code only sends the CCR or CCD XML data that is already available in LibreEHR; 
+these files as currently generated by existing LibreEHR code do not meet the requirements 
+of the MU2 criteria, and the current CCD files do not pass strict CDA validation tests.
+
+C. Problems Solved:
+
+1. Patient-initiated transmission of clinical data from the Report section of the Patient 
+Portal interface.
+
+2. Provider-initiated transmission of clinical data from the Report section of the Patient 
+pane in the main LibreEHR interface.
+
+3. Log all data transmissions including date/time, patient, and whether transmission 
+was initiated by the patient through the Patient Portal or by an LibreEHR user through the 
+main interface.
+
+4. Receive Direct messages from other sources.
+
+D. How it Works:
+Once configured, LibreEHR will interface with a phiMail Direct messaging server to complete the
+required message transactions. The phiMail platform is described on the EMR Direct website, 
+http://www.emrdirect.com and http://www.emrdirect.com/phimail-faq.html.
+
+E. What you need before enabling Direct Messaging in LibreEHR:
+
+1. Test Mode: Developers may request a complimentary test address at 
+https://www.emrdirect.com/subscribe-developer  
+Access to a sandbox server is available for testing and development purposes.
+
+2. Production Mode: Healthcare provider users should begin by signing up for a production 
+Direct messaging account with EMR Direct by registering at https://www.emrdirect.com/subscribe
+
+Subscribers will receive the username, password, and server address information with which to 
+configure LibreEHR.  
+
+F. How to enable the Direct Messaging Features in LibreEHR:
+Setup of phiMail Direct messaging Service is done in the Administration::Globals::Connectors 
+tab
+
+1. Check the ""Enable phiMail Direct Messaging Service"" checkbox.
+
+2. Enter the Server Address, Username, and Password provided to you. The server address
+will be of the form ""ssl://servername.example.com:32541"" - replace the hostname and port
+with the values provided to you by EMR Direct. The Username is your Direct Address. Do not 
+enter the server URL into your browser address bar, as this will not work.
+
+3. Specify the LibreEHR user who will receive notification of new incoming Direct messages. 
+Enter their LibreEHR username in the notification user field.
+
+4. Specify the interval for automatic message checking; we suggest 5 or 10 minutes as a
+starting point, but installations processing a large number of Direct messages may want a 
+shorter interval. To disable automatic message checking through LibreEHR's background service
+manager, set the interval to 0 (zero). Disabling automatic checking would be appropriate 
+if message checking is managed through another mechanism, such as a system cron job.
+
+5. Optionally check ""phiMail Allow CCD Send"" and/or ""phiMail Allow CCR Send"" to enable
+the Transmit feature for these data types. If you do not select at least one of these,
+LibreEHR will operate in a receive-only mode.
+
+6. Click the ""Save"" button.
+
+7. Confirm that a valid Notification Email Address is set in the Administration::
+Globals::Notifications tab to receive error notifications from the Direct Messaging service.
+
+8. Install the EMR Direct trust anchor certificate.  
+
+Note: This is *not* your Direct certificate; it is the trust anchor for the SSL 
+certificate issued to our servers, and is used only to validate the SSL certificate 
+presented by the phiMail server on the other side of LibreEHR's connection.  Your Direct private
+key and certificate are managed by the phiMail Server and are not installed in LibreEHR.
+Your Direct certificate is made availabe for your review by EMR Direct, but you will not
+need to install it anywhere.
+
+For added security, the trust anchor for the phiMail Server should be installed in the LibreEHR 
+installation tree at:
+
+[installation_root]/sites/[site_id]/documents/phimail_server_pem/phimail_server.pem
+
+This phimail_server_pem directory and its contents should be readable by the the 
+webserver process, but only writable by trusted local users. The certificate file 
+itself must be PEM encoded. You can identify a PEM encoded certificate file because 
+it begins with the text ""-----BEGIN CERTIFICATE-----"". Although LibreEHR will connect 
+to phiMail servers without installing this certificate, this is a required configuration 
+step for all production  accounts to ensure that you are connecting to the correct 
+server. You can obtain the correct certificate at the following URLs:
+
+  a. Test accounts: http://certs.emrdirect.com/EMRDirectTestCA.crt
+     Important: Don't forget to rename the file to phimail_server.pem and install it
+     in the correct directory.
+
+  b. Production accounts: https://www.phicert.com/certs/phiCertDirectRootCA.crt
+     Important: The production root must be converted to PEM format as follows:
+     $ openssl x509 -in phiCertDirectRootCA.crt -inform DER -out phimail_server.pem
+     Don't forget to install phimail_server.pem in the correct directory. As an added
+     security measure, please call us to confirm the thumbprint on this certificate.
+
+G. Debugging background connections to the server.
+
+You may review the connection activity to the server by Selecting Administration::Other::Logs,
+selecting ""direct-message"" in the ""Name of events:"" drop-down menu, and clicking ""[Refresh]"".
+If the background service is succesfully connecting, you will see ""message check completed""
+events in the log as well as any message related entries (see below for instructions to
+view more detailed message related status information). If you see no entries, make sure that
+the background service is enabled (See F.4 above). If you see ""could not connect to server""
+entries, each entry will also contain an error code:
+
+  C1: phiMail is disabled in the global configuration. Fix: enable.
+  C2: the phiMail server URL entered in the global configuration is invalid. Fix: Confirm
+      the URL has been entered correctly. It should be of the form 
+      ""ssl://server.example.com:32541"".
+  C3: unable to create stream context. Fix: Usually this is because the server certificate 
+      file installed in F.8 above is not the correct certificate or is in the wrong format.
+  C4: failed to open connection. Fix: Confirm you Internet service and local DNS servers are
+      online and your firewall is not blocking connections to the phiMail Server.
+
+H. Checking the status and history of the Direct Messaging Service in LibreEHR:
+Administrators may view the status of the service by Selecting Reports::Services::Background 
+Services from the main LibreEHR left navigation bar. The ""View Log"" link on this page or 
+Reports::Services::Direct Message Log will open the messaging history log showing each message 
+sent or received and the current status of that message (Received, Sent, Delivery Confirmed, 
+or Failed).
+
+I. Note of message status messages: Receiving message status updates requires that Direct message
+checking be enabled. When receiving messages, the phiMail back-end is fully compliant with the 
+Direct messaging protocols to notify the sender and provide final delivery confirmation, but 
+please note that  many other Direct providers do not yet support these features. If a message 
+is sent to a recipient using one of these other systems, LibreEHR probably won't ever receive a 
+final delivery confirmation for that message.
+
+J. How to use the Direct Messaging Features in LibreEHR:
+
+1. Sending:
+When the phiMail Direct Messaging service is enabled, an additional ""Transmit"" button will
+appear in the Continuity of Care Record (CCR) and/or Continuity of Care Document (CCD) block 
+of the Reports section in both the Patient Portal and the Patient pane of the main provider 
+interface. 
+
+To transmit a CCR or CCD, first click the ""Transmit"" button. This will open a small dialog 
+immediately below the button with a form field to enter the intended recipient's Direct Address. 
+Clicking ""Transmit"" again will hide the dialog.
+
+A Direct Address should have the same form as a regular email address, e.g. 
+jonesclinic@direct.example.com. Enter the address in the field and click the ""Send"" button 
+immediately to the right of the field. Only a single recipient may be specified in the field.
+The Send button will be temporarily disabled while LibreEHR is communicating with the phiMail 
+server. This will only work for properly-configured Direct addresses. Attempts to send to a 
+regular email address or Direct address outside of our test mode ""trust sandbox"" will fail
+during testing. Production accounts have wide interoperability with other Direct service
+providers. Should you encounter a trust community with which LibreEHR does not interoperate,
+please let us know at support@emrdirect.com.
+
+LibreEHR will then display a status message immediately below the Address field, the 
+success or failure of the message transmission, or an error message. If the message is
+successfully submitted to the server, the Address field will be cleared to prevent accidental
+re-transmission. If multiple recipients are required, the next recipient can now be entered.
+
+If you receive an error message, it will be followed by an error code. For a discussion
+of error codes beginning with the letter ""C"" please see section G above. Error codes
+beginning with ""EC"" are listed here:
+
+  EC 1: phiMail disabled in global configuration. Fix: enable.
+  EC 4: authentication failure. Fix: The Username and Password entered in the
+        global configuration must be corrected.
+  EC 5: request to add text failed. Fix: Confirm total message length < 5MB.
+  EC 6: problem sending the text. Fix: Confirm your local network connectivity is stable.
+  EC 7: request to add clinical document failed. Fix: see EC 5.
+  EC 8: problem sending the clinical document. Fix: see EC 6.
+
+2. Receiving:
+When the phiMail Direct Messaging service is enabled, and message checking is enabled either 
+through the background services manager of another mechanism, LibreEHR will automatically process 
+message status updates and new messages. Status updates will be reflected immediately in the 
+Direct Messaging log. Additionally, if a ""Failed"" notification is received for a previously sent 
+message, a regular email message will be generated to the Notification Email Address specified 
+in the Notifications tab of the Global Settings panel (accessed by selecting Administration::
+Globals from the main left navigation menu).
+
+New Direct messages will be processed as follows. A new ""Patient Note"" will be generated and 
+sent to the phiMail notification user specified in the Connectors tab of the Global settings. 
+The patient note will contain information about the message, including any text at the beginning 
+of the message from the sender. Any attachments (and any non-text content) will be automatically 
+converted to separate LibreEHR Documents, which will be referenced in the new Patient Note.  
+The Documents and the Patient Note are initially created without an assigned patient. 
+
+At this time, the envisioned workflow is that the notification user will review the message text
+and any included Documents to determine which patient the content belongs to and will then set the 
+patient using the existing Patient Note interface for choosing a patient. Once the patient is sent, 
+the Patient Note can be forwarded to another provider or staff member as appropriate using the 
+existing forwarding mechanism for Patient Notes. The unassigned Documents can be viewed by Selecting 
+Miscellaneous::New Documents from the main left navigation menu, which opens a Documents list. Once 
+the specified document is opened, the user can optionally categorize the document and, when 
+appropriate, assign the document to a specific patient using the ""Move to Patient #"" feature in the 
+Documents interface.
+
+
+Trademark Notice: phiMail is a registered trademark of EMR Direct.
+
+Copyright (c) 2013-2014 EMR Direct.
+
+Here are the behaviors and the privacy requirements in the form of privacy stories we build from them:
+Privacy stories are built explicitly from our labelled privacy behaviors in the format of we (action) (data type) for (purpose)Actions: Share, Collect, Process
+Data Types: Health data, address, usage data
+Purposes: compliance, Functionality, security
+Stories:
+1. We share health data and address for compliance. We share health data and address for Functionality. We collect health data and address for complaince. We collect health data and address for functionality. We process health data, address and usage data for compliance. We process health data, address and usage data for functionality. We process health data, address and usage data for security..
+
+Email and password
+Zulip's default EmailAuthBackend authenticates users by verifying control over their email address, and then allowing them to set a password for their account. There are two development environment details worth understanding:
+
+All of our authentication flows in the development environment have special links to the /emails page (advertised in /devtools), which shows all emails that the Zulip server has ""sent"" (emails are not actually sent by the development environment), to make it convenient to click through the UI of signup, password reset, etc.
+There's a management command, manage.py print_initial_password username@example.com, that prints out default passwords for the development environment users. Note that if you change a user's password in the development environment, those passwords will no longer work. It also prints out the user's current API key.
+
+Security and privacy
+Use of the push notification bouncer is subject to the Zulip Cloud Terms of Service, Privacy Policy and Rules of Use. By using push notifications, you agree to these terms.
+
+We've designed this push notification bouncer service with security and privacy in mind:
+
+A central design goal of the Push Notification Service is to avoid any message content being stored or logged by the service, even in error cases.
+
+The Push Notification Service only stores the necessary metadata for delivering the notifications to the appropriate devices and otherwise operating the service:
+
+The APNS/FCM tokens needed to securely send mobile push notifications to iOS and Android devices, one per device registered to be notified by your Zulip server.
+User ID numbers generated by your Zulip server, needed to route a given notification to the appropriate set of mobile devices. These user ID numbers are opaque to the Push Notification Service and Kandra Labs.
+Basic organization metadata, optional usage statistics, and aggregate statistics about how many push notifications are sent by each customer.
+The Push Notification Service receives (but does not store) the contents of individual mobile push notifications:
+
+The numeric message ID generated by your Zulip server.
+Metadata on the message's sender (name and avatar URL).
+Metadata on the message's recipient (channel name + ID, topic, direct message recipients, etc.).
+A timestamp.
+The message's content.
+There's a PUSH_NOTIFICATION_REDACT_CONTENT setting available to disable any message content being sent via the push notification bouncer (i.e., message content will be replaced with New message). Note that this setting makes push notifications significantly less usable.
+
+We plan to replace that setting with end-to-end encryption which would eliminate that usability tradeoff and additionally allow us to not have any access to the other details mentioned in this section.
+
+All of the network requests (both from Zulip servers to the Push Notification Service and from the Push Notification Service to the relevant Google and Apple services) are encrypted over the wire with SSL/TLS.
+
+The code for the push notification forwarding service is 100% open source and available as part of the Zulip server project on GitHub (specifically, here).
+
+The push notification forwarding servers are professionally managed by a small team of security-sensitive engineers.
+
+If you have any questions about the security model, contact Zulip support.
+
+Uploading basic metadata
+All Zulip installations running Zulip 8.0 or greater that are registered for the Mobile Push Notification Service regularly upload to the service basic metadata about the organizations hosted by the installation. (Older Zulip servers upload these metadata only if uploading usage statistics is enabled).
+
+Uploaded metadata consists of, for each organization hosted by the installation:
+
+A subset of the basic metadata returned by the unauthenticated GET /server_settings API endpoint.
+
+The purpose of that API endpoint is to serve the minimal data needed by the Zulip mobile apps in order to:
+
+Verify that a given URL is indeed a valid Zulip server URL
+Present a correct login form, offering only the supported features and authentication methods for that organization and Zulip server version.
+Most of the metadata it returns is necessarily displayed to anyone with network access to the Zulip server on the login and signup pages for your Zulip organization as well.
+
+(Some fields returned by this endpoint, like the organization icon and description, are not included in uploaded metadata.)
+
+The organization type and creation date.
+
+The number of user accounts with each role.
+
+Our use of uploaded metadata is governed by the same Terms of Service and Privacy Policy that covers the Mobile Push Notification Service itself.
+
+Uploading usage statistics
+By default, Zulip installations that register for the Mobile Push Notification Service upload the following usage statistics. You can disable these uploads any time by setting ZULIP_SERVICE_SUBMIT_USAGE_STATISTICS=False in /etc/zulip/settings.py.
+
+Totals for messages sent and read with subtotals for various combinations of clients and integrations.
+Totals for active users under a few definitions (1day, 7day, 15day) and related statistics.
+Some of the graphs on your server's usage statistics page can be generated from these statistics.
+
+When enabled, usage statistics are submitted via an hourly cron job. If you'd like to access plan management immediately after enabling SUBMIT_USAGE_STATISTICS=True (the legacy form of this setting) on a pre-8.0 Zulip server, you can run the analytics job manually via:
+
+/home/zulip/deployments/current/manage.py update_analytics_counts
+Our use of uploaded usage statistics is governed by the same Terms of Service and Privacy Policy that covers the Mobile Push Notification Service itself.
+
+Rate limits
+The Mobile Push Notification Service API has a very high default rate limit of 1000 requests per minute. A Zulip server makes requests to this API every time it sends a push notification, which is fairly frequent, but we believe it to be unlikely that a self-hosted installation will hit this limit.
+
+This limit is primarily intended to protect the service against DoS attacks (intentional or otherwise). If you hit this limit or you anticipate that your server will require sending more push notifications than the limit permits, please contact support.
+
+Updating your server's registration
+Your server's registration includes the server's hostname and contact email address (from EXTERNAL_HOST and ZULIP_ADMINISTRATOR in /etc/zulip/settings.py, aka the --hostname and --email options in the installer). You can update your server's registration data by running manage.py register_server again.
+
+If you'd like to rotate your server's API key for this service (zulip_org_key), you need to use manage.py register_server --rotate-key option; it will automatically generate a new zulip_org_key and store that new key in /etc/zulip/zulip-secrets.conf.
+
+Deactivating your server's registration
+If you are deleting your Zulip server or otherwise no longer want to use the Mobile Push Notification Service, you can deactivate your server's registration.
+
+Cancel any paid plans associated with your server.
+
+Run the deregistration command. If you installed Zulip directly on the server (without Docker), run as root:
+
+su zulip -c '/home/zulip/deployments/current/manage.py register_server --deactivate'
+Or if you're using Docker, run:
+
+docker exec -it -u zulip <container_name> /home/zulip/deployments/current/manage.py register_server --deactivate
+Comment out the ZULIP_SERVICE_PUSH_NOTIFICATIONS = True line in your /etc/zulip/settings.py file (i.e., add #  at the start of the line), and restart your Zulip server.
+
+If you ever need to reactivate your server's registration, contact Zulip support.
+
+Pausing use of the Mobile Push Notification Service
+You can temporarily stop using the Mobile Push Notification Service. Comment out the PUSH_NOTIFICATION_BOUNCER_URL = 'https://push.zulipchat.com' line in your /etc/zulip/settings.py file (i.e., add #  at the start of the line), and restart your Zulip server. This approach makes it easy to start using the service again by uncommenting the same line.
+
+Sending push notifications directly from your server
+This section documents an alternative way to send push notifications that does not involve using the Mobile Push Notification Service at the cost of needing to compile and distribute modified versions of the Zulip mobile apps.
+
+We don't recommend this path -- patching and shipping a production mobile app can take dozens of hours to set up even for an experienced developer, and even more time to maintain. And it doesn't provide material privacy benefits -- your organization's push notification data would still go through Apple/Google's servers, just not Kandra Labs'. But in the interest of transparency, we document in this section roughly what's involved in doing so.
+
+As discussed above, it is impossible for a single app in the Google or Apple store to receive push notifications from multiple, mutually untrusted, servers. The Mobile Push Notification Service is one of the possible solutions to this problem.
+
+The other possible solution is for an individual Zulip server's administrators to build and distribute their own copy of the Zulip mobile apps, hardcoding a key that they possess. This solution is possible with Zulip, but it requires the server administrators to publish their own copies of the Zulip mobile apps. There's nothing the Zulip team can do to eliminate this onerous requirement.
+
+The main work is thus distributing your own copies of the Zulip mobile apps configured to use APNS/FCM keys that you generate. This is not for the faint of heart! If you haven't done this before, be warned that one can easily spend hundreds of dollars (on things like a DUNS number registration) and a week struggling through the hoops Apple requires to build and distribute an app through the Apple app store, even if you're making no code modifications to an app already present in the store (as would be the case here). The Zulip mobile app also gets frequent updates that you will have to either forgo or republish to the app stores yourself.
+
+If you've done that work, the Zulip server configuration for sending push notifications through the new app is quite straightforward:
+
+Create an FCM push notifications key in the Google Developer console and set android_gcm_api_key in /etc/zulip/zulip-secrets.conf to that key.
+
+In Apple's developer console, register a token or certificate for sending push notifications. Then in /etc/zulip/settings.py, set APNS_SANDBOX=False, and:
+
+If using APNs certificate-based authentication, set APNS_CERT_FILE to the path of your APNs certificate file.
+
+If using APNs token-based authentication, set APNS_TOKEN_KEY_FILE to the path of your APNs token key file, APNS_TOKEN_KEY_ID to the corresponding 10-character key ID, and APNS_TEAM_ID to your 10-character Apple team ID.
+
+Restart the Zulip server.
+
+
+
+Annotate the text with actions, data types, purposes, and stories as demonstrated, using only the categories from the list provided. For each annotation, provide your rationale and place <R> tag between your annotations and rationales.
+","Here are the annotations:
+
+**Actions:**
+
+1. Share - Collect - Direct messaging with LibreEHR and EMR Direct phiMail (R: The text describes the process of sharing data through direct messaging between LibreEHR and EMR Direct phiMail.)
+2. Collect - Health data - For compliance (R: The text mentions collecting health data for compliance purposes.)
+3. Collect - Address - For functionality (R: The text mentions collecting address data for functionality purposes.)
+4. Process - Health data, address, and usage data - For compliance (R: The text describes processing health data, address, and usage data for compliance purposes.)
+5. Process - Health data, address, and usage data - For functionality (R: The text describes processing health data, address, and usage data for functionality purposes.)
+6. Process - Health data, address, and usage data - For security (R: The text describes processing health data, address, and usage data for security purposes.)
+
+**Data Types","{""file_name"": ""file.txt"", ""full_cleaned_text"": ""Email and password\nZulip's default EmailAuthBackend authenticates users by verifying control over their email address, and then allowing them to set a password for their account. There are two development environment details worth understanding:\n\nAll of our authentication flows in the development environment have special links to the /emails page (advertised in /devtools), which shows all emails that the Zulip server has \""sent\"" (emails are not actually sent by the development environment), to make it convenient to click through the UI of signup, password reset, etc.\nThere's a management command, manage.py print_initial_password username@example.com, that prints out default passwords for the development environment users. Note that if you change a user's password in the development environment, those passwords will no longer work. It also prints out the user's current API key.\n\nSecurity and privacy\nUse of the push notification bouncer is subject to the Zulip Cloud Terms of Service, Privacy Policy and Rules of Use. By using push notifications, you agree to these terms.\n\nWe've designed this push notification bouncer service with security and privacy in mind:\n\nA central design goal of the Push Notification Service is to avoid any message content being stored or logged by the service, even in error cases.\n\nThe Push Notification Service only stores the necessary metadata for delivering the notifications to the appropriate devices and otherwise operating the service:\n\nThe APNS/FCM tokens needed to securely send mobile push notifications to iOS and Android devices, one per device registered to be notified by your Zulip server.\nUser ID numbers generated by your Zulip server, needed to route a given notification to the appropriate set of mobile devices. These user ID numbers are opaque to the Push Notification Service and Kandra Labs.\nBasic organization metadata, optional usage statistics, and aggregate statistics about how many push notifications are sent by each customer.\nThe Push Notification Service receives (but does not store) the contents of individual mobile push notifications:\n\nThe numeric message ID generated by your Zulip server.\nMetadata on the message's sender (name and avatar URL).\nMetadata on the message's recipient (channel name + ID, topic, direct message recipients, etc.).\nA timestamp.\nThe message's content.\nThere's a PUSH_NOTIFICATION_REDACT_CONTENT setting available to disable any message content being sent via the push notification bouncer (i.e., message content will be replaced with New message). Note that this setting makes push notifications significantly less usable.\n\nWe plan to replace that setting with end-to-end encryption which would eliminate that usability tradeoff and additionally allow us to not have any access to the other details mentioned in this section.\n\nAll of the network requests (both from Zulip servers to the Push Notification Service and from the Push Notification Service to the relevant Google and Apple services) are encrypted over the wire with SSL/TLS.\n\nThe code for the push notification forwarding service is 100% open source and available as part of the Zulip server project on GitHub (specifically, here).\n\nThe push notification forwarding servers are professionally managed by a small team of security-sensitive engineers.\n\nIf you have any questions about the security model, contact Zulip support.\n\nUploading basic metadata\nAll Zulip installations running Zulip 8.0 or greater that are registered for the Mobile Push Notification Service regularly upload to the service basic metadata about the organizations hosted by the installation. (Older Zulip servers upload these metadata only if uploading usage statistics is enabled).\n\nUploaded metadata consists of, for each organization hosted by the installation:\n\nA subset of the basic metadata returned by the unauthenticated GET /server_settings API endpoint.\n\nThe purpose of that API endpoint is to serve the minimal data needed by the Zulip mobile apps in order to:\n\nVerify that a given URL is indeed a valid Zulip server URL\nPresent a correct login form, offering only the supported features and authentication methods for that organization and Zulip server version.\nMost of the metadata it returns is necessarily displayed to anyone with network access to the Zulip server on the login and signup pages for your Zulip organization as well.\n\n(Some fields returned by this endpoint, like the organization icon and description, are not included in uploaded metadata.)\n\nThe organization type and creation date.\n\nThe number of user accounts with each role.\n\nOur use of uploaded metadata is governed by the same Terms of Service and Privacy Policy that covers the Mobile Push Notification Service itself.\n\nUploading usage statistics\nBy default, Zulip installations that register for the Mobile Push Notification Service upload the following usage statistics. You can disable these uploads any time by setting ZULIP_SERVICE_SUBMIT_USAGE_STATISTICS=False in /etc/zulip/settings.py.\n\nTotals for messages sent and read with subtotals for various combinations of clients and integrations.\nTotals for active users under a few definitions (1day, 7day, 15day) and related statistics.\nSome of the graphs on your server's usage statistics page can be generated from these statistics.\n\nWhen enabled, usage statistics are submitted via an hourly cron job. If you'd like to access plan management immediately after enabling SUBMIT_USAGE_STATISTICS=True (the legacy form of this setting) on a pre-8.0 Zulip server, you can run the analytics job manually via:\n\n/home/zulip/deployments/current/manage.py update_analytics_counts\nOur use of uploaded usage statistics is governed by the same Terms of Service and Privacy Policy that covers the Mobile Push Notification Service itself.\n\nRate limits\nThe Mobile Push Notification Service API has a very high default rate limit of 1000 requests per minute. A Zulip server makes requests to this API every time it sends a push notification, which is fairly frequent, but we believe it to be unlikely that a self-hosted installation will hit this limit.\n\nThis limit is primarily intended to protect the service against DoS attacks (intentional or otherwise). If you hit this limit or you anticipate that your server will require sending more push notifications than the limit permits, please contact support.\n\nUpdating your server's registration\nYour server's registration includes the server's hostname and contact email address (from EXTERNAL_HOST and ZULIP_ADMINISTRATOR in /etc/zulip/settings.py, aka the --hostname and --email options in the installer). You can update your server's registration data by running manage.py register_server again.\n\nIf you'd like to rotate your server's API key for this service (zulip_org_key), you need to use manage.py register_server --rotate-key option; it will automatically generate a new zulip_org_key and store that new key in /etc/zulip/zulip-secrets.conf.\n\nDeactivating your server's registration\nIf you are deleting your Zulip server or otherwise no longer want to use the Mobile Push Notification Service, you can deactivate your server's registration.\n\nCancel any paid plans associated with your server.\n\nRun the deregistration command. If you installed Zulip directly on the server (without Docker), run as root:\n\nsu zulip -c '/home/zulip/deployments/current/manage.py register_server --deactivate'\nOr if you're using Docker, run:\n\ndocker exec -it -u zulip <container_name> /home/zulip/deployments/current/manage.py register_server --deactivate\nComment out the ZULIP_SERVICE_PUSH_NOTIFICATIONS = True line in your /etc/zulip/settings.py file (i.e., add #  at the start of the line), and restart your Zulip server.\n\nIf you ever need to reactivate your server's registration, contact Zulip support.\n\nPausing use of the Mobile Push Notification Service\nYou can temporarily stop using the Mobile Push Notification Service. Comment out the PUSH_NOTIFICATION_BOUNCER_URL = 'https://push.zulipchat.com' line in your /etc/zulip/settings.py file (i.e., add #  at the start of the line), and restart your Zulip server. This approach makes it easy to start using the service again by uncommenting the same line.\n\nSending push notifications directly from your server\nThis section documents an alternative way to send push notifications that does not involve using the Mobile Push Notification Service at the cost of needing to compile and distribute modified versions of the Zulip mobile apps.\n\nWe don't recommend this path -- patching and shipping a production mobile app can take dozens of hours to set up even for an experienced developer, and even more time to maintain. And it doesn't provide material privacy benefits -- your organization's push notification data would still go through Apple/Google's servers, just not Kandra Labs'. But in the interest of transparency, we document in this section roughly what's involved in doing so.\n\nAs discussed above, it is impossible for a single app in the Google or Apple store to receive push notifications from multiple, mutually untrusted, servers. The Mobile Push Notification Service is one of the possible solutions to this problem.\n\nThe other possible solution is for an individual Zulip server's administrators to build and distribute their own copy of the Zulip mobile apps, hardcoding a key that they possess. This solution is possible with Zulip, but it requires the server administrators to publish their own copies of the Zulip mobile apps. There's nothing the Zulip team can do to eliminate this onerous requirement.\n\nThe main work is thus distributing your own copies of the Zulip mobile apps configured to use APNS/FCM keys that you generate. This is not for the faint of heart! If you haven't done this before, be warned that one can easily spend hundreds of dollars (on things like a DUNS number registration) and a week struggling through the hoops Apple requires to build and distribute an app through the Apple app store, even if you're making no code modifications to an app already present in the store (as would be the case here). The Zulip mobile app also gets frequent updates that you will have to either forgo or republish to the app stores yourself.\n\nIf you've done that work, the Zulip server configuration for sending push notifications through the new app is quite straightforward:\n\nCreate an FCM push notifications key in the Google Developer console and set android_gcm_api_key in /etc/zulip/zulip-secrets.conf to that key.\n\nIn Apple's developer console, register a token or certificate for sending push notifications. Then in /etc/zulip/settings.py, set APNS_SANDBOX=False, and:\n\nIf using APNs certificate-based authentication, set APNS_CERT_FILE to the path of your APNs certificate file.\n\nIf using APNs token-based authentication, set APNS_TOKEN_KEY_FILE to the path of your APNs token key file, APNS_TOKEN_KEY_ID to the corresponding 10-character key ID, and APNS_TEAM_ID to your 10-character Apple team ID.\n\nRestart the Zulip server."", ""metadata"": {""actions"": [""collect,use ""], ""data_types"": [""usage data""], ""purposes"": [""tracking, security""], ""stories"": [""We collect and use usage data for tracking and security""]}}",
