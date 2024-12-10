@@ -49,7 +49,7 @@ The system shall allow for fine-tuning of small (<7b param) LMs efficiently such
 
 ##### Usability
 
-The system shall provide user-friendly notebooks with descriptions that allow someone with no coding experience to use them.
+The system shall provide user-friendly notebooks with descriptions that allow someone with no coding experience to use them. Code shall be overly commented to be easily understood how all functions operate. 
 
 
 
