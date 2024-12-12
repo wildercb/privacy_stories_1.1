@@ -82,7 +82,6 @@ def create_annotation_prompt(example_file: Dict, target_text: str, ontology: Dic
 def create_annotation_prompt(
     processed_file: Dict, target_text: str, ontology: Dict[str, Union[List[str], Dict]]
 ) -> str:
-    """Creates an annotation prompt for the new file format."""
     prompt = (
         "You are a privacy expert annotator tasked with annotating text files with metadata about privacy behaviors and stories. "
         "For the given text, annotate the following:\n\n"
@@ -93,18 +92,13 @@ def create_annotation_prompt(
         "After providing your annotations, explain your rationale for these annotations. "
         "Place <R> tag between your annotations and your rationale.\n\n"
     )
-
     # Add ontology guidance
     prompt += "Use only the categories listed below when annotating:\n\n"
     prompt += "Actions:\n" + ", ".join(ontology.get("Actions", [])) + "\n\n"
     prompt += "Data Types:\n" + format_data_types(ontology.get("Data Types", {})) + "\n"
     prompt += "Purposes:\n" + ", ".join(ontology.get("Purpose", [])) + "\n\n"
-    
-    # Example text
     prompt += "Here is the text:\n\n"
     prompt += f"Full Cleaned Text:\n{processed_file['full_cleaned_text']}\n\n"
-    
-    # Example metadata
     prompt += "Here are the behaviors and the privacy requirements in the form of privacy stories we build from them:\n"
     prompt += "Privacy stories are built explicitly from our labelled privacy behaviors in the format of we (action) (data type) for (purpose)"
     if processed_file["metadata"]:
@@ -114,14 +108,12 @@ def create_annotation_prompt(
         prompt += f"Purposes: {', '.join(metadata['purposes'] or [])}\n"
         if metadata.get("stories"):
             prompt += "Stories:\n" + "\n".join([f"{i+1}. {story}." for i, story in enumerate(metadata["stories"])]) + "\n\n"
-
     prompt += f"{target_text}\n\n"
     prompt += (
         "Annotate the text with actions, data types, purposes, and stories as demonstrated, "
         "using only the categories from the list provided. For each annotation, provide your rationale "
         "and place <R> tag between your annotations and rationales.\n"
     )
-
     return prompt
 
 
@@ -157,7 +149,7 @@ def create_0_shot_annotation_prompt(example_file: Dict, target_text: str, ontolo
     return prompt
 
 # Create the judge prompt template
-def create_judge_prompt(original_prompt: str, response_1: str, response_2: str, annotations: dict = None) -> str:
+def create_judge_prompt(original_prompt: str, response_1: str, response_2: str) -> str:
     prompt = (
         "You are an impartial judge evaluating responses to a given prompt. Your task is to assess the quality of two responses and select the better one.\n\n"
         "Consider the following criteria when making your decision:\n"

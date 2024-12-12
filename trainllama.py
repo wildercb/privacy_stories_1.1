@@ -9,8 +9,8 @@ from unsloth import FastLanguageModel, PatchDPOTrainer
 # Step 1: Install Dependencies (if not already installed)
 # Ensure you have the necessary packages installed
 # You may need to run these pip install commands separately
-# !pip install "unsloth[colab-new] @ git+https://github.com/unsloth.git"
-# !pip install transformers datasets trl accelerate bitsandbytes
+# !pip install "unsloth[colab-new]l tr @ git+https://github.com/unsloth.git"
+# !pip instalansformers datasets trl accelerate bitsandbytes
 
 # Step 2: Load Local Dataset
 # Read the CSV file
