@@ -69,9 +69,11 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 import aisuite as ai
 import csv
 import torch
-from typing import List, Union, Optional
+from typing import List, Union, Optional, Dict
 import csv
 import os
+import json
+
 
 
 def run_multi_model_prompts(
@@ -223,6 +225,102 @@ def run_hf_prompts(
                 model_responses[model_name][-1].append(f"ERROR LOADING MODEL: {str(model_error)}")
     
     return model_responses
+
+
+def save_results_to_csv(models: List[str], 
+                         prompt_templates_dict: Dict, 
+                         model_responses: Dict, 
+                         output_file: str):
+    """
+    Save the model outputs, prompts, and file annotations to a CSV file.
+    """
+    # Open the output CSV file
+    with open(output_file, 'w', newline='', encoding='utf-8') as csvfile:
+        # Prepare the CSV header
+        fieldnames = ['File', 'Prompt', 'Model', 'Target File Path', 'Target Annotations', 'Model Response 1', 'Model Response 2']
+        
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+        writer.writeheader()
+
+        # Create a list of file keys to maintain order
+        file_keys = list(prompt_templates_dict.keys())
+
+        # Iterate through the prompt templates and models to pair responses
+        for file_key in file_keys:
+            template_info = prompt_templates_dict[file_key]
+            
+            for model in models:
+                # Get responses for this model
+                model_specific_responses = model_responses.get(model, {})
+                
+                # Get responses for this specific file/prompt
+                prompt_responses = model_specific_responses.get(file_key, [])
+                
+                # Ensure we have at least two responses (or 'No Response')
+                response1 = prompt_responses[0] if prompt_responses and len(prompt_responses) > 0 else 'No Response'
+                response2 = prompt_responses[1] if prompt_responses and len(prompt_responses) > 1 else 'No Response'
+
+                # Create a row for each model and file
+                row = {
+                    'File': file_key,
+                    'Prompt': template_info['prompt_template'],
+                    'Model': model,
+                    'Target File Path': template_info['input_file_path'],
+                    'Target Annotations': json.dumps(template_info['target_annotations']),
+                    'Model Response 1': json.dumps(response1, ensure_ascii=False),
+                    'Model Response 2': json.dumps(response2, ensure_ascii=False)
+                }
+
+                # Write the row to the CSV file
+                writer.writerow(row)
+
+
+def run_multi_file_annotations(prompt_templates_dict, output_csv, models=None):
+    """
+    Run annotation process for multiple files and save results to a CSV file.
+    """
+
+    try:
+        # Create a list of file keys to maintain order
+        file_keys = list(prompt_templates_dict.keys())
+
+        # Prepare prompts that maintains the file key order
+        test_prompts = [
+            prompt_templates_dict[file_key]['prompt_template'] 
+            for file_key in file_keys
+        ]
+
+        # Get model responses 
+        raw_model_responses = run_multi_model_prompts(
+            models=models, 
+            prompts=test_prompts, 
+            num_runs=2  # Number of runs per model
+        )
+
+        # Restructure responses to match file keys
+        model_responses = {}
+        for model in models:
+            model_responses[model] = {
+                file_key: model_runs 
+                for file_key, model_runs in zip(file_keys, raw_model_responses.get(model, []))
+            }
+
+        # Save results to CSV 
+        save_results_to_csv(
+            models=models,
+            prompt_templates_dict=prompt_templates_dict,
+            model_responses=model_responses,
+            output_file=output_csv
+        )
+
+        print(f"Annotation results saved to {output_csv}")
+        print(f"Number of files processed: {len(prompt_templates_dict)}")
+
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        import traceback
+        traceback.print_exc()
+
 '''
 import openai
 import json

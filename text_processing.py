@@ -3,8 +3,12 @@ import re
 import os
 import re
 from typing import Dict, Union, List
-
+import prompt_templates
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
 # Updated function to clean the text
+
+input_dir = 'input'
 
 def clean_text(text: str) -> str:
     """Removes annotations (A:, DT:, P:, S:) and unwanted tags."""
@@ -71,7 +75,142 @@ def process_input(path):
         return [process_file(path)]
     else:
         raise ValueError("Invalid path. Please provide a valid file or directory path.")
+
+
+def find_matching_file(input_file_path, annotations_dir):
+    """
+    Find the matching annotation file for a given input file.
     
+    Args:
+        input_file_path (str): Path to the input file
+        annotations_dir (str): Root directory of annotations
+    
+    Returns:
+        str: Path to the matching annotation file, or None if not found
+    """
+    # Get the relative path from the input directory
+    relative_path = os.path.relpath(input_file_path, input_dir)
+    annotation_file_path = os.path.join(annotations_dir, relative_path)
+    
+    return annotation_file_path if os.path.exists(annotation_file_path) else None
+
+
+def find_most_similar_file(input_file_path, annotations_dir, exclude_file):
+    """
+    Find the most similar annotation file to the input file, excluding a specified file.
+    
+    Args:
+        input_file_path (str): Path to the input file
+        annotations_dir (str): Directory containing the annotation files
+        exclude_file (str): File to exclude from similarity search
+    
+    Returns:
+        str: Path to the most similar annotation file
+    """
+    # Read the input file's content
+    with open(input_file_path, 'r', encoding='utf-8') as f:
+        input_text = f.read()
+    
+    # List to store (similarity_score, annotation_file_path)
+    similarity_scores = []
+    
+    # Loop through the annotations directory to calculate similarity
+    for root, _, files in os.walk(annotations_dir):
+        for filename in files:
+            if filename == exclude_file or filename.startswith('.'):
+                continue
+            
+            annotation_file_path = os.path.join(root, filename)
+            
+            # Read the annotation file's content
+            with open(annotation_file_path, 'r', encoding='utf-8') as f:
+                annotation_text = f.read()
+            
+            # Compute similarity using TF-IDF and cosine similarity
+            tfidf = TfidfVectorizer().fit_transform([input_text, annotation_text])
+            similarity = cosine_similarity(tfidf[0:1], tfidf[1:2])[0][0]
+            similarity_scores.append((similarity, annotation_file_path))
+    
+    # Sort by similarity score in descending order and return the most similar file
+    similarity_scores.sort(reverse=True, key=lambda x: x[0])
+    return similarity_scores[0][1] if similarity_scores else None
+
+
+def create_prompt_templates_dict(input_dir='input', annotations_dir='annotations', ontology_path='privacy_ontology_simple.json'):
+    """
+    Create a dictionary of prompt templates matching input files with their corresponding annotation examples.
+    
+    Args:
+        input_dir (str): Root directory containing input files to be annotated
+        annotations_dir (str): Root directory containing annotated example files
+        ontology_path (str): Path to the privacy ontology JSON file
+    
+    Returns:
+        dict: Dictionary of prompt templates for each input file
+    """
+    # Load privacy ontology
+    privacy_ontology = prompt_templates.load_privacy_ontology(ontology_path)
+    
+    # Dictionary to store prompt templates
+    prompt_templates_dict = {}
+    
+    # Walk through all directories and files in the input directory
+    for root, _, files in os.walk(input_dir):
+        for filename in files:
+            # Skip hidden files
+            if filename.startswith('.'):
+                continue
+            
+            # Full path to the input file
+            input_file_path = os.path.join(root, filename)
+            
+            # Find corresponding annotation file (for exclusion from similarity search)
+            annotation_file_path = find_matching_file(input_file_path, annotations_dir)
+            
+            if not annotation_file_path:
+                print(f"No matching annotation found for {input_file_path}")
+                continue
+            
+            try:
+                # Read the input text to annotate
+                with open(input_file_path, 'r', encoding='utf-8') as f:
+                    new_text_to_annotate = f.read()
+                
+                # Find the most similar annotation file
+                most_similar_annotation = find_most_similar_file(input_file_path, annotations_dir, os.path.basename(annotation_file_path))
+                
+                if not most_similar_annotation:
+                    print(f"No similar annotation found for {input_file_path}")
+                    continue
+                
+                # Process the example file from annotations
+                example_file = process_input(most_similar_annotation)[0]
+                
+                # Create prompt template
+                prompt_template = prompt_templates.create_0_shot_annotation_prompt(
+                    example_file, 
+                    new_text_to_annotate, 
+                    privacy_ontology
+                )
+                
+                # Create a unique key based on relative path
+                relative_key = os.path.relpath(input_file_path, input_dir)
+                
+                # Store in dictionary
+                prompt_templates_dict[relative_key] = {
+                    'input_file_path': input_file_path,
+                    'annotation_file_path': most_similar_annotation,
+                    'prompt_template': prompt_template,
+                    'target_annotations': process_file(annotation_file_path),
+                    'token_count': prompt_templates.count_tokens(prompt_template)
+                }
+            
+            except Exception as e:
+                print(f"Error processing {input_file_path}: {e}")
+    
+    return prompt_templates_dict
+
+
 '''To work with sectioned annotations 
 def clean_full_text(text):
     """Removes annotations (A:, DT:, P:), section tags {#s ... \}, and <PI> tags from the text."""
