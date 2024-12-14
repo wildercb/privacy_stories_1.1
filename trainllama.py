@@ -5,6 +5,7 @@ from datasets import Dataset
 from transformers import TrainingArguments
 from trl import DPOTrainer
 from unsloth import FastLanguageModel, PatchDPOTrainer
+import transformers
 
 # Step 1: Install Dependencies (if not already installed)
 # Ensure you have the necessary packages installed
@@ -103,8 +104,6 @@ model.save_pretrained("privacy-dpo-lora-model")
 # Step 9: Inference Example
 FastLanguageModel.for_inference(model)
 
-# Optional: Create a simple inference pipeline
-import transformers
 
 def generate_response(prompt, max_tokens=200):
     messages = [

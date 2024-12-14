@@ -1,6 +1,6 @@
 import json
 from typing import Dict, List, Union
-import tiktoken  # Library for token counting with OpenAI models
+import tiktoken  
 
 
 # Calculate token count for the prompt
@@ -115,8 +115,6 @@ def create_annotation_prompt(
         "and place <R> tag between your annotations and rationales.\n"
     )
     return prompt
-
-
 
 def create_0_shot_annotation_prompt(example_file: Dict, target_text: str, ontology: Dict[str, Union[List[str], Dict]]) -> str:
     # Start building the prompt with an instructional message
