@@ -6,7 +6,6 @@ from typing import Dict, Union, List
 import prompt_templates
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
-# Updated function to clean the text
 
 input_dir = 'input'
 
@@ -15,7 +14,6 @@ def clean_text(text: str) -> str:
     cleaned_text = re.sub(r'\(A:.*?\)|\(DT:.*?\)|\(P:.*?\)|\(S:.*?\)', '', text)
     return cleaned_text.strip()
 
-# Updated function to process the new file format
 def process_file(file_path: str) -> Dict:
     """Processes a single file to extract cleaned text, metadata, and stories."""
     with open(file_path, 'r') as file:
@@ -41,7 +39,6 @@ def process_file(file_path: str) -> Dict:
         }
     }
 
-# Recursive function to display data types with subcategories
 def format_data_types(data_types: Union[Dict, List], level: int = 0) -> str:
     """Formats data types and their subcategories recursively for prompt clarity."""
     formatted_text = ""
