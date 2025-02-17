@@ -1,7 +1,5 @@
 import os
 import re
-import os
-import re
 from typing import Dict, Union, List
 import prompt_templates
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -184,7 +182,7 @@ def create_prompt_templates_dict(input_dir='input', annotations_dir='annotations
                 example_file = process_input(most_similar_annotation)[0]
                 
                 # Create prompt template
-                prompt_template = prompt_templates.create_0_shot_annotation_prompt(
+                prompt_template = prompt_templates.create_annotation_prompt(
                     example_file, 
                     new_text_to_annotate, 
                     privacy_ontology

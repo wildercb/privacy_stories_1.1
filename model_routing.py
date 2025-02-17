@@ -116,7 +116,7 @@ def run_multi_model_prompts(
             for _ in range(num_runs):
                 try:
                     # Prepare messages in the standard chat format
-                    messages = [{"role": "system", "content": prompt}]
+                    messages = [{"role": "user", "content": prompt}]
                     
                     # Create chat completion
                     response = client.chat.completions.create(
@@ -275,7 +275,7 @@ def save_results_to_csv(models: List[str],
                 writer.writerow(row)
 
 
-def run_multi_file_annotations(prompt_templates_dict, output_csv, models=None):
+def run_multi_file_annotations(prompt_templates_dict, output_csv, models=None, num_runs=2):
     """
     Run annotation process for multiple files and save results to a CSV file.
     """
@@ -294,7 +294,7 @@ def run_multi_file_annotations(prompt_templates_dict, output_csv, models=None):
         raw_model_responses = run_multi_model_prompts(
             models=models, 
             prompts=test_prompts, 
-            num_runs=2  # Number of runs per model
+            num_runs=num_runs  # Number of runs per model
         )
 
         # Restructure responses to match file keys

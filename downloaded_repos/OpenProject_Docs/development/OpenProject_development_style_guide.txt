@@ -1,2 +1,0 @@
-OpenProject development style guide
-Frontend

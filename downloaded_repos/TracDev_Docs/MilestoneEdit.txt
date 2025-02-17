@@ -1,7 +1,0 @@
-Milestone Edit
-The purpose of this (neglected) branch is to eliminate the code duplication for editing milestones.  We have two ways to access that functionality, and two implementations of it.
-Was in:
-sandbox/milestone-edit-tmp
-Main change:
-r5670
-(the rest were merges from trunk)

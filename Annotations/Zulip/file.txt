@@ -107,22 +107,6 @@ The other possible solution is for an individual Zulip server's administrators t
 
 The main work is thus distributing your own copies of the Zulip mobile apps configured to use APNS/FCM keys that you generate. This is not for the faint of heart! If you haven't done this before, be warned that one can easily spend hundreds of dollars (on things like a DUNS number registration) and a week struggling through the hoops Apple requires to build and distribute an app through the Apple app store, even if you're making no code modifications to an app already present in the store (as would be the case here). The Zulip mobile app also gets frequent updates that you will have to either forgo or republish to the app stores yourself.
 
-If you've done that work, the Zulip server configuration for sending push notifications through the new app is quite straightforward:
-
-Create an FCM push notifications key in the Google Developer console and set android_gcm_api_key in /etc/zulip/zulip-secrets.conf to that key.
-
-In Apple's developer console, register a token or certificate for sending push notifications. Then in /etc/zulip/settings.py, set APNS_SANDBOX=False, and:
-
-If using APNs certificate-based authentication, set APNS_CERT_FILE to the path of your APNs certificate file.
-
-If using APNs token-based authentication, set APNS_TOKEN_KEY_FILE to the path of your APNs token key file, APNS_TOKEN_KEY_ID to the corresponding 10-character key ID, and APNS_TEAM_ID to your 10-character Apple team ID.
-
-Restart the Zulip server.
-
-<<<<<<< HEAD
-(A: collect,use ) (DT: usage data)(P:tracking, security) (S: We collect and use usage data for tracking and security)
-=======
 (A: collect,use ) (DT: usage data)(P:tracking, security)
 
 (S: We collect usage data for security. We use usage data for tracking.)
->>>>>>> 1fb6e403a0661573c989bacdd4d97d2aeca26219

@@ -8,6 +8,8 @@ def count_tokens(prompt: str, model: str = "gpt-3.5-turbo") -> int:
     """Calculates the token count for a given prompt string."""
     encoding = tiktoken.encoding_for_model(model)
     return len(encoding.encode(prompt))
+import json
+from typing import Dict, Union, List
 
 # Load the ontology from a JSON file
 def load_privacy_ontology(ontology_path: str) -> Dict[str, Union[List[str], Dict]]:
@@ -16,67 +18,57 @@ def load_privacy_ontology(ontology_path: str) -> Dict[str, Union[List[str], Dict
         ontology = json.load(file)
     return ontology
 
-# Recursive function to display data types with subcategories
+def format_simple_category(category: Union[Dict, List]) -> str:
+    """
+    Formats a flat category (e.g., Actions or Purposes) including definitions if available.
+    
+    For each entry, if a "Description" is present, it will be appended to the category name.
+    """
+    if isinstance(category, list):
+        return ", ".join(category)
+    elif isinstance(category, dict):
+        lines = []
+        for key, details in category.items():
+            desc = ""
+            if isinstance(details, dict) and "Description" in details:
+                if isinstance(details["Description"], list):
+                    desc = " - " + " ".join(details["Description"])
+                elif isinstance(details["Description"], str):
+                    desc = " - " + details["Description"]
+            lines.append(f"{key}{desc}")
+        return "\n".join(lines)
+    return ""
+
+# Recursive function to display data types with subcategories including definitions
 def format_data_types(data_types: Union[Dict, List], level: int = 0) -> str:
-    """Formats data types and their subcategories recursively for prompt clarity."""
+    """
+    Formats data types and their subcategories recursively for prompt clarity,
+    including definitions if provided.
+    """
     formatted_text = ""
     indent = "  " * level  # Indentation for hierarchy
 
     if isinstance(data_types, list):
-        # Base case: data_types is a list of items
         formatted_text += indent + ", ".join(data_types) + "\n"
     elif isinstance(data_types, dict):
-        # Recursive case: data_types is a dictionary with subcategories
         for category, subcategories in data_types.items():
-            formatted_text += f"{indent}{category}:\n"
-            formatted_text += format_data_types(subcategories, level + 1)
+            # Check if the current entry has a definition
+            description = ""
+            if isinstance(subcategories, dict) and "Description" in subcategories:
+                if isinstance(subcategories["Description"], list):
+                    description = " - " + " ".join(subcategories["Description"])
+                elif isinstance(subcategories["Description"], str):
+                    description = " - " + subcategories["Description"]
+            formatted_text += f"{indent}{category}{description}:\n"
+            # Recurse into subcategories (ignore the "Description" key)
+            if isinstance(subcategories, dict):
+                for key, value in subcategories.items():
+                    if key == "Description":
+                        continue
+                    formatted_text += format_data_types({key: value}, level + 1)
+            elif isinstance(subcategories, list):
+                formatted_text += indent + "  " + ", ".join(subcategories) + "\n"
     return formatted_text
-
-'''
-# Create the annotation prompt using the ontology
-def create_annotation_prompt(example_file: Dict, target_text: str, ontology: Dict[str, Union[List[str], Dict]]) -> str:
-    # Start building the prompt with an instructional message
-    prompt = (
-        "You are a privacy expert annotator who annotates text files with metadata about privacy behaviors in the form of "
-        "actions, data types, and purposes. For each section in a file that contains behaviors related to each other, annotate the following:\n\n"
-        "1. Actions: Actions that are performed or expected in this section.\n"
-        "2. Data Types: Types of data referenced in this section. Data types may include specific subcategories.\n"
-        "3. Purposes: Purposes or intentions related to these actions and data types.\n\n"
-        "After providing your annotations, explain your rationale for these annotations. "
-        "Place a <R> and </R> tags between your annotations and your rationale.\n\n"
-    )
-    # Add guidance from ontology
-    prompt += "Use only the categories listed below when annotating the sections:\n\n"
-    # Display actions
-    prompt += "Actions:\n" + ", ".join(ontology.get("Actions", [])) + "\n\n"
-    # Display data types with subcategories
-    prompt += "Data Types:\n" + format_data_types(ontology.get("Data Types", {})) + "\n"
-    # Display purposes
-    prompt += "Purposes:\n" + ", ".join(ontology.get("Purpose", [])) + "\n\n"
-    # Add an example from the provided file
-    prompt += "Here is an example of annotated sections:\n\n"
-    prompt += "Here is the section:\n"
-    prompt += f"Full Cleaned Text:\n{example_file['full_cleaned_text']}\n\n"
-    prompt += "And here are the sections you've annotated with their behaviors:\n\n"
-
-    for section in example_file["sections"]:
-        prompt += f"Section Text:\n{section['section_text_with_tags']}\n"
-        prompt += f"Actions: {', '.join(section['metadata']['actions'] or [])}\n"
-        prompt += f"Data Types: {', '.join(section['metadata']['data_types'] or [])}\n"
-        prompt += f"Purposes: {', '.join(section['metadata']['purposes'] or [])}\n"
-        if section.get('rationale') is not None: 
-            prompt += "<R>\n"
-            prompt += f"Rationale: {section.get('rationale')}\n\n"
-
-    prompt += f"{target_text}\n\n"
-    prompt += (
-        "Annotate the sections of the above text with actions, data types, and purposes as demonstrated, "
-        "using only the categories from the list provided. For each section, provide your annotations "
-        "followed by your rationale, and place <R> and </R> tags between your annotations and your rationales.\n"
-    )
-
-    return prompt
-'''
 
 # Updated function to create the annotation prompt
 def create_annotation_prompt(
@@ -84,39 +76,45 @@ def create_annotation_prompt(
 ) -> str:
     prompt = (
         "You are a privacy expert annotator tasked with annotating text files with metadata about privacy behaviors and stories. "
-        "For the given text, annotate the following:\n\n"
-        "1. Actions: Actions performed or expected in the text.\n"
-        "2. Data Types: Types of data referenced in the text. Data types may include specific subcategories.\n"
-        "3. Purposes: Intentions or purposes related to the actions and data types.\n"
-        "4. Stories: Concise stories that describe how actions, data types, and purposes interact in context.\n\n"
+        "For the given text, annotate the following: "
+        "1. <Actions>: Actions performed or expected in the text. "
+        "2. <Data Types>: Types of data referenced in the text. Data types may include specific subcategories. "
+        "3. <Purposes>: Intentions or purposes related to the actions and data types. "
+        "4. <Stories>: Concise stories that describe how actions, data types, and purposes interact in context. "
         "After providing your annotations, explain your rationale for these annotations. "
-        "Place <R> tag between your annotations and your rationale.\n\n"
+        "Place <R> tag between your annotations and your rationale.\n"
     )
     # Add ontology guidance
-    prompt += "Use only the categories listed below when annotating:\n\n"
-    prompt += "Actions:\n" + ", ".join(ontology.get("Actions", [])) + "\n\n"
-    prompt += "Data Types:\n" + format_data_types(ontology.get("Data Types", {})) + "\n"
-    prompt += "Purposes:\n" + ", ".join(ontology.get("Purpose", [])) + "\n\n"
+    prompt += "Use only the categories listed below when annotating:\n"
+    prompt += "<Actions>:\n" + format_simple_category(ontology.get("Actions", {})) + "\n</Actions>\n"
+    prompt += "<Data Types>:\n" + format_data_types(ontology.get("Data Types", {})) + "\n</Data Types>\n"
+    prompt += "<Purposes>:\n" + format_simple_category(ontology.get("Purpose", {})) + "\n</Purposes>\n"
+    
     prompt += "Here is the text:\n\n"
-    prompt += f"Full Cleaned Text:\n{processed_file['full_cleaned_text']}\n\n"
+    prompt += f"{processed_file.get('full_cleaned_text', '')}\n\n"
     prompt += "Here are the behaviors and the privacy requirements in the form of privacy stories we build from them:\n"
-    prompt += "Privacy stories are built explicitly from our labelled privacy behaviors in the format of we (action) (data type) for (purpose)"
-    if processed_file["metadata"]:
+    prompt += "Privacy stories are built explicitly from our labelled privacy behaviors in the format: we (action) (data type) for (purpose).\n"
+    
+    if processed_file.get("metadata"):
         metadata = processed_file["metadata"]
-        prompt += f"Actions: {', '.join(metadata['actions'] or [])}\n"
-        prompt += f"Data Types: {', '.join(metadata['data_types'] or [])}\n"
-        prompt += f"Purposes: {', '.join(metadata['purposes'] or [])}\n"
+        prompt += f"<Actions> {', '.join(metadata.get('actions', []))} </Actions> "
+        prompt += f"<Data Types> {', '.join(metadata.get('data_types', []))} </Data Types> " 
+        prompt += f"<Purposes> {', '.join(metadata.get('purposes', []))} </Purposes> "
         if metadata.get("stories"):
-            prompt += "Stories:\n" + "\n".join([f"{i+1}. {story}." for i, story in enumerate(metadata["stories"])]) + "\n\n"
+            stories_formatted = " ".join([f"{i+1}. {story}." for i, story in enumerate(metadata["stories"])])
+            prompt += f"<Stories> {stories_formatted} </Stories>"
     prompt += f"{target_text}\n\n"
     prompt += (
-        "Annotate the text with actions, data types, purposes, and stories as demonstrated, "
-        "using only the categories from the list provided. For each annotation, provide your rationale "
-        "and place <R> tag between your annotations and rationales.\n"
+        "Annotate the text with actions, data types, purposes, and stories as demonstrated, separating each category with their "
+        "appropriate <Actions>, <Data Types>, <Purposes>, and <Stories> tags using only the categories from the list provided. "
+        "For each annotation, provide your rationale and place <R> tag between your annotations and your rationale. "
+        "Make sure to use this XML format properly in your response.\n"
     )
     return prompt
 
-def create_0_shot_annotation_prompt(example_file: Dict, target_text: str, ontology: Dict[str, Union[List[str], Dict]]) -> str:
+def create_0_shot_annotation_prompt(
+    example_file: Dict, target_text: str, ontology: Dict[str, Union[List[str], Dict]]
+) -> str:
     # Start building the prompt with an instructional message
     prompt = (
         "You are a privacy expert annotator who annotates text files with metadata about privacy behaviors in the form of "
@@ -125,25 +123,21 @@ def create_0_shot_annotation_prompt(example_file: Dict, target_text: str, ontolo
         "2. Data Types: Types of data referenced in this section. Data types may include specific subcategories.\n"
         "3. Purposes: Purposes or intentions related to these actions and data types.\n\n"
         "After providing your annotations, explain your rationale for these annotations. "
-        "Place a <R> and </R> tags between your annotations and your rationale.\n\n"
+        "Place <R> and </R> tags between your annotations and your rationale.\n\n"
     )
     # Add guidance from ontology
     prompt += "Use only the categories listed below when annotating the sections:\n\n"
-    # Display actions
-    prompt += "Actions:\n" + ", ".join(ontology.get("Actions", [])) + "\n\n"
-    # Display data types with subcategories
+    prompt += "Actions:\n" + format_simple_category(ontology.get("Actions", {})) + "\n\n"
     prompt += "Data Types:\n" + format_data_types(ontology.get("Data Types", {})) + "\n"
-    # Display purposes
-    prompt += "Purposes:\n" + ", ".join(ontology.get("Purpose", [])) + "\n\n"
+    prompt += "Purposes:\n" + format_simple_category(ontology.get("Purpose", {})) + "\n\n"
             
     prompt += f"{target_text}\n\n"
     prompt += (
-        "Annotate the sections of the above text with actions, data types, and purposes."
-        "Using only the categories from the list provided. For each section, provide your annotations "
-        "followed by your rationale, and place <R> and </R> tags between your annotations and your rationales.\n"
+        "Annotate the sections of the above text with actions, data types, and purposes using only the categories from the list provided. "
+        "For each section, provide your annotations followed by your rationale, and place <R> and </R> tags between your annotations and your rationale.\n"
     )
-
     return prompt
+
 
 # Create the judge prompt template
 def create_judge_prompt(original_prompt: str, response_1: str, response_2: str) -> str:
