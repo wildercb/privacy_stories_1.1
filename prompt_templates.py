@@ -70,6 +70,33 @@ def format_data_types(data_types: Union[Dict, List], level: int = 0) -> str:
                 formatted_text += indent + "  " + ", ".join(subcategories) + "\n"
     return formatted_text
 
+def create_0_shot_annotation_prompt(
+    processed_file: Dict, target_text: str, ontology: Dict[str, Union[List[str], Dict]]
+) -> str:
+    prompt = (
+        "Your mission is to annotate software documentation with privacy behaviors in the form of actions, data types and purposes to build privacy requirements in the form of privacy stories. "
+        "For the given text, provide the following: "
+        "1. <Actions>: Actions performed or expected in the text. "
+        "2. <Data Types>: Types of data referenced in the text. Data types may include specific subcategories. "
+        "3. <Purposes>: Intentions or purposes related to the actions and data types. "
+        "4. <Stories>: Concise stories that describe how actions, data types, and purposes interact in context. "
+        "After providing your annotations, explain your rationale for these annotations. "
+        "Place <R> tag between your annotations and your rationale.\n" 
+    )
+    # Add guidance from ontology
+    prompt += "Use only the categories listed below when annotating the sections:\n\n"
+    prompt += "Actions:\n" + format_simple_category(ontology.get("Actions", {})) + "\n\n"
+    prompt += "Data Types:\n" + format_data_types(ontology.get("Data Types", {})) + "\n"
+    prompt += "Purposes:\n" + format_simple_category(ontology.get("Purpose", {})) + "\n\n"
+            
+    prompt += f"{target_text}\n\n"
+    prompt += (
+        "Annotate the sections of the above text with actions, data types, and purposes using only the categories from the list provided. "
+        "For each section, provide your annotations followed by your rationale, and place <R> and </R> tags between your annotations and your rationale.\n"
+    )
+    return prompt
+
+
 def create_annotation_prompt(
     processed_file: Dict, target_text: str, ontology: Dict[str, Union[List[str], Dict]]
 ) -> str:
@@ -103,39 +130,10 @@ def create_annotation_prompt(
             stories_formatted = " ".join([f"{i+1}. {story}." for i, story in enumerate(metadata["stories"])])
             prompt += f"<Stories> {stories_formatted} </Stories>\n"
     
-    prompt += "Here if youre document to annotate, when making these annotations refer only to the provided labels, only provide new labels where if they are absolutely necessary for generating the privacy requirement and explain how they would fit into the provided taxonomy of privacy behaviors. <Document> "
+    prompt += "Here is youre document to annotate, when making these annotations refer only to the provided labels, only provide new labels where if they are absolutely necessary for generating the privacy requirement and explain how they would fit into the provided taxonomy of privacy behaviors. <Document> "
     prompt += f"{target_text} </Document>"
     prompt += (
-        "Annotate the text with actions, data types, purposes, and stories as demonstrated, separating each category with their "
-        "appropriate <Actions>, <Data Types>, <Purposes>, and <Stories> tags using only the categories from the list provided, please number your stories. "
-        "For each annotation, provide your rationale and place <R> tag between your annotations and your rationale. "
-        "Make sure to use this XML format properly in your response. Review the behaviors noted and stories generated provide only those which maximize accuracy and precision.\n"
-    )
-    return prompt
-
-def create_annotation_prompt(
-    processed_file: Dict, target_text: str, ontology: Dict[str, Union[List[str], Dict]]
-) -> str:
-    prompt = (
-        "Your mission is to annotate software documentation with privacy behaviors in the form of actions, data types and purposes to build privacy requirements in the form of privacy stories. "
-        "For the given text, provide the following: "
-        "1. <Actions>: Actions performed or expected in the text. "
-        "2. <Data Types>: Types of data referenced in the text. Data types may include specific subcategories. "
-        "3. <Purposes>: Intentions or purposes related to the actions and data types. "
-        "4. <Stories>: Concise stories that describe how actions, data types, and purposes interact in context. "
-        "After providing your annotations, explain your rationale for these annotations. "
-        "Place <R> tag between your annotations and your rationale.\n" 
-    )
-    # Add guidance from ontology
-    prompt += "Use only the categories listed below when annotating the sections:\n\n"
-    prompt += "Actions:\n" + format_simple_category(ontology.get("Actions", {})) + "\n\n"
-    prompt += "Data Types:\n" + format_data_types(ontology.get("Data Types", {})) + "\n"
-    prompt += "Purposes:\n" + format_simple_category(ontology.get("Purpose", {})) + "\n\n"
-            
-    prompt += f"{target_text}\n\n"
-    prompt += (
-        "Annotate the sections of the above text with actions, data types, and purposes using only the categories from the list provided. "
-        "For each section, provide your annotations followed by your rationale, and place <R> and </R> tags between your annotations and your rationale.\n"
+        "Annotate the text with actions, data types, purposes, and stories as demonstrated, separating each category with their appropriate <Actions>, <Data Types>, <Purposes>, and <Stories> tags using only the categories from the list provided, please number your stories. For each annotation, provide your rationale and place <R> tag between your annotations and your rationale. Make sure to use this XML format properly in your response. Review the behaviors noted and stories generated provide only those which maximize accuracy and precision. Ensure to include your numbered stories in the format of we (action) (data type) for (purpose) inside of the <Stories> tags\n"
     )
     return prompt
 

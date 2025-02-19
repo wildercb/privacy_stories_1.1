@@ -4,7 +4,7 @@ import json
 from typing import Dict, List, Union
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
-import prompt_templates  # Must provide load_privacy_ontology, create_annotation_prompt, count_tokens
+from prompt_templates  import load_privacy_ontology, create_annotation_prompt, count_tokens 
 
 def clean_text(text: str) -> str:
     """Removes annotations (A:, DT:, P:, S:) and unwanted tags."""
@@ -50,7 +50,7 @@ def build_annotations_data(annotations_dir: str) -> Dict:
     return annotations_data
 
 def create_prompts_data_json(annotations_dir: str = 'data/annotations', 
-                               ontology_path: str = 'privacy_ontology_simple.json', 
+                               ontology_path: str = 'privacy_ontology.json', 
                                output_json: str = 'data/annotations/prompts_data.json') -> Dict:
     """
     Processes the annotations directory and creates a single JSON file containing, for each
@@ -61,7 +61,7 @@ def create_prompts_data_json(annotations_dir: str = 'data/annotations',
       - token_count, etc.
     """
     # Load privacy ontology from prompt_templates module.
-    privacy_ontology = prompt_templates.load_privacy_ontology(ontology_path)
+    privacy_ontology = load_privacy_ontology(ontology_path)
     
     # Build annotations data.
     annotations_data = build_annotations_data(annotations_dir)
@@ -70,10 +70,10 @@ def create_prompts_data_json(annotations_dir: str = 'data/annotations',
     for rel_path, annotation_data in annotations_data.items():
         full_annotation_path = os.path.join(annotations_dir, rel_path)
         try:
-            # Use the file's own processed text as both the example and the text to annotate.
+            # Use the file's own processed text as bosth the example and the text to annotate.
             new_text = annotation_data.get('full_cleaned_text', '')
-            prompt_template = prompt_templates.create_annotation_prompt(annotation_data, new_text, privacy_ontology)
-            token_count = prompt_templates.count_tokens(prompt_template)
+            prompt_template = create_annotation_prompt(annotation_data, new_text, privacy_ontology)
+            token_count = count_tokens(prompt_template)
             
             prompts_data[rel_path] = {
                 'annotation_file_path': full_annotation_path,

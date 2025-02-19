@@ -1,96 +1,39 @@
 {
-  "Actions": {
-    "sub": {
-      "Consent":{
-      "Consent request": {},
-      "Revoke Consent": {}
-    },"Delete":{},"stop":{},"anonymize":{},"aggregate":{
-      "Patterns":["Increasing awareness of information aggregation"]
-    }},
-    "Collect": {
-      "Synonyms": ["Store", "Keep", "Retain", "Provide Us","save"],
-        "external":{
-          "Patterns":["Strip Invisible Metadata"]
-        },
-        "Internal": {},
-        "Third-Party": {},
-        "Automatic": {}
+    "Actions": {
+      "Collect": {"Description" : ["The application gathers this data from the user"]},
+      "Use": {"Description" : ["The application Uses this data from the user"]},
+      "Share": {"Description" : ["The application shares this data from the user with another service, only use this label to indicate that the data is being shared to a third-party outside of the application"]}
     },
-    "Process": {
-      "Synonyms": ["Use"],
-        "Inference": {},
-        "Reference": {}
-    },
-    "Share": {
-      "Synonyms": ["Transfer", "Disclose","Disclosure" ,"Use Third Party"],
-        "Internal": {}
-    }
-  },
-  "Data Types": {
-   "sub": {"anonymize":{},"aggregate":{}},
-      "Patterns": ["Minimal-Information-Asymmetry","Awareness Feed","User data confinement pattern"],
-      "Synonyms": ["Personally Identifiable Information", "PII", "Personal Information", "Your Data","Your Information"],
-        "Contact Data": {
-          "Phone Number": {
-            "Synonyms": ["mobile number"]
-          },
+    "Data Types": {
+      "Contact Data": {
+          "Phone Number": {},
           "Email address": {},
           "User ID": {},
-          "Login Information": {},
           "Job Title": {},
-          "Contact List": {},
-          "Company Name": {},
-          "Address": {
-            "Synonyms": ["postal addess","mailing address","shipping address"]
-          },
-          "Name": {
-            "First Name": {},
-            "Last Name": {}
-          },
-          "Date of Birth": {
-            "Synonyms": ["birthday"]
-          },
-          "Image (Photos, Pictures, Video)": {
-            "Synonyms": ["photo","picture","video"]
-          },
-          "Government ID": {
-            "Synonyms":["National identification number"],
-            "Driver's License": {},
-            "Passport": {},
-            "Social Security Number": {},
-            "Tax ID Number": {},
-            "License Plate Number": {}
-          },
+          "Company": {},
+          "Address": {},
+          "Name": {},
+          "Date of Birth": {},
+          "Image": {},
+          "Government ID": {},
           "Biographical Data": {
-            "CV": {
-              "Synonyms":["Curriculum Vitae"]
-            },
-            "Education": {},
-            "Employment":{}
+          "CV": {},
+          "Education": {},
+          "Employment":{}
           }
-        },
-          "Health Data": {
-            "Synonyms":["medical information"],
-            "Physical activity": {}
+      },
+      "Health Data": { 
+          "Physical activity": {}
           },
           "Social Media": {},
           "Location": {
-            "Patterns": ["Location Granularity"],
-            "Approximate location": {},
-            "Precise location": {},
-            "GPS": {},
-            "Localisation": {},
-            "Address": {}
+          "Approximate location": {},
+          "Precise location": {}
           },
-    "Financial": {
-      "Synonyms": ["economic","spending","commercial information"],
+      "Financial": {
         "Orders": {},
-        "Payment Card": {},
         "Payment History": {},
-        "Purchase History": {
-          "Synonyms":["order history"]
-        },
-        "Carts": {},
+        "Purchase History": {},
         "Order": {},
         "Card Data": {},
         "Bank Account": {},
@@ -101,163 +44,81 @@
             "Insurance": {}
         }
     },
-    "Usage Data": {
-        "App Interactions": {
-          "Patterns": ["Use-of-dummies"],
-          "Pages Visited": {
-            "Synonyms": ["app activity"]
+      "Usage Data": {
+          "App Interactions": {
+            "Pages Visited": {},
+            "Timestamps": {},
+            "Interaction with Ads": {},
+            "User Engagement": {},
+            "Session ID": {}
           },
-          "Timestamps": {},
-          "Interaction with Ads": {},
-          "Content Viewing Order": {},
-          "User Engagement": {},
-          "Content Moderation": {},
-          "Clicks": {},
-          "Transportation Data": {}
-        },
     "Device Information": {
-      "Synonyms":["Log Data","App data"],
         "IP Address": {},
-        "Identifier": {
-          "Synonyms":["User IDs"],
-          "Device ID": {
-            "Synonyms":["device identifier"]
-          },
-          "Advertisement ID": {
-            "Synonyms":["Advertisement identifier", "ad identifiers"]
-
-          },
+        "Device ID": {},
+        "Advertisement ID": {},
         "Browser": {},
-        "Operating System": {
-          "Synonyms":["OS"]
-        },
-        "Device Settings": {},
-        "Make": {},
-        "Model": {},
-        "Network Information (Mobile Network)": {},
-        "Wi-Fi Access": {},
+        "Operating System": {},
         "Diagnostics": {},
         "Sensor Data": {},
         "Audio": {},
         "Browsing history": {}
-        }
-    }},
-    "Tracking": {
-        "Cookies": {
-          "Patterns": ["Protection-against-tracking"]
-        },
-        "Web Beacons/Pixels": {},
-        "Tags": {}
-    },
-    "Account Information": {
-      "Patterns":["Who’s Listening", "Unusual-activities"],
-      "Synonyms":["account credentials"],
-        "User id": {},
-        "Username": {},
-        "Password": {
-          "Patterns":["Informed Secure Passwords"]
-        },
-        "Files": {},
-        "Account Balance": {},
-        "Messages": {},
-        "Friends": {}
-    }},
-  "Purpose": {
-    "Contact": {
-      "Synonyms": ["Support", "Messaged"],
-        "Receive": {},
-        "Send": {},
-        "Communicate": {}
-    },
-    "Analytics": {
-      "Synonyms": ["analyze"],
-       "Data Analysis": {},
-       "User Similarity": {},
-       "Statistical Analysis": {},
-        "User Habits":{
-          "Synonyms":["usage trends"]
-        },
-        "Internal Analysis":{},
-        "Marketing Effectiveness":{},
-        "System Analysis":{}
-    },
-      
-    "Customization": {
-          "Synonyms": ["personalization"],
-          "Customer Profile": {},
-          "Memorization": {}
-        },
-    "Advertisement": {
-      "Synonyms": ["marketing","advertising"],
-      "Tailored Ads":{},
-      "Targeted Ads":{}
-    },
-    "Security": {
-        "System Protection": {
-          "Authenticate": {},
-          "Identify": {},
-          "Crash": {}
-        },
-        "User Protection": {
-          "Blocking Spam": {},
-          "Blocking Abusive Messages": {},
-          "Fraud Prevention": {}
-        }
-    },
-    "Tracking": {
-        "Site Visits Internal": {},
-        "Site Visits External": {}
-    },
-    "Functionality": {
-      "Synonyms": ["Provide","Optimize","Enable","Operate","Maintain"],
-        "Business Purpose": {},
-        "Commercial Purpose": {},
-        "Access": {},
-        "Payments": {},
-        "Provide Service": {
-          "Synonyms":["Enable/Disable Functions"]
-        },
-        "Data Storage": {},
-        "Provide Support": {},
-        "Order Fulfillment": {
-          "Synonyms":["process order"]
-        },
-        "Support": {},
-        "Promotions": {}
+      }},
+      "Tracking": {
+          "Cookies": {},
+          "Web Beacons": {},
+          "Tags": {}
       },
-      "Accounts": {
-          "Account Management": {
-            "Patterns":["Informed Secure Passwords","Psuedonymous Identity"],
-            "Log in" : {},
-            "Log out" : {},
-            "Account Open": {},
-            "Account Close": {},
-            "Account Update": {}
+      "Account Information": {
+          "User id": {},
+          "Username": {},
+          "Password": {},
+          "Account Balance": {},
+          "Messages": {},
+          "Friends": {}
+      }},
+    "Purpose": {
+      "Contact": { "Description" : ["The application and its team is contacting the user"],
+          "Receive": {},
+          "Send": {},
+          "Communicate": {}
+      },
+      "Analytics": { "Description" : ["Data is being used for analysis"],
+         "Statistical Analysis": {},
+         "User Habits":{},
+         "Internal Analysis":{},
+         "Marketing Effectiveness":{}
+      },
+      "Customization": { "Description" : ["Data is being used to customize the experience of the application"] },
+      "Advertisement": { "Description" : ["Data is being used to deliver advertisement"],
+        "Personalized Ads":{}
+       },
+      "Security": { "Description" : ["Data is being used for security purposes"],
+          "Authenticate": {},
+          "User Protection": {
+            "Blocking Spam": {},
+            "Blocking Abusive Messages": {},
+            "Fraud Prevention": {}
+      }},
+      "Tracking": { "Description" : ["Data is being used to track the user's activity internally or cross-site"] },
+      "Functionality": { "Description" : ["Data is required for functions of the application"],
+          "Business Purpose": {},
+          "Access": {},
+          "Payments": {},
+          "Data Storage": {},
+          "Order Fulfillment": {}
         },
-          "Personal Analytics" : {
-            "Financial analysis" : {},
-            "Health analysis" : {}
-          }
-        },
-    "Requirements": {
-      "Synonyms": ["Compliance"],
-        "legal compliance": {},
-        "Policy Compliance": {},
-        "Third-Party Compliance": {},
-        "Business Compliance": {
-          "Evaluation": {},
-          "Sale": {},
-          "Accounting": {}
+        "Accounts": { "Description" : ["Data is being used for account services"],
+            "Account Management": {},
+            "Personal Analytics" : {
+              "Financial analysis" : {},
+              "Health analysis" : {}
+            }
+          },
+      "Requirements": { "Description" : ["The application is required or obligated to handle this data"],
+          "legal compliance": {},
+          "Policy Compliance": {},
+          "Third-Party Compliance": {},
+          "Business Compliance": {}
       }
-    },
-    "Save": {
-        "Store": {},
-        "Order Progress": {}
-    },
-    "Identification": {
-      "Synonyms": ["Identify","authenticate"],
-        "Verified Feedback": {}
-    }
-  }
+}}
   
-}
