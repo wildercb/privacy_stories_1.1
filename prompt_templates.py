@@ -75,8 +75,8 @@ def create_annotation_prompt(
     processed_file: Dict, target_text: str, ontology: Dict[str, Union[List[str], Dict]]
 ) -> str:
     prompt = (
-        "You are a privacy expert annotator tasked with annotating text files with metadata about privacy behaviors and stories. "
-        "For the given text, annotate the following: "
+        "Your mission is to annotate software documentation with privacy behaviors in the form of actions, data types and purposes to build privacy requirements in the form of privacy stories. "
+        "For the given text, provide the following: "
         "1. <Actions>: Actions performed or expected in the text. "
         "2. <Data Types>: Types of data referenced in the text. Data types may include specific subcategories. "
         "3. <Purposes>: Intentions or purposes related to the actions and data types. "
