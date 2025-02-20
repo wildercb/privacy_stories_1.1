@@ -1,10 +1,18 @@
 import os
+import sys
 import re
 import json
 from typing import Dict, List, Union
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
-from prompt_templates  import load_privacy_ontology, create_annotation_prompt, count_tokens 
+
+notebook_dir = os.path.abspath(".")
+project_root = os.path.abspath(os.path.join(notebook_dir, ".."))
+if project_root not in sys.path:
+    sys.path.insert(0, project_root)
+
+# Now we can import from the prompt_templates package
+from prompt_templates import load_privacy_ontology, create_annotation_prompt, count_tokens
 
 def clean_text(text: str) -> str:
     """Removes annotations (A:, DT:, P:, S:) and unwanted tags."""
@@ -49,9 +57,9 @@ def build_annotations_data(annotations_dir: str) -> Dict:
                 print(f"Error processing annotation file {file_path}: {e}")
     return annotations_data
 
-def create_prompts_data_json(annotations_dir: str = 'data/annotations', 
-                               ontology_path: str = 'privacy_ontology.json', 
-                               output_json: str = 'data/annotations/prompts_data.json') -> Dict:
+def create_prompts_data_json(annotations_dir: str = '../data/annotations', 
+                               ontology_path: str = '../privacy_ontology.json', 
+                               output_json: str = '../data/annotations/prompts_data.json') -> Dict:
     """
     Processes the annotations directory and creates a single JSON file containing, for each
     annotation file:

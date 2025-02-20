@@ -94,6 +94,70 @@ def run_multi_file_annotations(
         import traceback
         traceback.print_exc()
 
+# Function to generate prompts from model_routing CSV file and send to a single model
+def llm_llm_eval(csv_file_path: str, model: str, num_runs: int = 1, temperature: float = 0.7, max_tokens: int = 50):
+    """Reads a CSV file, generates judge prompts, sends them to a single model, and saves responses to a new CSV file."""
+    
+    # Read CSV and generate prompts
+    with open(csv_file_path, mode='r', encoding='utf-8') as csvfile:
+        reader = csv.DictReader(csvfile)
+        input_rows = list(reader)
+        fieldnames = reader.fieldnames + ['AI Preference']  # Add new column
+
+    prompts = []
+    for row in input_rows:
+        original_prompt = row.get('Prompt', '')
+        response_1 = row.get('Model Response 1', '')
+        response_2 = row.get('Model Response 2', '')
+
+        prompt = prompt_templates.create_judge_prompt(original_prompt, response_1, response_2)
+        prompts.append((row, prompt))  # Keep the original row paired with the prompt
+
+    # Initialize aisuite client
+    client = ai.Client()
+
+    # Prepare to store responses
+    updated_rows = []
+
+    # Iterate over the prompts and get responses from the model
+    for row, prompt in prompts:
+        ai_preference = None
+
+        # Run the prompt multiple times
+        for _ in range(num_runs):
+            try:
+                # Prepare the message for the model
+                messages = [{"role": "system", "content": prompt}]
+                
+                # Send the prompt to the model via aisuite
+                response = client.chat.completions.create(
+                    model=model,
+                    messages=messages,
+                    temperature=temperature,
+                    max_tokens=max_tokens
+                )
+
+                # Extract the response and use it as the AI preference
+                ai_preference = response.choices[0].message.content.strip()
+                print(f"AI Preference: {ai_preference}")
+                break  # Exit loop on successful response
+            except Exception as e:
+                print(f"Error with model {model}: {e}")
+                ai_preference = f"ERROR: {str(e)}"
+
+        # Update the row with the AI Preference
+        row['AI Preference'] = ai_preference
+        updated_rows.append(row)
+
+    # Save the updated rows to a new CSV file
+    output_file_path = os.path.splitext(csv_file_path)[0] + f'_with_ai_preference_{model}'
+    with open(output_file_path, mode='w', encoding='utf-8', newline='') as outputfile:
+        writer = csv.DictWriter(outputfile, fieldnames=fieldnames)
+        writer.writeheader()
+        writer.writerows(updated_rows)
+
+    print(f"Processed file saved to {output_file_path}")
+
 def run_hf_prompts(
     models: List[str], 
     prompts: Union[str, List[str]], 
